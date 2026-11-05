@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://ciy0uaygbkns3"]
+
+[ext_resource type="Script" path="res://Scripts/Player/PlayerMovement.cs" id="1_movement"]
+[ext_resource type="PackedScene" uid="uid://8mty0la5evqd" path="res://Assets/Models_Exported/character_25d.glb" id="2_model"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerAnimation.cs" id="3_anim"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("VisualNode")]
+script = ExtResource("1_movement")
+VisualNode = NodePath("CharacterModel")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CharacterModel" parent="." instance=ExtResource("2_model")]
+
+[node name="PlayerAnimation" type="Node" parent="." node_paths=PackedStringArray("TargetCharacter")]
+script = ExtResource("3_anim")
+TargetCharacter = NodePath("..")
