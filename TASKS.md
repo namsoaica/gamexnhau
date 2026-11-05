@@ -15,6 +15,10 @@
 - [x] **[AI - producer]** Thiết lập tài liệu `README.md` chuyên nghiệp tại thư mục gốc và tạo hardlink đồng bộ sang dự án Godot.
 - [x] **[AI - producer]** Xây dựng tài liệu `docs/CONTRIBUTING.md` hướng dẫn quy trình cộng tác, branching strategy, PR template và giải quyết xung đột Scene Godot.
 - [x] **[AI - producer]** Nâng cấp mục 4 "Quy Trình Cộng Tác Nhóm" trong `README.md`: Hướng dẫn phân quyền cho Trưởng nhóm (Collaborators, bảo vệ nhánh `main`), quy trình thực hành 7 bước kèm khối lệnh bash cho thành viên, và sơ đồ Mermaid trực quan.
+- [x] **[HUMAN - AiichaN]** Đóng góp hệ thống tương tác NPC (`IInteractable`, `InteractableArea`, `SimpleNpc`), chống rơi vực (`VoidKillZone`), bộ dò tương tác (`PlayerInteractor`), Coyote Time, Jump Buffer, Anti-moonwalk, Procedural Animation, kịch bản test `test_suite.gd`.
+- [x] **[AI - code-reviewer]** Rà soát chất lượng mã nguồn nhánh `origin/dev`: phát hiện và sửa triệt để 3 nguy cơ rò rỉ bộ nhớ (memory leaks) trong `_ExitTree()`.
+- [x] **[AI - code-reviewer]** Sáp nhập (Merge) nhánh `origin/dev` vào `main`, giải quyết xung đột `WorldMap.tscn`, `.gitignore`, `PlayerAnimation.cs`, bảo tồn trọn vẹn mở rộng `Map_Surroundings`.
+- [x] **[AI - code-reviewer]** Chạy kiểm thử tự động Godot Headless `test_suite.gd` (32/32 tests Pass) và biên dịch `dotnet build` đạt 0 Warning 0 Error.
 
 ---
 

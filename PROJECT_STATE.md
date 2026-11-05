@@ -19,16 +19,22 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, nhảy, xoay mặt theo góc nhìn Camera Isometric. |
-| `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`) theo trạng thái sàn và vận tốc của Player. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, chống moonwalk, dịch chuyển tức thời `TeleportTo`. |
+| `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip. |
+| `Scripts/Player/PlayerInteractor.cs` | `uid://cwt2g2l1041b` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
+| `Scripts/Core/IInteractable.cs` | `uid://cb38i1wmsj35b` | Interface chuẩn định nghĩa thực thể tương tác (`PromptText`, `CanInteract()`, `Interact()`, `OnFocusGained()`, `OnFocusLost()`). |
+| `Scripts/Core/InteractableArea.cs` | `uid://b45c22501e5v` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
+| `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
+| `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà và tự động `LookAt` vào Player chuẩn góc Isometric. |
 | `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` cho các mesh địa hình (`Terrain`, `Staircase`, `Path`, `Paver`), chướng ngại vật (`Rock`, `Fence`) và ranh giới núi (`Mountain`, `Cliff`). |
 
 ### B. Scenes (`Scenes/`)
 | File Scene | UID | Cấu Trúc Node Chính |
 | :--- | :--- | :--- |
-| `Scenes/Characters/Player.tscn` | `uid://ciy0uaygbkns3` | `CharacterBody3D` (PlayerMovement) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `CharacterModel` (`character_25d.glb`) -> `PlayerAnimation`. |
-| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | `WorldMap` (Node3D) -> `WorldEnvironment` (Sky hoạt hình) -> `DirectionalLight3D` (Mặt trời) -> `MapAutoCollision` -> `Map_25D` (`map_25d.glb`) -> `Map_Surroundings` (`map_surroundings.glb`) -> `Player` -> `IsometricCamera` (CameraFollow). |
+| `Scenes/Characters/Player.tscn` | `uid://ciy0uaygbkns3` | `CharacterBody3D` (PlayerMovement) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `CharacterModel` (`character_25d.glb`) -> `PlayerAnimation` -> `PlayerInteractor` (Area3D). |
+| `Scenes/Characters/NPC.tscn` | (PackedScene) | `Node3D` (SimpleNpc) -> `CharacterModel` (`character_25d.glb`) -> `InteractableArea` (Area3D). |
+| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | `WorldMap` (Node3D) -> `WorldEnvironment` -> `DirectionalLight3D` -> `MapAutoCollision` -> `Map_25D` (`map_25d.glb`) -> `Map_Surroundings` (`map_surroundings.glb`) -> `Player` -> `IsometricCamera` (CameraFollow) -> `NPC` -> `VoidKillZone` (Area3D). |
 | `Scenes/Levels/TestLevel.tscn` | `uid://c66126flaj42w` | Level kiểm thử mặt sàn phẳng ban đầu. |
 
 ### C. 3D Models & Assets
@@ -39,9 +45,16 @@
 
 ---
 
-## 3. Hệ Thống Điều Khiển (Input Controls)
-- **Di chuyển**: Phím `W / A / S / D` hoặc phím mũi tên `↑ / ← / ↓ / →` (được tính toán di chuyển tương đối theo góc nhìn màn hình Camera Isometric).
-- **Nhảy**: Phím `Space`.
+## 3. Hệ Thống Điều Khiển & Physics Layers (Input & Layers)
+- **Di chuyển**: Phím `W / A / S / D` hoặc phím mũi tên `↑ / ← / ↓ / →` (chuẩn hóa `Input.GetVector`, tính toán tương đối theo góc nhìn Camera Isometric).
+- **Nhảy**: Phím `Space` (có hỗ trợ Coyote Time 0.15s và Jump Buffer 0.15s).
+- **Tương tác**: Phím `E` (Action name `"interact"`).
+- **3D Physics Layers**:
+  - Layer 1: `World` (Mặt sàn, địa hình, vật cản tĩnh)
+  - Layer 2: `Player` (Nhân vật người chơi)
+  - Layer 3: `NPC` (Nhân vật NPC)
+  - Layer 4: `Interactable` (Vùng tương tác)
+  - Layer 5: `Hazard/KillZone` (Vực thẳm, bẫy nguy hiểm)
 
 ---
 
@@ -68,54 +81,35 @@
    - `checkpoint_and_reset.py`: Tự động hóa việc đóng gói trạng thái và dọn dẹp ngữ cảnh.
 3. **Đồng bộ hóa Không gian làm việc (Workspace Orchestration)**:
    - Đồng bộ liên kết `AGENTS.md`, `GEMINI.md`, `.agents/`, `docs/`, `PROJECT_STATE.md`, `TASKS.md`, `CODING_STANDARDS.md` tại cả `C:\xnhaugame` và thư mục dự án con `dự-án-trò-chơi-mới`.
-   - Luồng chat chính đóng vai trò Orchestrator: tự động nạp trạng thái, phân tích nhiệm vụ, ủy thác cho Sub-agent/Workflow tương ứng và xác nhận lưu trạng thái vào `PROJECT_STATE.md` sau mỗi lượt.
 
 ### [2026-11-06] - Mở Rộng Thế Giới Xung Quanh (Surrounding Environment 2.5D)
 1. **Thiết kế & Xuất Mô Hình Blender (`map_surroundings.glb`)**:
-   - Chạy script Python (`generate_surroundings.py`) ngầm với Blender 5.4 CLI, tuyệt đối không ghi đè file nguồn `map_25d.blend`.
-   - Tạo file nguồn Blender mới `Assets/Blender_Source/map_surroundings.blend` và xuất `Assets/Models_Exported/map_surroundings.glb` chuẩn tọa độ Godot (-Z forward, Y up).
-   - Quy mô mở rộng thế giới 84m x 84m:
-     + Cánh đồng cỏ bát ngát `Terrain_Plains_Mesh` khoét lỗ khít khao tại cao độ Z=0 với mép đảo trung tâm, tích hợp chân đế skirt chống hở đáy.
-     + 4 Dãy núi low-poly hùng vĩ bao quanh 4 viền ngoài (`Mountain_Mesh_North`, `Mountain_Mesh_South`, `Mountain_Mesh_West`, `Mountain_Mesh_East`) cao 8-15m làm ranh giới tự nhiên bao trọn bản đồ.
-     + 45 Khối đá tảng `Rock_Mesh_*` rải rác tạo điểm nhấn phong cảnh.
-     + 70 Cây cối stylized (`Tree_Mesh_Pine_*`, `Tree_Mesh_Deciduous_*`) và 90 cụm hoa cúc, thảm cỏ (`Grass_Clump_Mesh_*`, `Daisy_Mesh_*`).
-     + Đồng bộ 100% bảng màu và vật liệu với map gốc: `Mat_Grass`, `Mat_Stone`, `Mat_Mountain_Purple`, `Mat_Mountain_Dark`.
+   - Chạy script Python (`generate_surroundings.py`) ngầm với Blender 5.4 CLI, tạo `Assets/Blender_Source/map_surroundings.blend` và xuất `Assets/Models_Exported/map_surroundings.glb`.
+   - Cánh đồng 84m x 84m, 4 dãy núi bao quanh cao 8-15m, 45 tảng đá, 70 cây, 90 cụm hoa cỏ.
 2. **Nâng Cấp Vật Lý Va Chạm (`MapAutoCollision.cs`)**:
-   - Cập nhật hàm `IsWalkableSurface` nhận diện thêm `rock`, `mountain`, `cliff`.
-   - Tự động sinh `Trimesh Collision` (ConcavePolygonShape3D) cho cánh đồng phẳng và các vật cản núi/đá để Player không rơi khỏi map và không đi xuyên vật thể.
-   - Tuân thủ 100% `CODING_STANDARDS.md` (hàm < 25 dòng, file < 200 dòng, build 0 lỗi 0 cảnh báo).
+   - Tự động sinh `Trimesh Collision` cho núi đá và cánh đồng.
 3. **Tích hợp Scene `WorldMap.tscn`**:
    - Thêm Instance `Map_Surroundings` (`map_surroundings.glb`, UID `uid://sdy3ykn64aus`).
-   - Kiểm thử thực tế trong Godot Engine: toàn bộ mesh địa hình, đá tảng và dãy núi đều được tự động sinh va chạm vật lý hoàn chỉnh.
-
-### [2026-11-06] - Đánh Giá & Kiểm Định Chất Lượng Toàn Diện (QA Review)
-1. **Kiểm tra Chuẩn Code (Clean Code & Coding Standards)**:
-   - Toàn bộ 4 file C# trong `Scripts/` đều tuân thủ tuyệt đối quy định:
-     + `CameraFollow.cs`: 40 dòng (< 200 dòng), hàm dài nhất 11 dòng (< 25 dòng).
-     + `MapAutoCollision.cs`: 82 dòng (< 200 dòng), hàm dài nhất 14 dòng (< 25 dòng).
-     + `PlayerAnimation.cs`: 96 dòng (< 200 dòng), hàm dài nhất 19 dòng (< 25 dòng).
-     + `PlayerMovement.cs`: 167 dòng (< 200 dòng), hàm dài nhất 18 dòng (< 25 dòng).
-   - Kiểm tra lồng ghép: 100% không vượt quá 2 cấp độ lồng, áp dụng triệt để Guard Clauses.
-   - Bổ sung và đồng bộ 100% chú thích XML `/// <summary>` bằng tiếng Việt cho toàn bộ các hàm vòng đời Godot (`_Ready`, `_PhysicsProcess`, `_Process`).
-2. **Kiểm tra An toàn Bộ nhớ & Vòng đời**:
-   - Rà soát toàn bộ các sự kiện `+=`, không phát hiện listener treo hoặc rò rỉ bộ nhớ sự kiện C#.
-3. **Kiểm tra Tính toàn vẹn Tài nguyên & Build**:
-   - Khớp 100% các mã định danh UID giữa các Scene (`Player.tscn`, `WorldMap.tscn`, `TestLevel.tscn`) và các tài nguyên mô hình 3D/Scripts.
-   - Chạy lệnh `dotnet build`: Đạt 0 Warning(s), 0 Error(s).
 
 ### [2026-11-06] - Chuẩn Hóa Hạ Tầng Cộng Tác Nhóm & Tài Liệu (Multi-developer Setup)
-1. **Chuẩn hóa Git & Môi trường Đa Lập Trình Viên**:
-   - **Cập nhật `.gitignore`**: Bỏ qua toàn bộ cache Godot (`.godot/`, `.mono/`), bản build xuất ra (`build/`, `*.pck`, `*.apk`), artifact C# (`bin/`, `obj/`, `*.suo`, `*.user`), thư mục IDE (`.vs/`, `.vscode/`, `.idea/`), file backup Blender (`*.blend1`, `*.blend2`, v.v.), và file rác hệ điều hành (`Thumbs.db`, `.DS_Store`).
-   - **Xóa & Untrack file thừa**: Xóa file lỗi font `1.gitinore.txt`, untrack và xóa các file backup `*.blend1` khỏi kho lưu trữ Git.
-   - **Cập nhật `.gitattributes`**: Chuẩn hóa `* text=auto eol=lf`, `*.cs text diff=csharp eol=crlf`, phân loại rõ file text diff Godot (`.tscn`, `.tres`, `.godot`) và đánh dấu nhị phân `binary` cho toàn bộ asset 3D/hình ảnh/âm thanh (`.blend`, `.glb`, `.png`, `.wav`).
-   - **Cập nhật `.editorconfig`**: Định dạng Allman Style cho C#, 4 spaces indent, quy chuẩn đặt tên biến `_camelCase` và giới hạn dùng `var`.
-2. **Xây dựng Tài liệu Hướng dẫn Chuyên Nghiệp**:
-   - **Tạo `README.md`**: Tổng quan kiến trúc game 2.5D Isometric, hướng dẫn cài đặt Quick Start (.NET 8 SDK, Godot Mono), quy trình Git phân nhánh (`main`, `develop`, `feature/*`), Conventional Commits, chiến lược chống xung đột Scene trong Godot, và giới thiệu hệ thống AI Orchestrator.
-   - **Nâng cấp mục 4 `README.md` (Quy Trình Cộng Tác Nhóm)**: Bổ sung liên kết repository chính thức `https://github.com/namsoaica/gamexnhau`, hướng dẫn thiết lập phân quyền cho Repo Owner (thêm Collaborators, bật Branch Protection cho nhánh `main`), quy trình 7 bước thực hành chuẩn cho thành viên với đầy đủ khối lệnh bash copy-paste, và sơ đồ Mermaid trực quan luồng phối hợp nhóm.
-   - **Tạo `docs/CONTRIBUTING.md`**: Hướng dẫn chi tiết từng bước cho thành viên mới, checklist kiểm thử trước khi commit, quy chuẩn đóng góp 3D/Audio, và mẫu Pull Request Template.
-   - **Đồng bộ liên kết**: Tạo hardlink đồng bộ `README.md`, `.gitignore`, `.gitattributes`, `.editorconfig` giữa thư mục gốc và thư mục dự án Godot.
-3. **Xác thực Hệ Thống**:
-   - Kiểm tra biên dịch `dotnet build`: Đạt 0 Warning(s), 0 Error(s).
+1. **Chuẩn hóa Git & Môi trường**: Cập nhật `.gitignore`, `.gitattributes`, `.editorconfig` (Allman style, LF/CRLF, binary 3D). Xóa file thừa `1.gitinore.txt` và untrack `*.blend1`.
+2. **Xây dựng Tài liệu Hướng dẫn**: Tạo `README.md`, `docs/CONTRIBUTING.md`, bổ sung mục 4 Quy trình Cộng tác nhóm với lệnh bash và sơ đồ Mermaid.
 
-
-
+### [2026-11-06] - Rà Soát Mã Nguồn & Sáp Nhập Nhánh `origin/dev` (AiichaN - Thành viên Hùng)
+1. **Đánh Giá Chất Lượng Mã Nguồn (Code Review) Nhánh `dev`**:
+   - `IInteractable.cs`: 35 dòng, chuẩn Single Responsibility, XML comment tiếng Việt đầy đủ. Đạt xuất sắc.
+   - `InteractableArea.cs`: 96 dòng, tự động tạo collision shape, ủy quyền tương tác cho cha. Đạt xuất sắc.
+   - `SimpleNpc.cs`: 171 dòng, hiển thị lời thoại billboard 3D, hẹn giờ tự ẩn sau 4 giây. **Đã phát hiện & refactor chống rò rỉ bộ nhớ**: hủy delegate `_hideTimer.Timeout` trước khi tạo timer mới và trong `_ExitTree`.
+   - `VoidKillZone.cs`: 129 dòng, bảo vệ Player rơi vực, tự động ghi nhớ điểm hồi sinh ban đầu và `TeleportTo`. **Đã phát hiện & refactor chống rò rỉ bộ nhớ**: bổ sung `_ExitTree()` hủy sự kiện `BodyEntered -= OnBodyEntered`.
+   - `PlayerInteractor.cs`: 185 dòng, quét mục tiêu tương tác gần nhất trong bán kính `ScanRadius`, phát signal UI. **Đã phát hiện & refactor chống rò rỉ bộ nhớ**: bổ sung `_ExitTree()` hủy sự kiện `AreaEntered` và `AreaExited`.
+   - `PlayerMovement.cs`: 189 dòng, nâng cấp Coyote Time (0.15s), Jump Buffer (0.15s), `Input.GetVector` isometric chuẩn hóa, `TeleportTo`, xoay mặt nhân vật chống moonwalk. 100% hàm < 20 dòng (< 25 dòng). Đạt xuất sắc.
+   - `PlayerAnimation.cs`: 194 dòng (< 200 dòng), tự nhận diện animation clip, tự fallback procedural lean/bobbing. Đạt chuẩn.
+2. **Sáp Nhập (Merge) & Giải Quyết Xung Đột (Conflict Resolution)**:
+   - Sáp nhập thành công commit `08bcde2` vào nhánh `main` (commit `e324f53`).
+   - Xung đột `.gitignore`: Giữ toàn bộ quy chuẩn nghiêm ngặt của `main` và bổ sung rule `test_rot.gd`.
+   - Xung đột `WorldMap.tscn`: Giữ trọn vẹn Instance mở rộng `Map_Surroundings` đồng thời tích hợp thêm `NPC` và `VoidKillZone`.
+   - Xung đột `PlayerAnimation.cs`: Hợp nhất định nghĩa `_Process(double delta) => UpdateAnimation((float)delta)` ngắn gọn, sạch sẽ.
+   - `nuget.config`: Khôi phục đường dẫn gói GodotPackages cục bộ chuẩn môi trường máy.
+3. **Xác Thực Hệ Thống & Kiểm Thử Tự Động**:
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+   - Chạy kịch bản kiểm thử Godot Headless `test_suite.gd`: **Passed: 32 / Failed: 0** (100% Pass).
