@@ -45,7 +45,7 @@ public partial class MapAutoCollision : Node
 	/// </summary>
 	private void CreateCollisionIfMissing(MeshInstance3D meshInstance)
 	{
-		if (HasStaticBodyChild(meshInstance))
+		if (meshInstance.Mesh == null || HasStaticBodyChild(meshInstance))
 		{
 			return;
 		}

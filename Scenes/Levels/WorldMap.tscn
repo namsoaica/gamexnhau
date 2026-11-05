@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bu1mkq5a5sqce"]
+
+[ext_resource type="Script" uid="uid://7j1cd1f4exa7" path="res://Scripts/Core/MapAutoCollision.cs" id="1_autocol"]
+[ext_resource type="PackedScene" uid="uid://ci1e6hoc2uacw" path="res://Assets/Models_Exported/map_25d.glb" id="2_mapglb"]
+[ext_resource type="PackedScene" uid="uid://ciy0uaygbkns3" path="res://Scenes/Characters/Player.tscn" id="3_player"]
+[ext_resource type="Script" uid="uid://c7kqoh0ntwdus" path="res://Scripts/Core/CameraFollow.cs" id="4_cam"]
+
+[sub_resource type="Environment" id="Environment_vibrant"]
+background_mode = 1
+background_color = Color(0.72, 0.84, 0.96, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.85, 0.88, 0.95, 1)
+ambient_light_energy = 0.8
+
+[node name="WorldMap" type="Node3D" unique_id=1742541137]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=622661758]
+environment = SubResource("Environment_vibrant")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=162072595]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 25, 10)
+light_color = Color(1, 0.98, 0.92, 1)
+light_energy = 1.6
+shadow_enabled = true
+
+[node name="MapAutoCollision" type="Node" parent="." unique_id=1559068524]
+script = ExtResource("1_autocol")
+
+[node name="Map_25D" parent="." unique_id=2032450463 instance=ExtResource("2_mapglb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015144348, 0.0102472305, -0.0016038418)
+
+[node name="Player" parent="." unique_id=2044242254 instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, -6)
+
+[node name="IsometricCamera" type="Camera3D" parent="." unique_id=86864845 node_paths=PackedStringArray("Target")]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, -22, 24.35, 22)
+projection = 1
+current = true
+size = 17.5
+script = ExtResource("4_cam")
+Target = NodePath("../Player")

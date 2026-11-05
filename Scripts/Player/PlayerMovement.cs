@@ -33,20 +33,17 @@ public partial class PlayerMovement : CharacterBody3D
 		FloorSnapLength = 0.35f;
 		FloorConstantSpeed = true;
 		FloorMaxAngle = Mathf.DegToRad(50.0f);
-
 		VisualNode ??= (Node3D?)FindChild("Character_Armature") ?? (Node3D?)FindChild("CharacterModel");
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;
-
 		ApplyGravity(dt);
 		ReadInputDirection();
 		HandleJump();
 		ApplyMovement(dt);
 		ApplyRotation(dt);
-
 		MoveAndSlide();
 	}
 
@@ -67,7 +64,6 @@ public partial class PlayerMovement : CharacterBody3D
 	private void ApplyGravity(float delta)
 	{
 		if (IsOnFloor()) return;
-
 		Vector3 currentVelocity = Velocity;
 		currentVelocity.Y -= Gravity * delta;
 		Velocity = currentVelocity;
@@ -78,15 +74,15 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private void ReadInputDirection()
 	{
-		float horizontal = 0.0f;
-		float vertical = 0.0f;
+		float h = 0.0f;
+		float v = 0.0f;
 
-		if (IsActionPressed("move_left", Key.A, Key.Left)) horizontal -= 1.0f;
-		if (IsActionPressed("move_right", Key.D, Key.Right)) horizontal += 1.0f;
-		if (IsActionPressed("move_forward", Key.W, Key.Up)) vertical -= 1.0f;
-		if (IsActionPressed("move_backward", Key.S, Key.Down)) vertical += 1.0f;
+		if (IsActionPressed("move_left", Key.A, Key.Left)) h -= 1.0f;
+		if (IsActionPressed("move_right", Key.D, Key.Right)) h += 1.0f;
+		if (IsActionPressed("move_forward", Key.W, Key.Up)) v -= 1.0f;
+		if (IsActionPressed("move_backward", Key.S, Key.Down)) v += 1.0f;
 
-		Vector2 rawInput = new Vector2(horizontal, vertical);
+		Vector2 rawInput = new Vector2(h, v);
 		_inputDirection = rawInput.LengthSquared() > 1.0f ? rawInput.Normalized() : rawInput;
 	}
 
@@ -96,14 +92,12 @@ public partial class PlayerMovement : CharacterBody3D
 	private void HandleJump()
 	{
 		if (!IsOnFloor()) return;
-
 		bool jumpPressed = IsActionPressed("jump", Key.Space, Key.Space);
 		if (!jumpPressed) return;
 
 		Vector3 currentVelocity = Velocity;
 		currentVelocity.Y = JumpVelocity;
 		Velocity = currentVelocity;
-
 		EmitSignal(SignalName.Jumped);
 	}
 
@@ -114,12 +108,10 @@ public partial class PlayerMovement : CharacterBody3D
 	{
 		Vector3 target = CalculateTargetVelocity();
 		Vector3 currentVelocity = Velocity;
-
 		float rate = _inputDirection.LengthSquared() > MinMoveThreshold ? Acceleration : Deceleration;
 
 		currentVelocity.X = Mathf.MoveToward(currentVelocity.X, target.X, rate * delta);
 		currentVelocity.Z = Mathf.MoveToward(currentVelocity.Z, target.Z, rate * delta);
-
 		Velocity = currentVelocity;
 	}
 
@@ -128,16 +120,10 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private Vector3 CalculateTargetVelocity()
 	{
-		if (IsSideScroller)
-		{
-			return new Vector3(_inputDirection.X * MoveSpeed, 0.0f, 0.0f);
-		}
+		if (IsSideScroller) return new Vector3(_inputDirection.X * MoveSpeed, 0.0f, 0.0f);
 
 		Camera3D? cam = ReferenceCamera ?? GetViewport()?.GetCamera3D();
-		if (cam == null)
-		{
-			return new Vector3(_inputDirection.X * MoveSpeed, 0.0f, _inputDirection.Y * MoveSpeed);
-		}
+		if (cam == null) return new Vector3(_inputDirection.X * MoveSpeed, 0.0f, _inputDirection.Y * MoveSpeed);
 
 		Vector3 camForward = -cam.GlobalTransform.Basis.Z;
 		camForward.Y = 0.0f;
@@ -146,7 +132,6 @@ public partial class PlayerMovement : CharacterBody3D
 		Vector3 camRight = cam.GlobalTransform.Basis.X;
 		camRight.Y = 0.0f;
 		camRight = camRight.Normalized();
-
 		Vector3 moveDir = (camRight * _inputDirection.X) - (camForward * _inputDirection.Y);
 		return moveDir * MoveSpeed;
 	}
@@ -157,13 +142,11 @@ public partial class PlayerMovement : CharacterBody3D
 	private void ApplyRotation(float delta)
 	{
 		Node3D? targetNode = VisualNode ?? this;
-
 		if (IsSideScroller)
 		{
 			RotateSideScroller(targetNode, delta);
 			return;
 		}
-
 		RotateIsometric(targetNode, delta);
 	}
 
@@ -173,7 +156,6 @@ public partial class PlayerMovement : CharacterBody3D
 	private void RotateSideScroller(Node3D node, float delta)
 	{
 		if (Mathf.Abs(_inputDirection.X) < MinMoveThreshold) return;
-
 		float targetAngle = _inputDirection.X > 0 ? Mathf.DegToRad(90.0f) : Mathf.DegToRad(-90.0f);
 		Vector3 currentRotation = node.Rotation;
 		currentRotation.Y = Mathf.LerpAngle(currentRotation.Y, targetAngle, RotationSpeed * delta);
@@ -199,11 +181,7 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private bool IsActionPressed(string actionName, Key key1, Key key2)
 	{
-		if (InputMap.HasAction(actionName) && Input.IsActionPressed(actionName))
-		{
-			return true;
-		}
-
+		if (InputMap.HasAction(actionName) && Input.IsActionPressed(actionName)) return true;
 		return Input.IsKeyPressed(key1) || Input.IsKeyPressed(key2);
 	}
 }
