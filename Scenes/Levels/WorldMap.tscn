@@ -9,12 +9,23 @@
 [ext_resource type="Script" uid="uid://dwpklcl7pp863" path="res://Scripts/Core/VoidKillZone.cs" id="6_void"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/DevOverlay.tscn" id="7_dev"]
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_world"]
+sky_top_color = Color(0.35, 0.62, 0.95, 1)
+sky_horizon_color = Color(0.7, 0.82, 0.95, 1)
+ground_bottom_color = Color(0.22, 0.38, 0.22, 1)
+ground_horizon_color = Color(0.55, 0.72, 0.6, 1)
+
+[sub_resource type="Sky" id="Sky_world"]
+sky_material = SubResource("ProceduralSkyMaterial_world")
+
 [sub_resource type="Environment" id="Environment_vibrant"]
-background_mode = 1
-background_color = Color(0.72, 0.84, 0.96, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.85, 0.88, 0.95, 1)
-ambient_light_energy = 0.8
+background_mode = 2
+sky = SubResource("Sky_world")
+ambient_light_source = 3
+ambient_light_energy = 0.45
+tonemap_mode = 3
+tonemap_exposure = 1.0
+ssao_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_void"]
 size = Vector3(400, 10, 400)
@@ -26,9 +37,13 @@ environment = SubResource("Environment_vibrant")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=162072595]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 25, 10)
-light_color = Color(1, 0.98, 0.92, 1)
-light_energy = 1.6
+light_color = Color(1, 0.97, 0.91, 1)
+light_energy = 1.15
 shadow_enabled = true
+shadow_bias = 0.04
+shadow_blur = 1.6
+directional_shadow_mode = 2
+directional_shadow_max_distance = 70.0
 
 [node name="MapAutoCollision" type="Node" parent="." unique_id=1559068524]
 script = ExtResource("1_autocol")

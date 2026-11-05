@@ -25,6 +25,8 @@
 - [x] **[AI - blender-helper]** Cải tạo mô hình 3D bản đồ: Gán vật liệu Mat_Grass kèm texture tex_grass_grid.png và UV phẳng cho SM_Tier2_Pavers, mở rộng mép tiếp giáp về Y=6.99m đóng kín khe hở bậc thềm 3.6cm, extrude độ dày 0.42m thành khối 3D đặc chống xuyên vật lý, xuất map_25d.glb và lưu an toàn map_25d_fixed.blend. (Test suite: 66/66 Pass).
 - [x] **[AI - csharp-coder]** Bổ sung tính năng Zoom Camera bằng con lăn chuột (`CameraFollow.cs`), đưa NPC xuống mặt đất và hoàn thiện hội thoại (`SimpleNpc.cs`, `WorldMap.tscn`).
 - [x] **[AI - csharp-coder]** Xây dựng Chế Độ Dev (Dev Mode / Debug Overlay HUD - `DevOverlay.cs`, `DevPlayerTab.cs`, `DevNpcTab.cs`): phím tắt `F1`/`~`/`F3`, tinh chỉnh `MoveSpeed`, `JumpVelocity`, `Gravity`, `InfiniteJump`, dịch chuyển tức thời `TeleportTo`, Live Dialogue Editor sửa câu thoại NPC trực tiếp khi chơi, slider zoom camera, hiển thị FPS & tọa độ Player theo thời gian thực. (Build 0 lỗi 0 cảnh báo, 66/66 test cases Pass).
+- [x] **[AI - csharp-coder]** Tái thiết ánh sáng môi trường (ACES Tonemap, ProceduralSky dịu mát, SSAO, bóng đổ PSSM) và xây dựng hệ thống dốc va chạm phẳng `StairRampBuilder` (`ConvexPolygonShape3D`) + `FloorMaxAngle >= 58°` giúp leo cầu thang trơn tru. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
+- [x] **[AI - blender-helper]** Khắc phục lỗi đất xung quanh trắng xóa: Gán vật liệu cỏ xanh `Mat_Grass_Plain` (#529934) kèm texture `tex_grass_grid.png` đóng gói và UV mapping planar projection `(x/4, y/4)` cho `Terrain_Plains_Mesh` trong `map_surroundings.blend`, xuất `map_surroundings.glb`; đo đạc chính xác AABB, bước bậc và độ dốc (51.11° & 57.12°) của 2 cầu thang `SM_Staircase_01` & `SM_Staircase_02` trong `map_25d_fixed.blend`. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
 
 ---
 

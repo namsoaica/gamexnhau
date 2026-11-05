@@ -121,3 +121,44 @@
   - 100% file < 200 dòng, mọi hàm < 20 dòng (< 25 dòng), an toàn bộ nhớ hủy sự kiện trong `_ExitTree()`.
   - `dotnet build`: **0 Warning(s), 0 Error(s)**.
 
+## Phiên làm việc: 2026-11-06 (Sáng - Sub-agent csharp-coder: Tái Thiết Ánh Sáng Môi Trường & Hệ Thống Dốc Cầu Thang)
+- **Cải tạo ánh sáng, bóng đổ và bầu trời (`WorldMap.tscn`)**:
+  - Khắc phục lỗi "1 màu trắng xóa" do ánh sáng chói lóa (ambient 0.8 + light 1.6 = 2.4, không có tonemap khiến màn hình clipping 100% white).
+  - Cấu hình lại `WorldEnvironment`: `background_mode = 2` (Sky), `Sky` với `ProceduralSkyMaterial` (bầu trời xanh dịu mát: sky_top Color(0.35, 0.62, 0.95), sky_horizon Color(0.70, 0.82, 0.95), ground_bottom Color(0.22, 0.38, 0.22), ground_horizon Color(0.55, 0.72, 0.60)).
+  - Bật ánh sáng môi trường dịu nhẹ `ambient_light_source = 3` (Sky), `ambient_light_energy = 0.45`.
+  - Bắt buộc kích hoạt Tonemap `tonemap_mode = 3` (ACES), `tonemap_exposure = 1.0` giúp khử hiện tượng cháy sáng, tăng độ tương phản và màu sắc tự nhiên.
+  - Bật `ssao_enabled = true` tạo bóng tiếp xúc chân thực dưới chân vách đá, cầu thang, cây cối.
+  - Cấu hình lại `DirectionalLight3D`: `light_color = Color(1.0, 0.97, 0.91)`, `light_energy = 1.15`, `shadow_enabled = true`, `shadow_bias = 0.04`, `shadow_blur = 1.6`, `directional_shadow_mode = 2` (PSSM 4 splits), `directional_shadow_max_distance = 70.0`.
+- **Khắc phục triệt để lỗi không leo được cầu thang (`SM_Staircase_01`, `SM_Staircase_02`)**:
+  - `PlayerMovement.cs`: Nâng `FloorMaxAngle` lên 58 độ (`Mathf.DegToRad(58.0f)`), tinh chỉnh `FloorSnapLength = 0.40f` khi ở trên sàn giúp bám chặt mặt dốc thang không bị nảy.
+  - Tạo mới `Scripts/Core/StairRampBuilder.cs`: Tự động phân tích hình học mesh cầu thang, tạo dốc va chạm phẳng `ConvexPolygonShape3D` dạng hình nêm lăng trụ (wedge) bao phủ từ chân thang lên đỉnh thang, mở rộng 5cm kết nối êm ái với sàn dưới và thềm trên.
+  - Nâng cấp `Scripts/Core/MapAutoCollision.cs`: Điều phối gọi `StairRampBuilder.BuildStairRamp` cho các mesh cầu thang, đồng thời tự động áp dụng vật liệu cỏ xanh `GetOrCreatePaverMaterial()` cho cả `Terrain_Plains_Mesh` (và các mesh chứa `plains`) loại bỏ hoàn toàn màu trắng xung quanh đảo.
+- **Kiểm định chất lượng**:
+  - Tuân thủ 100% `CODING_STANDARDS.md`: File < 200 dòng, mỗi hàm < 25 dòng, Guard Clauses, XML tiếng Việt, an toàn bộ nhớ trong `_ExitTree()`.
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+  - Godot Headless `test_suite.gd`: Bổ sung 3 test suites (`test_lighting_and_sky`, `test_staircase_ramp_collision`, `test_plains_recolor`), **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
+
+## Phiên làm việc: 2026-11-06 (Sáng - Sub-agent blender-helper: Đồng bộ Model Môi Trường Cỏ Xanh & Đo đạc Cầu Thang)
+- **Khắc phục lỗi đất xung quanh trắng xóa trong `map_surroundings.blend`**:
+  - Mở file `Assets/Blender_Source/map_surroundings.blend` bằng Blender 5.4 CLI.
+  - Mesh `Terrain_Plains_Mesh` được gán vật liệu cỏ xanh `Mat_Grass_Plain` với Base Color tươi mát `#529934` (Color(0.32, 0.60, 0.20, 1.0)), Roughness = 0.85.
+  - Tải và đóng gói (pack) trực tiếp texture `Assets/Blender_Source/tex_grass_grid.png` vào file blend, kết nối Image Texture `Color` -> Principled BSDF `Base Color`.
+  - Cập nhật UV mapping dạng planar projection chiếu đứng `(u, v) = (x/4, y/4)` cho toàn bộ 1,896 mặt của `Terrain_Plains_Mesh`, hoa văn cỏ phủ đều tuyệt đối trên diện tích 84m x 84m.
+  - Bảo tồn nguyên vẹn vị trí, xoay và vật liệu của toàn bộ 63 cây, 45 tảng đá, 36 hoa cúc và dãy núi phía Bắc `Mountain_Mesh_North`.
+  - Lưu an toàn file blend vào `Assets/Blender_Source/map_surroundings.blend`.
+  - Xuất mô hình sang `Assets/Models_Exported/map_surroundings.glb` chuẩn Godot (`export_yup=True`, `export_materials='EXPORT'`). Re-import tự động trích xuất texture vào Godot.
+- **Đo đạc hình học chi tiết Cầu Thang trong `map_25d_fixed.blend`**:
+  - `SM_Staircase_01`:
+    - Kích thước AABB: X=[3.9250, 5.0750] (Rộng 1.15m), Y=[3.1960, 4.0040] (Dài 0.808m), Z=[0.0000, 1.2500] (Cao 1.25m).
+    - Độ dốc (Rise/Run): 1.25 / 0.808 = 1.5470 -> Góc nghiêng: **57.12°**.
+    - Bước bậc: 5 bậc, mỗi bậc cao (Rise) = **0.2500m** (25cm), sâu (Tread run) = **0.1600m** (16cm), góc nghiêng từng bước = **57.38°**.
+  - `SM_Staircase_02`:
+    - Kích thước AABB: X=[5.1500, 6.2500] (Rộng 1.10m), Y=[5.9958, 7.0042] (Dài 1.0083m), Z=[1.2500, 2.5000] (Cao 1.25m).
+    - Độ dốc (Rise/Run): 1.25 / 1.0083 = 1.2397 -> Góc nghiêng: **51.11°**.
+    - Bước bậc: 6 bậc, mỗi bậc cao (Rise) = **0.2083m** (~20.8cm), sâu (Tread run) = **0.1667m** (~16.7cm), góc nghiêng từng bước = **51.34°**.
+  - Đã đối chiếu và xác nhận giải pháp collision ramp của `StairRampBuilder` (`ConvexPolygonShape3D`) kết hợp `FloorMaxAngle >= 58.0°` trong `PlayerMovement.cs` khớp hoàn hảo với thông số thực tế của mesh.
+- **Kiểm định tự động**:
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+  - Godot Headless `test_suite.gd`: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
+
+

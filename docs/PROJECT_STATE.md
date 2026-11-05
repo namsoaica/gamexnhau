@@ -19,7 +19,7 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, dịch chuyển tức thời `TeleportTo`. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, dịch chuyển tức thời `TeleportTo`. |
 | `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip. |
 | `Scripts/Player/PlayerInteractor.cs` | `uid://cwt2g2l1041b` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/IInteractable.cs` | `uid://cb38i1wmsj35b` | Interface chuẩn định nghĩa thực thể tương tác (`PromptText`, `CanInteract()`, `Interact()`, `OnFocusGained()`, `OnFocusLost()`). |
@@ -27,7 +27,8 @@
 | `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà, tự động `LookAt` vào Player chuẩn góc Isometric, hỗ trợ thu phóng con lăn chuột mượt mà (`MinZoomSize = 8`, `MaxZoomSize = 30`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` chống xuyên mép rìa bậc thềm cho các mesh địa hình (`Terrain`, `Staircase`, `Path`, `Paver`, `Rock`, `Mountain`), đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho nền gạch. |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho cả nền gạch và cánh đồng `plains`. |
+| `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
 | `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt phím `F1`/`~`/`F3`, mở khóa chuột, tự động tìm kiếm node, cập nhật FPS & tọa độ Player theo thời gian thực, điều khiển Zoom Camera, tải lại Scene. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
 | `Scripts/UI/DevNpcTab.cs` | (C# Script) | Tab Live Dialogue Editor: Hiển thị tên NPC, danh sách thoại trong `ItemList`, ô nhập `LineEdit`, nút thêm thoại mới, phát thoại ngay, xoay vòng thoại, xóa câu thoại. |
@@ -44,7 +45,7 @@
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
 - **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm).
-- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; chỉ giữ lại DUY NHẤT 1 dãy núi hùng vĩ phía Bắc `Mountain_Mesh_North` làm phông nền background xa, đã loại bỏ các dãy núi South, West, East che tầm nhìn Isometric; dọn sạch vật cản tiền cảnh).
+- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói `tex_grass_grid.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
 - **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
@@ -241,6 +242,62 @@
    - Tuân thủ 100% `CODING_STANDARDS.md`: `DevOverlay.cs` (178 dòng), `DevNpcTab.cs` (164 dòng), `DevPlayerTab.cs` (127 dòng), mọi hàm < 20 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt.
    - 100% sự kiện kết nối đều được hủy (`-=`) sạch sẽ trong `_ExitTree()`.
    - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Cải Tạo Toàn Diện Ánh Sáng Môi Trường, Tonemap, Bóng Đổ & Hệ Thống Dốc Cầu Thang Tự Động (Sub-agent csharp-coder)
+1. **Tái Thiết Hiệu Ứng Ánh Sáng, Bầu Trời & Tonemap (Lighting, Shadows & Environment)**:
+   - Khắc phục triệt để lỗi "1 màu trắng xóa" do quá sáng clipping (ambient 0.8 + light 1.6 = 2.4 không có tonemap):
+   - Cấu hình lại `WorldEnvironment` trong `WorldMap.tscn`:
+     * `background_mode = 2` (Sky).
+     * Tạo `Sky` với `ProceduralSkyMaterial`: `sky_top_color = Color(0.35, 0.62, 0.95)`, `sky_horizon_color = Color(0.70, 0.82, 0.95)`, `ground_bottom_color = Color(0.22, 0.38, 0.22)`, `ground_horizon_color = Color(0.55, 0.72, 0.60)`.
+     * `ambient_light_source = 3` (Sky), `ambient_light_energy = 0.45` (ánh sáng môi trường dịu nhẹ, cân bằng).
+     * Kích hoạt Tonemap chuẩn điện ảnh: `tonemap_mode = 3` (ACES), `tonemap_exposure = 1.0` giúp khử hoàn toàn cháy sáng trắng, màu sắc cảnh vật rực rỡ và có chiều sâu.
+     * Bật `ssao_enabled = true` (Screen Space Ambient Occlusion) tạo bóng tiếp xúc tự nhiên dưới chân cây cối, tảng đá và cầu thang.
+   - Cấu hình lại `DirectionalLight3D`:
+     * `light_color = Color(1.0, 0.97, 0.91)` (ánh nắng ấm áp tự nhiên).
+     * `light_energy = 1.15` (cường độ cân bằng, hài hòa).
+     * `shadow_enabled = true`, `shadow_bias = 0.04`, `shadow_blur = 1.6` (bóng đổ mềm mại).
+     * `directional_shadow_mode = 2` (PSSM 4 splits), `directional_shadow_max_distance = 70.0` (bóng đổ sắc nét toàn cảnh đảo).
+2. **Khắc Phục Lỗi Leo Cầu Thang (`SM_Staircase_01`, `SM_Staircase_02`)**:
+   - Phân tích nguyên nhân: Mặt đứng bậc thang 90° cản trở capsule (`FloorBlockOnWall = true`) và góc dốc của thang ~51°-57.1° vượt quá `FloorMaxAngle = 50°`.
+   - Nâng cấp `PlayerMovement.cs`:
+     * Tăng `DefaultMaxFloorAngle = 58.0f` (`Mathf.DegToRad(58.0f)`), cho phép leo dốc/thang lên tới 58 độ mà không bị trượt hay coi là tường.
+     * Tinh chỉnh `DefaultFloorSnap = 0.40f`, giữ chân nhân vật luôn bám dính mặt dốc mượt mà khi di chuyển.
+   - Tạo `Scripts/Core/StairRampBuilder.cs`:
+     * Tự động phân tích hình học đỉnh và xác định hướng leo dốc của mesh cầu thang (`stair`/`staircase`).
+     * Tạo mặt dốc va chạm phẳng dạng `ConvexPolygonShape3D` (lăng trụ tam giác / hình nêm wedge) trùm kín từ chân đến đỉnh bậc, mở rộng nhẹ 5cm để tiếp giáp trơn tru với sàn dưới và thềm trên.
+   - Nâng cấp `Scripts/Core/MapAutoCollision.cs`:
+     * Tích hợp `StairRampBuilder.BuildStairRamp` cho các mesh cầu thang thay vì sinh trimesh 90°.
+     * Mở rộng `ShouldRecolorToGrass` đồng bộ vật liệu cỏ xanh texture `tex_grass_grid.png` cho cả cánh đồng `Terrain_Plains_Mesh`, đảm bảo 100% không gian đất xung quanh có màu xanh cỏ tươi mát.
+3. **Kiểm Định Tự Động & Tiêu Chuẩn Clean Code**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: `PlayerMovement.cs` (183 dòng), `MapAutoCollision.cs` (179 dòng), `StairRampBuilder.cs` (137 dòng), mọi hàm < 25 dòng, Guard Clauses, XML tiếng Việt, an toàn bộ nhớ trong `_ExitTree()`.
+   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 91 bài test: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Khắc Phục Lỗi Trắng Xóa Bản Đồ Môi Trường & Đo Đạc Thông Số Cầu Thang (Sub-agent blender-helper)
+1. **Khắc Phục Lỗi Nền Đất Xung Quanh Trắng Xóa (`map_surroundings.blend`)**:
+   - Khảo sát nguyên nhân gốc rễ trong Blender 5.4: Mesh `Terrain_Plains_Mesh` dùng vật liệu `Mat_Grass` nhưng texture `Tex_Grass_Grid` chưa được pack vào file blend (`has_data: False`), và Base Color là màu xám trắng. Khi xuất GLB, glTF exporter không nhúng được ảnh nên gán màu trắng xóa.
+   - Nâng cấp mô hình trong `Assets/Blender_Source/map_surroundings.blend`:
+     * Tạo và gán vật liệu `Mat_Grass_Plain` với Base Color chuẩn xanh cỏ tươi `#529934` (Color(0.32, 0.60, 0.20, 1.0)), Roughness = 0.85.
+     * Tải và đóng gói (pack) trực tiếp texture cỏ `Assets/Blender_Source/tex_grass_grid.png` vào file blend.
+     * Liên kết Image Texture node -> Principled BSDF `Base Color` -> Material Output.
+     * Tái lập trình UV mapping cho toàn bộ 1,896 mặt đa giác theo planar projection chiếu đứng `(u, v) = (x/4, y/4)`, đảm bảo hoa văn ô cỏ phủ đều và sắc nét trên toàn bộ cánh đồng 84m x 84m.
+     * Bảo tồn nguyên vẹn 100% vị trí và vật liệu của 63 cây, 45 tảng đá, 36 hoa cúc và dãy núi phía Bắc `Mountain_Mesh_North`.
+     * Lưu file cập nhật an toàn vào `Assets/Blender_Source/map_surroundings.blend`.
+     * Xuất mô hình ra `Assets/Models_Exported/map_surroundings.glb` chuẩn Godot (`export_yup=True`, `export_materials='EXPORT'`).
+     * Re-import vào Godot Headless: Texture `map_surroundings_tex_grass_grid.png` được tự động trích xuất và liên kết hoàn hảo.
+2. **Khảo Sát & Đo Đạc Thông Số Hình Học Cầu Thang (`map_25d_fixed.blend`)**:
+   - `SM_Staircase_01`:
+     * AABB: X: [3.9250, 5.0750] (Rộng: 1.1500m), Y: [3.1960, 4.0040] (Dài/Run: 0.8080m), Z: [0.0000, 1.2500] (Cao/Rise: 1.2500m).
+     * Độ dốc tổng thể (Rise/Run): 1.2500 / 0.8080 = 1.5470 -> Góc nghiêng: **57.12°**.
+     * Cấu trúc: 5 bậc thang. Chiều cao mỗi bậc (Rise) = **0.2500m** (25cm), độ sâu mặt bậc (Tread run) = **0.1600m** (16cm). Góc nghiêng từng bậc = **57.38°**.
+   - `SM_Staircase_02`:
+     * AABB: X: [5.1500, 6.2500] (Rộng: 1.1000m), Y: [5.9958, 7.0042] (Dài/Run: 1.0083m), Z: [1.2500, 2.5000] (Cao/Rise: 1.2500m).
+     * Độ dốc tổng thể (Rise/Run): 1.2500 / 1.0083 = 1.2397 -> Góc nghiêng: **51.11°**.
+     * Cấu trúc: 6 bậc thang. Chiều cao mỗi bậc (Rise) = **0.2083m** (~20.8cm), độ sâu mặt bậc (Tread run) = **0.1667m** (~16.7cm). Góc nghiêng từng bậc = **51.34°**.
+   - Khuyến nghị vật lý cho `csharp-coder`: Do độ dốc cầu thang thực tế (51.11° và 57.12°) vượt quá góc leo dốc tối đa mặc định (45°), giải pháp kết hợp dốc va chạm lăng trụ phẳng `ConvexPolygonShape3D` của `StairRampBuilder` cùng cấu hình `FloorMaxAngle >= 58.0°` trong `PlayerMovement.cs` đảm bảo nhân vật đi lên mượt mà tuyệt đối.
+3. **Kiểm Định & Biên Dịch**:
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
 
 
 

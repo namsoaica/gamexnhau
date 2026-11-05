@@ -49,6 +49,9 @@ func run_suite():
 	test_camera_zoom()
 	test_npc_ground_position()
 	test_backface_collision()
+	test_lighting_and_sky()
+	test_staircase_ramp_collision()
+	test_plains_recolor()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -296,6 +299,68 @@ func test_backface_collision():
 					if sub_child.shape.backface_collision:
 						found_concave_backface = true
 	assert_true(found_concave_backface, "ConcavePolygonShape3D has BackfaceCollision enabled")
+
+func test_lighting_and_sky():
+	print("\n-- Testing Lighting, Shadows & Sky Environment --")
+	var world_env = test_map.find_child("WorldEnvironment") as WorldEnvironment
+	assert_true(world_env != null, "WorldEnvironment node exists in WorldMap")
+	var env = world_env.environment
+	assert_true(env != null, "Environment resource assigned")
+	assert_true(env.background_mode == Environment.BG_SKY, "Background mode is Sky (2)")
+	assert_true(env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY, "Ambient light source is Sky (3)")
+	assert_true(is_equal_approx(env.ambient_light_energy, 0.45), "Ambient light energy is 0.45")
+	assert_true(env.tonemap_mode == Environment.TONE_MAPPER_ACES, "Tonemap mode is ACES (3)")
+	assert_true(is_equal_approx(env.tonemap_exposure, 1.0), "Tonemap exposure is 1.0")
+	assert_true(env.ssao_enabled == true, "SSAO is enabled")
+
+	assert_true(env.sky != null, "Sky resource exists")
+	var sky_mat = env.sky.sky_material as ProceduralSkyMaterial
+	assert_true(sky_mat != null, "Sky material is ProceduralSkyMaterial")
+	assert_true(sky_mat.sky_top_color.is_equal_approx(Color(0.35, 0.62, 0.95)), "Sky top color is soft sky blue")
+
+	var light = test_map.find_child("DirectionalLight3D") as DirectionalLight3D
+	assert_true(light != null, "DirectionalLight3D node exists in WorldMap")
+	assert_true(is_equal_approx(light.light_energy, 1.15), "Light energy is 1.15")
+	assert_true(light.shadow_enabled == true, "Shadows enabled")
+	assert_true(is_equal_approx(light.shadow_bias, 0.04), "Shadow bias is 0.04")
+	assert_true(is_equal_approx(light.shadow_blur, 1.6), "Shadow blur is 1.6")
+	assert_true(light.directional_shadow_mode == DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS, "Directional shadow mode is PSSM 4 splits (2)")
+	assert_true(is_equal_approx(light.directional_shadow_max_distance, 70.0), "Directional shadow max distance is 70.0")
+
+func test_staircase_ramp_collision():
+	print("\n-- Testing Staircase Ramp Collision (Smooth Climbing) --")
+	var map_25d = test_map.find_child("Map_25D")
+	var stair1 = map_25d.find_child("SM_Staircase_01") as MeshInstance3D
+	var stair2 = map_25d.find_child("SM_Staircase_02") as MeshInstance3D
+	assert_true(stair1 != null and stair2 != null, "Both staircases exist in Map_25D")
+
+	var has_convex_ramp_1 = false
+	for child in stair1.get_children():
+		if child is StaticBody3D:
+			for col in child.get_children():
+				if col is CollisionShape3D and col.shape is ConvexPolygonShape3D:
+					has_convex_ramp_1 = true
+	assert_true(has_convex_ramp_1, "SM_Staircase_01 has ConvexPolygonShape3D ramp collision")
+
+	var has_convex_ramp_2 = false
+	for child in stair2.get_children():
+		if child is StaticBody3D:
+			for col in child.get_children():
+				if col is CollisionShape3D and col.shape is ConvexPolygonShape3D:
+					has_convex_ramp_2 = true
+	assert_true(has_convex_ramp_2, "SM_Staircase_02 has ConvexPolygonShape3D ramp collision")
+
+	var player = test_map.find_child("Player") as CharacterBody3D
+	assert_true(player != null, "Player exists")
+	print("Player FloorMaxAngle (deg): ", rad_to_deg(player.floor_max_angle))
+	assert_true(player.floor_max_angle >= deg_to_rad(57.5), "Player FloorMaxAngle >= 57.5 deg (supports 58 deg)")
+
+func test_plains_recolor():
+	print("\n-- Testing Terrain Plains Recolor To Grass --")
+	var map_surr = test_map.find_child("Map_Surroundings")
+	var plains = map_surr.find_child("Terrain_Plains_Mesh") as MeshInstance3D
+	assert_true(plains != null, "Terrain_Plains_Mesh exists")
+	assert_true(plains.material_override != null, "Terrain_Plains_Mesh has grass MaterialOverride applied (no white terrain)")
 
 
 

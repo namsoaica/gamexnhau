@@ -19,7 +19,7 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, dịch chuyển tức thời `TeleportTo`. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, dịch chuyển tức thời `TeleportTo`. |
 | `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip. |
 | `Scripts/Player/PlayerInteractor.cs` | `uid://cwt2g2l1041b` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/IInteractable.cs` | `uid://cb38i1wmsj35b` | Interface chuẩn định nghĩa thực thể tương tác (`PromptText`, `CanInteract()`, `Interact()`, `OnFocusGained()`, `OnFocusLost()`). |
@@ -27,7 +27,8 @@
 | `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà, tự động `LookAt` vào Player chuẩn góc Isometric, hỗ trợ thu phóng con lăn chuột mượt mà (`MinZoomSize = 8`, `MaxZoomSize = 30`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` chống xuyên mép rìa bậc thềm cho các mesh địa hình (`Terrain`, `Staircase`, `Path`, `Paver`, `Rock`, `Mountain`), đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho nền gạch. |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho cả nền gạch và cánh đồng `plains`. |
+| `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
 | `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt phím `F1`/`~`/`F3`, mở khóa chuột, tự động tìm kiếm node, cập nhật FPS & tọa độ Player theo thời gian thực, điều khiển Zoom Camera, tải lại Scene. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
 | `Scripts/UI/DevNpcTab.cs` | (C# Script) | Tab Live Dialogue Editor: Hiển thị tên NPC, danh sách thoại trong `ItemList`, ô nhập `LineEdit`, nút thêm thoại mới, phát thoại ngay, xoay vòng thoại, xóa câu thoại. |
@@ -44,7 +45,7 @@
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
 - **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm).
-- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; chỉ giữ lại DUY NHẤT 1 dãy núi hùng vĩ phía Bắc `Mountain_Mesh_North` làm phông nền background xa, đã loại bỏ các dãy núi South, West, East che tầm nhìn Isometric; dọn sạch vật cản tiền cảnh).
+- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói `tex_grass_grid.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
 - **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
@@ -181,4 +182,61 @@
 3. **Đồng Bộ Nền Gạch Sang Màu & Texture Cỏ (`MapAutoCollision.cs`)**:
    - Gán `StandardMaterial3D` với texture `tex_grass_grid.png` (fallback `map_25d_Tex_Grass_Grid.png`), `AlbedoColor = Colors.White` và `TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps`.
    - Giúp bề mặt nền gạch `SM_Tier2_Pavers` đồng nhất tuyệt đối về họa tiết ô cỏ và sắc độ với thảm cỏ xung quanh.
-4. **Bổ Sung 
+4. **Bổ Sung Tính Năng Phóng To / Thu Nhỏ Camera Bằng Con Lăn Chuột (`CameraFollow.cs`)**:
+   - Bắt sự kiện `MouseButton.WheelUp` (phóng to, giảm Orthographic Size) và `MouseButton.WheelDown` (thu nhỏ, tăng Orthographic Size).
+   - Tham số: `MinZoomSize = 8.0f;`, `MaxZoomSize = 30.0f;`, `ZoomSpeed = 1.5f;`, `ZoomSmoothness = 10.0f;`.
+   - Nội suy mượt mà trong `_Process`: `Size = Mathf.Lerp(Size, _targetZoomSize, ZoomSmoothness * (float)delta);`.
+5. **Đưa NPC Xuống Mặt Đất & Hoàn Thiện Tương Tác Hội Thoại**:
+   - Cập nhật Scene `WorldMap.tscn`: Chuyển vị trí NPC từ sườn đồi `(3, 2.5, -6)` xuống mặt đất bằng phẳng đảo trung tâm `(5.0, 0.5, -4.0)` gần lối đi chính của Player.
+   - Nâng cấp `SimpleNpc.cs`: Cấu hình nhãn `Label3D` với `NoDepthTest = true;`, `FontSize = 36;`, `OutlineSize = 8;` để chữ luôn hiển thị rõ nét, không bị che khuất. Nhấn E đổi câu thoại mượt mà xoay vòng.
+6. **Kiểm Định & Biên Dịch**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: Mọi hàm < 20 dòng (< 25 dòng), mọi file < 195 dòng (< 200 dòng).
+   - `dotnet build "C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **63 / 63 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Cải Tạo Mô Hình 3D Bản Đồ: Đóng Kín Khe Hở Bậc Thềm & Đồng Bộ Nền Gạch Cỏ Xanh (Sub-agent blender-helper)
+1. **Đồng Bộ Nền Gạch `SM_Tier2_Pavers` Thành Thảm Cỏ Tự Nhiên**:
+   - Gán vật liệu `Mat_Grass` trực tiếp vào mesh trong Blender, kết nối texture `Tex_Grass_Grid` (`tex_grass_grid.png`).
+   - Thiết lập UV mapping phẳng (planar projection) chuẩn 1:1 `(u, v) = (x, y)` cho các mặt trên của `SM_Tier2_Pavers`, đồng bộ hoàn hảo họa tiết ô lưới và sắc thái màu xanh cỏ với mặt sàn `SM_Terrain_Chunk` của đảo trung tâm.
+2. **Khắc Phục Triệt Để Khe Hở Rìa Bậc Thềm (`SM_Staircase_02` & `SM_Tier2_Pavers`)**:
+   - Khắc phục khe hở 3.6cm trước đây (bậc thang kết thúc ở Y = 7.004m, nền gạch cũ bắt đầu ở Y = 7.040m).
+   - Mở rộng mép tiếp giáp của `SM_Tier2_Pavers` về `Y = 6.99m`, đè nhẹ lên bậc thang 1.4cm (`7.0042m - 6.9900m`), đóng kín 100% khoảng trống chuyển tiếp giữa cầu thang và thềm paver.
+   - Kéo đùn (extrude) độ dày của `SM_Tier2_Pavers` sâu xuống đất thêm 0.40m (`Z` từ 2.10m đến 2.52m), đồng thời tạo khối móng đặc monolithic liên kết toàn bộ chân đế bên dưới từ Z=2.10m đến Z=2.50m. Tạo thành một khối 3D đặc vững chắc, loại bỏ hoàn toàn hiện tượng xuyên mép, lọt kẽ vật lý.
+3. **Quy Tắc Bảo Toàn & Pipeline Blender CLI**:
+   - Chạy script Python ngầm qua Blender CLI 5.4.
+   - Tuyệt đối tuân thủ quy tắc bảo tồn tài nguyên gốc: File nguồn gốc `map_25d.blend` được giữ nguyên vẹn 100%.
+   - Lưu trữ bản cải tiến an toàn vào `Assets/Blender_Source/map_25d_fixed.blend`.
+   - Xuất model `Assets/Models_Exported/map_25d.glb` chuẩn tọa độ Godot (-Z forward, Y up, `export_yup=True`).
+4. **Kiểm Định & Xác Thực Hệ Thống**:
+   - Bổ sung bài kiểm tra `test_paver_stair_gap_and_thickness` trong `test_suite.gd` đo đạc trực tiếp AABB: độ dày paver Y >= 0.40m và độ phủ mép tiếp giáp Z paver >= Z stair (0 gap).
+   - Biên dịch `dotnet build "C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Chạy kiểm thử tự động Godot Headless `test_suite.gd`: **66 / 66 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Xây Dựng Chế Độ Dev (Dev Mode / Debug Overlay HUD & Live Dialogue Editor)
+1. **Kiến Trúc & Phím Tắt Dev Mode (`Scripts/UI/DevOverlay.cs`)**:
+   - Phím tắt bật/tắt: Hỗ trợ linh hoạt `F1`, `~` (QuoteLeft / Tilde) và `F3`.
+   - Tự động mở khóa chuột (`Input.MouseMode = Visible`) khi mở bảng HUD và ẩn bảng khi tắt hoặc ấn nút '✕'.
+   - Tự động dò tìm các node trong Scene Tree: `PlayerMovement`, `CameraFollow`, `SimpleNpc`.
+2. **Tab 1: 🎮 Nhân Vật (Player Tweaks - `Scripts/UI/DevPlayerTab.cs`)**:
+   - Thanh trượt (Slider) tinh chỉnh `MoveSpeed` (2.0 đến 25.0) hiển thị số thực trực tiếp.
+   - Thanh trượt `JumpVelocity` (5.0 đến 25.0) hiển thị số thực.
+   - Thanh trượt `Gravity` (5.0 đến 40.0) hiển thị số thực.
+   - CheckBox `Nhảy Vô Hạn / Bất Tử (Infinite Jump)`: Người chơi có thể nhảy liên tục trên không trung.
+   - Nút `Hồi sinh / Về điểm xuất phát`: Dịch chuyển tức thời Player về vị trí xuất phát ban đầu `SpawnPosition` qua `TeleportTo`.
+3. **Tab 2: 💬 Hội Thoại NPC (NPC Dialogue Live Editor - `Scripts/UI/DevNpcTab.cs`)**:
+   - Hiển thị thông tin tên NPC hiện tại (`NpcName`).
+   - Hiển thị danh sách câu thoại trong `ItemList` trực quan.
+   - Ô nhập `LineEdit` cho phép gõ câu thoại mới.
+   - Nút `Thêm Thoại`: Cập nhật trực tiếp vào mảng `DialogueLines` của NPC trong thời gian thực.
+   - Nút `Nói Ngay`: Kích hoạt NPC phát câu thoại vừa nhập lập tức qua `DisplayMessage`.
+   - Nút `Xoay Vòng Thoại`: Gọi `SpeakNextLine()` để chuyển sang câu tiếp theo.
+   - Nút `Xóa Thoại`: Xóa câu thoại đang chọn hoặc câu cuối cùng.
+4. **Tab 3: 📷 Camera & Môi Trường (World & Stats)**:
+   - Thanh trượt `Camera Zoom`: Đồng bộ trực tiếp `TargetZoomSize` của `CameraFollow` (từ 8.0 đến 35.0).
+   - Hiển thị thông số thời gian thực: `FPS` và tọa độ `Player Pos: (X, Y, Z)`.
+   - Nút `Tải Lại Màn Chơi`: Gọi `GetTree().ReloadCurrentScene()`.
+5. **Thiết Kế Giao Diện UI & Tích Hợp Scene (`Scenes/UI/DevOverlay.tscn`)**:
+   - Bảng `PanelContainer` hiện đại, tông màu tối bán trong suốt (semi-transparent dark theme, bo góc 10px).
+   - Gắn `DevOverlay.tscn` vào `Scenes/Levels/WorldMap.tscn`.
+6. **Chuẩn Clean Code & An Toàn Bộ Nhớ**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: `DevOverlay.cs` (178 dòng), `DevNpcTab.cs` (164 dòng), `DevPlayerTab.cs` (127 dò

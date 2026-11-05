@@ -3,28 +3,30 @@ using Godot;
 namespace Game.Core;
 
 /// <summary>
-/// Tự động quét tạo va chạm vật lý (Trimesh Collision) và đồng bộ vật liệu xanh cỏ cho nền gạch trong Map.
+/// Tự động quét tạo va chạm vật lý (Trimesh / Stair Ramp) và đồng bộ vật liệu cỏ xanh cho nền đất trong Map.
 /// </summary>
 public partial class MapAutoCollision : Node
 {
 	[ExportGroup("Cấu hình Va Chạm")]
 	[Export] public bool EnableAutoCollision { get; set; } = true;
 
-	[ExportGroup("Cấu hình Đổi Màu Nền Gạch")]
+	[ExportGroup("Cấu hình Đổi Màu Nền Cỏ")]
 	[Export] public bool RecolorPaversToGrass { get; set; } = true;
 	[Export] public Color PaverAlbedoColor { get; set; } = Colors.White;
 	[Export] public string GrassTexturePath { get; set; } = "res://Assets/Models_Exported/tex_grass_grid.png";
 
 	private StandardMaterial3D? _cachedPaverMaterial;
 
-	/// <summary>
-	/// Bắt đầu quét cây node cha để tự động sinh va chạm vật lý và cập nhật vật liệu.
-	/// </summary>
 	public override void _Ready()
 	{
 		if (!EnableAutoCollision) return;
 		Node rootNode = GetParent() ?? this;
 		ScanAndProcessMeshes(rootNode);
+	}
+
+	public override void _ExitTree()
+	{
+		_cachedPaverMaterial = null;
 	}
 
 	/// <summary>
@@ -51,9 +53,9 @@ public partial class MapAutoCollision : Node
 	/// </summary>
 	private void ProcessMeshInstance(MeshInstance3D meshInstance)
 	{
-		if (RecolorPaversToGrass && IsPaverSurface(meshInstance.Name))
+		if (RecolorPaversToGrass && ShouldRecolorToGrass(meshInstance.Name))
 		{
-			ApplyGrassMaterialToPaver(meshInstance);
+			ApplyGrassMaterial(meshInstance);
 		}
 
 		if (IsWalkableSurface(meshInstance.Name))
@@ -63,16 +65,16 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Áp dụng vật liệu cỏ đồng bộ texture cho các mesh nền gạch.
+	/// Áp dụng vật liệu cỏ đồng bộ texture cho các mesh nền gạch và đồng bằng.
 	/// </summary>
-	private void ApplyGrassMaterialToPaver(MeshInstance3D meshInstance)
+	private void ApplyGrassMaterial(MeshInstance3D meshInstance)
 	{
 		meshInstance.MaterialOverride = GetOrCreatePaverMaterial();
-		GD.Print($"[MapAutoCollision] Đã đồng bộ texture cỏ cho nền gạch: {meshInstance.Name}");
+		GD.Print($"[MapAutoCollision] Đã đồng bộ texture cỏ cho: {meshInstance.Name}");
 	}
 
 	/// <summary>
-	/// Tạo hoặc trả về vật liệu cỏ với texture đồng bộ cho nền gạch.
+	/// Tạo hoặc trả về vật liệu cỏ với texture đồng bộ cho nền đất và gạch.
 	/// </summary>
 	private StandardMaterial3D GetOrCreatePaverMaterial()
 	{
@@ -109,11 +111,18 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Tạo StaticBody3D kèm ConcavePolygonShape3D nếu MeshInstance3D chưa có va chạm.
+	/// Tạo va chạm phù hợp: dốc phẳng trơn cho cầu thang, hoặc Trimesh cho địa hình.
 	/// </summary>
 	private void CreateCollisionIfMissing(MeshInstance3D meshInstance)
 	{
 		if (meshInstance.Mesh == null || HasStaticBodyChild(meshInstance)) return;
+
+		if (StairRampBuilder.IsStaircase(meshInstance.Name))
+		{
+			StairRampBuilder.BuildStairRamp(meshInstance);
+			return;
+		}
+
 		meshInstance.CreateTrimeshCollision();
 		EnableBackfaceCollision(meshInstance);
 		GD.Print($"[MapAutoCollision] Đã tạo va chạm (BackfaceCollision bật) cho: {meshInstance.Name}");
@@ -140,7 +149,7 @@ public partial class MapAutoCollision : Node
 	/// <summary>
 	/// Kiểm tra xem node con đã có StaticBody3D hay chưa để tránh tạo trùng lặp.
 	/// </summary>
-	private bool HasStaticBodyChild(Node node)
+	private static bool HasStaticBodyChild(Node node)
 	{
 		foreach (Node child in node.GetChildren())
 		{
@@ -150,18 +159,18 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Nhận diện mesh nền gạch (chứa từ khóa paver hoặc tier2_pavers).
+	/// Nhận diện mesh cần đổi sang cỏ xanh (gạch paver hoặc cánh đồng plains).
 	/// </summary>
-	private bool IsPaverSurface(string nodeName)
+	private static bool ShouldRecolorToGrass(string nodeName)
 	{
 		string lower = nodeName.ToLower();
-		return lower.Contains("paver") || lower.Contains("tier2_pavers");
+		return lower.Contains("paver") || lower.Contains("tier2_pavers") || lower.Contains("plains");
 	}
 
 	/// <summary>
 	/// Lọc tên các Mesh cần tạo bề mặt va chạm cho nhân vật đi lại hoặc cản trở chuyển động.
 	/// </summary>
-	private bool IsWalkableSurface(string nodeName)
+	private static bool IsWalkableSurface(string nodeName)
 	{
 		string lower = nodeName.ToLower();
 		return lower.Contains("terrain") ||

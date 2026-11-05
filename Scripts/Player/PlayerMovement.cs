@@ -33,8 +33,8 @@ public partial class PlayerMovement : CharacterBody3D
 	private float _jumpBufferTimer;
 
 	private const float MinMoveThreshold = 0.05f;
-	private const float DefaultFloorSnap = 0.35f;
-	private const float DefaultMaxFloorAngle = 50.0f;
+	private const float DefaultFloorSnap = 0.40f;
+	private const float DefaultMaxFloorAngle = 58.0f;
 
 	public override void _Ready()
 	{
