@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bat3uly7f4c8o" path="res://Scripts/Player/PlayerMovement.cs" id="1_movement"]
 [ext_resource type="PackedScene" uid="uid://8mty0la5evqd" path="res://Assets/Models_Exported/character_25d.glb" id="2_model"]
 [ext_resource type="Script" uid="uid://dic3neyglppy0" path="res://Scripts/Player/PlayerAnimation.cs" id="3_anim"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerInteractor.cs" id="4_interactor"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
@@ -21,3 +22,6 @@ shape = SubResource("CapsuleShape3D_player")
 [node name="PlayerAnimation" type="Node" parent="." node_paths=PackedStringArray("TargetCharacter")]
 script = ExtResource("3_anim")
 TargetCharacter = NodePath("..")
+
+[node name="PlayerInteractor" type="Area3D" parent="."]
+script = ExtResource("4_interactor")

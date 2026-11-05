@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SimpleNpc.cs" id="1_npc"]
+[ext_resource type="PackedScene" uid="uid://8mty0la5evqd" path="res://Assets/Models_Exported/character_25d.glb" id="2_model"]
+[ext_resource type="Script" path="res://Scripts/Core/InteractableArea.cs" id="3_area"]
+
+[node name="NPC" type="Node3D"]
+script = ExtResource("1_npc")
+
+[node name="CharacterModel" parent="." instance=ExtResource("2_model")]
+
+[node name="InteractableArea" type="Area3D" parent="."]
+script = ExtResource("3_area")
+PromptText = "Nói chuyện (E)"

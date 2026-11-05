@@ -1,3 +1,28 @@
 # Godot 4+ specific ignores
 .godot/
+.mono/
 /android/
+
+# .NET / C# build outputs
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.sln.DotSettings.user
+
+# IDEs and Editors
+.vs/
+.vscode/
+.idea/
+*.swp
+*.lock
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary debug scripts
+test_rot.gd
+test_rot.gd.uid
