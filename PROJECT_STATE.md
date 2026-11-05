@@ -295,4 +295,75 @@
 
 ### [2026-11-06] - Khắc Phục Lỗi Trắng Xóa Bản Đồ Môi Trường & Đo Đạc Thông Số Cầu Thang (Sub-agent blender-helper)
 1. **Khắc Phục Lỗi Nền Đất Xung Quanh Trắng Xóa (`map_surroundings.blend`)**:
-   - Khảo sát nguyên nhân gốc rễ trong Blender 5.4: Mesh `Terrain_Plains_Mesh` dùng v�
+   - Khảo sát nguyên nhân gốc rễ trong Blender 5.4: Mesh `Terrain_Plains_Mesh` dùng vật liệu `Mat_Grass` nhưng texture `Tex_Grass_Grid` chưa được pack vào file blend (`has_data: False`), và Base Color là màu xám trắng. Khi xuất GLB, glTF exporter không nhúng được ảnh nên gán màu trắng xóa.
+   - Nâng cấp mô hình trong `Assets/Blender_Source/map_surroundings.blend`:
+     * Tạo và gán vật liệu `Mat_Grass_Plain` với Base Color chuẩn xanh cỏ tươi `#529934` (Color(0.32, 0.60, 0.20, 1.0)), Roughness = 0.85.
+     * Tải và đóng gói (pack) trực tiếp texture cỏ `Assets/Blender_Source/tex_grass_grid.png` vào file blend.
+     * Liên kết Image Texture node -> Principled BSDF `Base Color` -> Material Output.
+     * Tái lập trình UV mapping cho toàn bộ 1,896 mặt đa giác theo planar projection chiếu đứng `(u, v) = (x/4, y/4)`, đảm bảo hoa văn ô cỏ phủ đều và sắc nét trên toàn bộ cánh đồng 84m x 84m.
+     * Bảo tồn nguyên vẹn 100% vị trí và vật liệu của 63 cây, 45 tảng đá, 36 hoa cúc và dãy núi phía Bắc `Mountain_Mesh_North`.
+     * Lưu file cập nhật an toàn vào `Assets/Blender_Source/map_surroundings.blend`.
+     * Xuất mô hình ra `Assets/Models_Exported/map_surroundings.glb` chuẩn Godot (`export_yup=True`, `export_materials='EXPORT'`).
+     * Re-import vào Godot Headless: Texture `map_surroundings_tex_grass_grid.png` được tự động trích xuất và liên kết hoàn hảo.
+2. **Khảo Sát & Đo Đạc Thông Số Hình Học Cầu Thang (`map_25d_fixed.blend`)**:
+   - `SM_Staircase_01`:
+     * AABB: X: [3.9250, 5.0750] (Rộng: 1.1500m), Y: [3.1960, 4.0040] (Dài/Run: 0.8080m), Z: [0.0000, 1.2500] (Cao/Rise: 1.2500m).
+     * Độ dốc tổng thể (Rise/Run): 1.2500 / 0.8080 = 1.5470 -> Góc nghiêng: **57.12°**.
+     * Cấu trúc: 5 bậc thang. Chiều cao mỗi bậc (Rise) = **0.2500m** (25cm), độ sâu mặt bậc (Tread run) = **0.1600m** (16cm). Góc nghiêng từng bậc = **57.38°**.
+   - `SM_Staircase_02`:
+     * AABB: X: [5.1500, 6.2500] (Rộng: 1.1000m), Y: [5.9958, 7.0042] (Dài/Run: 1.0083m), Z: [1.2500, 2.5000] (Cao/Rise: 1.2500m).
+     * Độ dốc tổng thể (Rise/Run): 1.2500 / 1.0083 = 1.2397 -> Góc nghiêng: **51.11°**.
+     * Cấu trúc: 6 bậc thang. Chiều cao mỗi bậc (Rise) = **0.2083m** (~20.8cm), độ sâu mặt bậc (Tread run) = **0.1667m** (~16.7cm). Góc nghiêng từng bậc = **51.34°**.
+   - Khuyến nghị vật lý cho `csharp-coder`: Do độ dốc cầu thang thực tế (51.11° và 57.12°) vượt quá góc leo dốc tối đa mặc định (45°), giải pháp kết hợp dốc va chạm lăng trụ phẳng `ConvexPolygonShape3D` của `StairRampBuilder` cùng cấu hình `FloorMaxAngle >= 58.0°` trong `PlayerMovement.cs` đảm bảo nhân vật đi lên mượt mà tuyệt đối.
+3. **Kiểm Định & Biên Dịch**:
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Loại Bỏ Hoàn Toàn Tấm Phông Nền Trắng Sky Backdrop (Sub-agent blender-helper)
+1. **Loại Bỏ `SM_Sky_Backdrop_Plane` Khỏi `map_25d_fixed.blend`**:
+   - Sử dụng Blender 5.4 CLI: Xác định tấm plane 54m x 45m tại tọa độ (13, 13, 7.5) mang vật liệu `Mat_Sky_Gradient` che khuất bầu trời Procedural Sky và dãy núi background phía Bắc.
+   - Xóa bỏ triệt để object `SM_Sky_Backdrop_Plane`, orphan mesh `Plane` và orphan material `Mat_Sky_Gradient`.
+   - Bảo tồn 100% nguyên vẹn toàn bộ các thực thể khác: `SM_Terrain_Chunk`, `SM_Staircase_01`, `SM_Staircase_02`, `SM_Tier2_Pavers`, `SM_Mountains_Background`, 17 cây thông & phong, 7 tảng đá lớn, các phiến đá bước, 4 đám mây hoạt hình `SM_Cloud_*` và toàn bộ hoa cúc, bụi cỏ.
+   - Tuân thủ quy tắc bảo toàn tài nguyên gốc: Tuyệt đối không ghi đè `map_25d.blend`.
+   - Lưu trữ an toàn cập nhật vào `Assets/Blender_Source/map_25d_fixed.blend`.
+2. **Xuất Model `.glb` Chuẩn Godot & Re-import**:
+   - Xuất mô hình sang `Assets/Models_Exported/map_25d.glb` (`export_yup=True`, `export_materials='EXPORT'`).
+   - Kiểm tra import GLB: Số lượng objects giảm chính xác từ 232 xuống 231 (xác nhận `SM_Sky_Backdrop_Plane` và mesh `Plane` đã bị xóa hoàn toàn).
+   - Re-import tài nguyên thành công trong Godot Editor Headless.
+3. **Kiểm Định & Biên Dịch Tự Động**:
+   - Bổ sung bài kiểm tra `assert_true(sky_plane == null, "SM_Sky_Backdrop_Plane removed (sky is clear and unobstructed)")` vào `test_suite.gd`.
+   - Godot Headless `test_suite.gd`: **92 / 92 Test cases Passed (100% Pass, 0 Fail)**.
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Triển Khai Chế Độ Camera Tự Do (Free Cam), Tích Hợp Gamepad Controller Toàn Diện & Xóa Triệt Để Vùng Trắng Bầu Trời (Sub-agent csharp-coder)
+1. **Bộ Lọc Xóa Bỏ Phông Nền Trắng Trong Mã Nguồn (`MapAutoCollision.cs`)**:
+   - Bổ sung hàm nhận diện `IsSkyBackdrop`: Quét các node mesh chứa từ khóa `sky_backdrop`, `backdrop`, `sky_plane`.
+   - Tự động ẩn và giải phóng (`meshInstance.Visible = false; meshInstance.QueueFree();`), không tạo va chạm và ngăn chặn hoàn toàn việc che lấp bầu trời `ProceduralSky` tự nhiên.
+2. **Chế Độ Camera Tự Do (Free Camera Mode 6-DOF) & Nâng Cấp Dev Mode**:
+   - Xây dựng component `Scripts/Core/FreeCameraController.cs` (156 dòng):
+     * Điều khiển bay 6 bậc tự do: Phím `W/A/S/D` hoặc Cần gạt trái Gamepad theo hướng camera (`Transform.Basis`).
+     * Nâng/hạ độ cao: Phím `Space/E` (bay lên), `Ctrl/Q` (bay xuống); Cò phải `R2` hoặc `RB` (bay lên), Cò trái `L2` hoặc `LB` (bay xuống).
+     * Xoay góc nhìn Pitch & Yaw 360°: Giữ Chuột Phải rê chuột (Mouse Motion) hoặc Cần gạt phải Gamepad (Right Stick).
+     * Tinh chỉnh tốc độ bay: Cuộn con lăn chuột hoặc bấm cần gạt trái `L3` (5.0 - 50.0 m/s).
+   - Nâng cấp `Scripts/Core/CameraFollow.cs` (155 dòng):
+     * Tích hợp `SetFreeCamActive(bool active)`: Chuyển đổi linh hoạt giữa góc nhìn Isometric (Orthogonal) và FreeCam (Perspective FOV 75°).
+     * Tích hợp `ResetToPlayer()`: Tự động đưa Camera quay về khóa ngắm nhân vật chính.
+     * Hỗ trợ thu phóng mượt mà bằng Cần gạt phải Gamepad (Right Stick) trong chế độ Isometric.
+   - Tạo `Scripts/UI/DevWorldTab.cs` (161 dòng) & Nâng cấp `Scenes/UI/DevOverlay.tscn`:
+     * CheckBox `[🎥 Bật/Tắt Camera Tự Do (Free Cam)]` đồng bộ trực tiếp camera.
+     * Slider `Tốc độ FreeCam` (5.0 đến 50.0) tinh chỉnh tức thời.
+     * Nút `[🔄 Quay Về Góc Nhìn Player (Isometric)]` khôi phục camera ngay lập tức.
+     * Nhãn hiển thị trạng thái camera thời gian thực (`🎥 Free Cam 6-DOF` / `🎯 Khóa góc nhìn Isometric`).
+     * Đảm bảo an toàn bộ nhớ 100% trong `_ExitTree()` hủy đăng ký mọi sự kiện UI.
+3. **Tích Hợp Tay Cầm (Gamepad / Joypad Controller) Toàn Diện**:
+   - Cấu hình `project.godot` `[input]`: Bổ sung toàn diện các sự kiện Joypad cho `move_left`, `move_right`, `move_forward`, `move_backward`, `jump` (JoyButton.A), `interact` (JoyButton.X / Y).
+   - Bảng điều khiển Dev Mode (`DevOverlay.cs`):
+     * Phím tắt bật/tắt bằng tay cầm: Nút `Back` / `Select` (`JoyButton.Back`), `Start` hoặc ấn cần phải `R3` (`JoyButton.RightStick`).
+     * Chuyển đổi qua lại giữa các tab Dev Mode mượt mà bằng 2 nút vai `LB` / `RB`.
+4. **Kiểm Định Chất Lượng & Clean Code Standards**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả 15 files C# đều < 195 dòng (< 200 dòng), 100% hàm < 20 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt.
+   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 117 bài test: **117 / 117 Test cases Passed (100% Pass, 0 Fail)**.
+
+
+
