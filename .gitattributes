@@ -1,2 +1,22 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+
+# Godot Scene Files (Text files with Git LFS Lockable capability)
+*.tscn text lockable
+
+# 3D Models & Sources (Git LFS with Lockable)
+*.blend filter=lfs diff=lfs merge=lfs -text lockable
+*.glb filter=lfs diff=lfs merge=lfs -text lockable
+*.gltf filter=lfs diff=lfs merge=lfs -text lockable
+*.fbx filter=lfs diff=lfs merge=lfs -text lockable
+
+# Textures & Images (Git LFS)
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text
+
+# Audio (Git LFS)
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
