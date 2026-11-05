@@ -34,6 +34,7 @@
 - [x] **[AI - texture-architect]** Khởi tạo hệ thống Texture & Material dùng chung nền tảng (`Assets/Textures/`, `Assets/Materials_Shared/`, `TEXTURE_CATALOG.md`), tối ưu VRAM và chống phân mảnh tài nguyên.
 - [x] **[AI - csharp-coder]** Chuẩn hóa vật liệu Player (`M_Character_Body.tres`, `M_Character_Face.tres`), refactor `MapAutoCollision.cs` tải và gán trực tiếp shared materials cho toàn bộ mesh địa hình/đường đất/rào gỗ/núi tím/đá tảng trên Map, mở rộng `test_suite.gd` đạt 193/193 test cases Passed (100%).
 - [x] **[AI - blender-helper]** Áp dụng bộ texture nền tảng mới vào Map trong Blender (cỏ `tex_grass_seamless.png`, đất `tex_dirt_seamless.png`, gỗ `tex_wood_seamless.png`, đá `tex_rock_seamless.png`), sinh planar UV cho đường đất và smart UV cho cầu thang/biển báo, đóng gói vào `map_25d_fixed.blend` và `map_surroundings.blend`, xuất `map_25d.glb` và `map_surroundings.glb` chuẩn Godot, mở rộng `test_suite.gd` đạt 203/203 tests Pass (100%).
+- [x] **[AI - agy-customizations & producer]** Tự động cấu hình toàn diện Workspace Antigravity CLI: Di chuyển và chuẩn hóa 5 kỹ năng vào `.agents/skills/{skill_name}/SKILL.md` (`csharp-coder`, `code-reviewer`, `producer`, `blender-helper`, `texture-architect`), thiết lập Junction `Assets/` ở thư mục gốc, cập nhật `AGENTS.md` và `GEMINI.md` tự động kích hoạt dây chuyền kỹ năng và điều phối Sub-agent độc lập chống loãng token.
 
 ---
 

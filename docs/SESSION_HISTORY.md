@@ -326,6 +326,27 @@
   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
   - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
 
+## Phiên làm việc: 2026-11-06 (Sáng - Chuẩn Hóa Toàn Diện Workspace Antigravity CLI & Tự Động Kích Hoạt 5 Kỹ Năng)
+- **Chuẩn hóa thư mục kỹ năng theo Antigravity Workspace (`.agents/skills/{skill_name}/SKILL.md`)**:
+  - Di chuyển và hoàn thiện 5 kỹ năng chính:
+    1. `csharp-coder`: Viết mã C# gameplay Godot 4 (.NET 8), Clean Code, XML tiếng Việt, `[Export]` Inspector, `dotnet build` 0 lỗi 0 cảnh báo.
+    2. `code-reviewer`: Rà soát code, kiểm tra giới hạn hàm < 25 dòng, file < 200 dòng, bắt rò rỉ bộ nhớ trong `_ExitTree()`.
+    3. `producer`: Quản lý tiến độ `TASKS.md`, `PROJECT_STATE.md`, phân chia việc giữa Human và AI.
+    4. `blender-helper`: Hỗ trợ 3D Blender, xuất `.glb` chuẩn Godot, cấm nhúng texture trùng lặp, bảo vệ file `.blend` gốc.
+    5. `texture-architect`: Kiến trúc Texture/Material, cây quyết định 3 bước chống phình VRAM, quản lý `TEXTURE_CATALOG.md`.
+    (Kèm kỹ năng bổ trợ `checkpoint` để đóng gói trạng thái phiên làm việc).
+  - Dọn dẹp thư mục cũ `.gemini/skills/` trong nhánh dự án con.
+- **Thiết lập kho tài nguyên dùng chung & Junction thư mục gốc**:
+  - Tạo Junction `C:\xnhaugame\Assets` liên kết trực tiếp tới `C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Assets`, giúp đường dẫn `Assets/Textures/TEXTURE_CATALOG.md` và `Assets/Materials_Shared/` truy cập thông suốt ở cả thư mục gốc lẫn dự án con.
+- **Cấu hình tự động kích hoạt dây chuyền (`AGENTS.md` & `GEMINI.md`)**:
+  - Viết lại quy tắc Orchestrator: Tự động phân tích câu lệnh bất kỳ của người dùng và kích hoạt dây chuyền kỹ năng tương ứng (không cần người dùng phải gõ `@tên-skill`).
+  - Ép buộc cách ly tiến trình qua Sub-agent (`invoke_subagent` / `run_workflow`) để toàn bộ việc đọc/viết mã dài chạy trong tiến trình con, giải phóng 100% token nháp khi hoàn thành.
+  - Cập nhật workflow scripts: `dev_and_review.py`, `asset_and_material_pipeline.py`, `checkpoint_and_reset.py`.
+- **Kiểm định chất lượng**:
+  - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
+
+
 
 
 
