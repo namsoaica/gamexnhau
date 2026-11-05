@@ -3,7 +3,7 @@ using Godot;
 namespace Game.Core;
 
 /// <summary>
-/// Tự động quét tạo va chạm vật lý (Trimesh / Stair Ramp) và đồng bộ vật liệu cỏ xanh cho nền đất trong Map.
+/// Tự động quét tạo va chạm vật lý (Trimesh / Stair Ramp), loại bỏ phông trắng và đồng bộ cỏ xanh cho Map.
 /// </summary>
 public partial class MapAutoCollision : Node
 {
@@ -49,10 +49,17 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Xử lý từng MeshInstance3D: áp dụng vật liệu nền cỏ và tạo va chạm nếu cần.
+	/// Xử lý từng MeshInstance3D: xóa phông nền trắng, phủ vật liệu cỏ và tạo va chạm nếu cần.
 	/// </summary>
 	private void ProcessMeshInstance(MeshInstance3D meshInstance)
 	{
+		if (IsSkyBackdrop(meshInstance.Name))
+		{
+			meshInstance.Visible = false;
+			meshInstance.QueueFree();
+			return;
+		}
+
 		if (RecolorPaversToGrass && ShouldRecolorToGrass(meshInstance.Name))
 		{
 			ApplyGrassMaterial(meshInstance);
@@ -96,18 +103,9 @@ public partial class MapAutoCollision : Node
 	/// </summary>
 	private Texture2D? LoadGrassTexture()
 	{
-		if (ResourceLoader.Exists(GrassTexturePath))
-		{
-			return GD.Load<Texture2D>(GrassTexturePath);
-		}
-
-		const string fallbackPath = "res://Assets/Models_Exported/map_25d_Tex_Grass_Grid.png";
-		if (ResourceLoader.Exists(fallbackPath))
-		{
-			return GD.Load<Texture2D>(fallbackPath);
-		}
-
-		return null;
+		if (ResourceLoader.Exists(GrassTexturePath)) return GD.Load<Texture2D>(GrassTexturePath);
+		const string fallback = "res://Assets/Models_Exported/map_25d_Tex_Grass_Grid.png";
+		return ResourceLoader.Exists(fallback) ? GD.Load<Texture2D>(fallback) : null;
 	}
 
 	/// <summary>
@@ -159,6 +157,15 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
+	/// Nhận diện mesh phông nền trắng cần xóa bỏ để lộ bầu trời xanh ProceduralSky.
+	/// </summary>
+	private static bool IsSkyBackdrop(string nodeName)
+	{
+		string lower = nodeName.ToLower();
+		return lower.Contains("sky_backdrop") || lower.Contains("backdrop") || lower.Contains("sky_plane");
+	}
+
+	/// <summary>
 	/// Nhận diện mesh cần đổi sang cỏ xanh (gạch paver hoặc cánh đồng plains).
 	/// </summary>
 	private static bool ShouldRecolorToGrass(string nodeName)
@@ -173,15 +180,9 @@ public partial class MapAutoCollision : Node
 	private static bool IsWalkableSurface(string nodeName)
 	{
 		string lower = nodeName.ToLower();
-		return lower.Contains("terrain") ||
-		       lower.Contains("stair") ||
-		       lower.Contains("path") ||
-		       lower.Contains("paver") ||
-		       lower.Contains("fence") ||
-		       lower.Contains("floor") ||
-		       lower.Contains("ground") ||
-		       lower.Contains("rock") ||
-		       lower.Contains("mountain") ||
+		return lower.Contains("terrain") || lower.Contains("stair") || lower.Contains("path") ||
+		       lower.Contains("paver") || lower.Contains("fence") || lower.Contains("floor") ||
+		       lower.Contains("ground") || lower.Contains("rock") || lower.Contains("mountain") ||
 		       lower.Contains("cliff");
 	}
 }

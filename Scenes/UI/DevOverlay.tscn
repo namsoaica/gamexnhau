@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/DevOverlay.cs" id="1_overlay"]
 [ext_resource type="Script" path="res://Scripts/UI/DevPlayerTab.cs" id="2_player_tab"]
 [ext_resource type="Script" path="res://Scripts/UI/DevNpcTab.cs" id="3_npc_tab"]
+[ext_resource type="Script" path="res://Scripts/UI/DevWorldTab.cs" id="4_world_tab"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 16.0
@@ -28,7 +29,7 @@ script = ExtResource("1_overlay")
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 470.0
-offset_bottom = 580.0
+offset_bottom = 620.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBox" type="VBoxContainer" parent="DevPanel"]
@@ -48,7 +49,7 @@ text = "🛠️ CHẾ ĐỘ DEV (DEBUG HUD)"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 12
-text = "[F1 / ~]"
+text = "[F1 / ~ / Select]"
 
 [node name="CloseBtn" type="Button" parent="DevPanel/VBox/HeaderBar"]
 custom_minimum_size = Vector2(28, 28)
@@ -204,15 +205,16 @@ text = "🗑️ Xóa Đã Chọn"
 [node name="DevWorldTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
+script = ExtResource("4_world_tab")
 
 [node name="ZoomRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevWorldTab"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/ZoomRow"]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
-text = "Camera Zoom:"
+text = "Isometric Zoom:"
 
 [node name="ZoomSlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevWorldTab/ZoomRow"]
 layout_mode = 2
@@ -229,12 +231,52 @@ layout_mode = 2
 text = "17.5"
 horizontal_alignment = 2
 
-[node name="Sep" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+[node name="SepCam" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+
+[node name="FreeCamCheck" type="CheckBox" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+text = "🎥 Bật/Tắt Camera Tự Do (Free Cam)"
+
+[node name="FreeCamSpeedRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/FreeCamSpeedRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "Tốc độ FreeCam:"
+
+[node name="SpeedSlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevWorldTab/FreeCamSpeedRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 5.0
+max_value = 50.0
+step = 1.0
+value = 15.0
+
+[node name="SpeedVal" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/FreeCamSpeedRow"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "15.0"
+horizontal_alignment = 2
+
+[node name="ResetCameraBtn" type="Button" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "🔄 Quay Về Góc Nhìn Player (Isometric)"
+
+[node name="FreeCamStatusLabel" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
+text = "Trạng thái: 🎯 Khóa góc nhìn Isometric"
+
+[node name="SepStats" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
 layout_mode = 2
 
 [node name="StatsBox" type="VBoxContainer" parent="DevPanel/VBox/Tabs/DevWorldTab"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="FpsLabel" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/StatsBox"]
 layout_mode = 2
@@ -246,7 +288,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 text = "Player Pos: (0.0, 0.0, 0.0)"
 
-[node name="Sep2" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+[node name="SepReload" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
 layout_mode = 2
 
 [node name="ReloadBtn" type="Button" parent="DevPanel/VBox/Tabs/DevWorldTab"]

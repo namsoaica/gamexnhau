@@ -26,12 +26,14 @@
 | `Scripts/Core/InteractableArea.cs` | `uid://b45c22501e5v` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
 | `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
-| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà, tự động `LookAt` vào Player chuẩn góc Isometric, hỗ trợ thu phóng con lăn chuột mượt mà (`MinZoomSize = 8`, `MaxZoomSize = 30`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho cả nền gạch và cánh đồng `plains`. |
+| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), cung cấp `SetFreeCamActive()` và `ResetToPlayer()`. |
+| `Scripts/Core/FreeCameraController.cs` | (C# Script) | Bộ điều khiển Camera Tự Do (6-DOF Fly Cam) độc lập, hỗ trợ bàn phím WASD / Space / Ctrl / EQ, xoay góc nhìn chuột phải + Mouse Motion hoặc Right Stick cần phải, nâng/hạ độ cao bằng cò L2/R2 hoặc LB/RB, cuộn chuột điều chỉnh tốc độ bay (5.0 - 50.0). |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho cả nền gạch và cánh đồng `plains`, tự động loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky. |
 | `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
-| `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt phím `F1`/`~`/`F3`, mở khóa chuột, tự động tìm kiếm node, cập nhật FPS & tọa độ Player theo thời gian thực, điều khiển Zoom Camera, tải lại Scene. |
+| `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt linh hoạt bằng phím `F1`/`~`/`F3` hoặc tay cầm Gamepad (`Back`/`Select`, `Start`, `RightStick`), chuyển đổi các tab bằng nút vai `LB`/`RB`, mở khóa chuột, điều phối các tab con. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
 | `Scripts/UI/DevNpcTab.cs` | (C# Script) | Tab Live Dialogue Editor: Hiển thị tên NPC, danh sách thoại trong `ItemList`, ô nhập `LineEdit`, nút thêm thoại mới, phát thoại ngay, xoay vòng thoại, xóa câu thoại. |
+| `Scripts/UI/DevWorldTab.cs` | (C# Script) | Tab Môi trường & Camera: Slider Zoom Isometric, CheckBox kích hoạt `[🎥 Free Cam]`, Slider tốc độ bay Free Cam (5.0 - 50.0), Nút `[🔄 Quay về góc nhìn Player]`, hiển thị nhãn trạng thái camera thời gian thực, FPS, Player Pos, và nút Reload màn chơi. An toàn bộ nhớ trong `_ExitTree()`. |
 
 ### B. Scenes (`Scenes/`)
 | File Scene | UID | Cấu Trúc Node Chính |
@@ -44,22 +46,40 @@
 
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
-- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm).
+- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm; đã loại bỏ hoàn toàn phông nền trắng `SM_Sky_Backdrop_Plane` để lộ trọn vẹn bầu trời Procedural Sky điện ảnh).
 - **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói `tex_grass_grid.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
 - **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
 
 ## 3. Hệ Thống Điều Khiển & Physics Layers (Input & Layers)
-- **Di chuyển**: Phím `W / A / S / D` hoặc phím mũi tên `↑ / ← / ↓ / →` (chuẩn hóa `Input.GetVector`, tính toán tương đối theo góc nhìn Camera Isometric).
-- **Nhảy**: Phím `Space` (có hỗ trợ Coyote Time 0.15s và Jump Buffer 0.15s).
-- **Tương tác**: Phím `E` (Action name `"interact"`).
-- **3D Physics Layers**:
-  - Layer 1: `World` (Mặt sàn, địa hình, vật cản tĩnh)
-  - Layer 2: `Player` (Nhân vật người chơi)
-  - Layer 3: `NPC` (Nhân vật NPC)
-  - Layer 4: `Interactable` (Vùng tương tác)
-  - Layer 5: `Hazard/KillZone` (Vực thẳm, bẫy nguy hiểm)
+
+### A. Chế Độ Chơi Mặc Định (Isometric Gameplay)
+| Hành Động | Bàn Phím & Chuột | Tay Cầm Gamepad / Joypad |
+| :--- | :--- | :--- |
+| **Di chuyển** | `W / A / S / D` hoặc phím mũi tên `↑ / ← / ↓ / →` (chuẩn hóa `Input.GetVector` theo hướng camera) | Cần gạt trái (Left Stick: Axis 0 & 1) hoặc D-Pad (`↑ / ← / ↓ / →`) |
+| **Nhảy** | Phím `Space` (Coyote Time 0.15s, Jump Buffer 0.15s) | Nút `A` (Xbox) / Nút `✕` (PlayStation) - `JoyButton.A` |
+| **Tương tác** | Phím `E` (Action name `"interact"`) | Nút `X` / `Y` (Xbox) hoặc `□` / `△` (PlayStation) - `JoyButton.X / Y` |
+| **Thu phóng Camera (Zoom)** | Cuộn con lăn chuột (`WheelUp`: phóng to, `WheelDown`: thu nhỏ) | Cần gạt phải (Right Stick: Axis 3 đẩy lên/xuống) |
+| **Bật/Tắt Chế Độ Dev** | Phím `F1`, `~` (QuoteLeft / Tilde) hoặc `F3` | Nút `Back` / `Select` (`JoyButton.Back`), `Start` hoặc nhấn cần phải `R3` (`JoyButton.RightStick`) |
+| **Chuyển Tab Dev Mode** | Nhấp chuột chọn Tab | Nút vai `LB` (Tab trước) / `RB` (Tab kế tiếp) |
+
+### B. Chế Độ Camera Tự Do (Free Cam Mode - 6-DOF Fly Cam)
+| Hành Động | Bàn Phím & Chuột | Tay Cầm Gamepad / Joypad |
+| :--- | :--- | :--- |
+| **Bay Ngang / Tiến Lùi** | Phím `W / A / S / D` theo hướng nhìn camera | Cần gạt trái (Left Stick: Axis 0 & 1) |
+| **Nâng Độ Cao (Bay lên)** | Phím `Space` hoặc `E` | Nút vai phải `RB` (`JoyButton.RightShoulder`) hoặc Cò phải `R2` (`JoyAxis.TriggerRight`) |
+| **Hạ Độ Cao (Bay xuống)** | Phím `Ctrl` hoặc `Q` | Nút vai trái `LB` (`JoyButton.LeftShoulder`) hoặc Cò trái `L2` (`JoyAxis.TriggerLeft`) |
+| **Xoay Góc Nhìn (Pitch & Yaw 360°)** | Giữ Chuột Phải (Right Click) + rê chuột | Cần gạt phải (Right Stick: Axis 2 & 3 xoay 360°) |
+| **Tăng/Giảm Tốc Độ Bay** | Cuộn con lăn chuột lên / xuống (5.0 - 50.0 m/s) | Nhấn cần gạt trái `L3` (`JoyButton.LeftStick`) |
+| **Quay Về Góc Nhìn Isometric** | Bấm nút `[🔄 Quay Về Góc Nhìn Player]` trên Dev HUD | Bấm Reset trên HUD hoặc tắt Dev Mode |
+
+### C. 3D Physics Layers
+- Layer 1: `World` (Mặt sàn, địa hình, vật cản tĩnh)
+- Layer 2: `Player` (Nhân vật người chơi)
+- Layer 3: `NPC` (Nhân vật NPC)
+- Layer 4: `Interactable` (Vùng tương tác)
+- Layer 5: `Hazard/KillZone` (Vực thẳm, bẫy nguy hiểm)
 
 ---
 
@@ -298,6 +318,52 @@
 3. **Kiểm Định & Biên Dịch**:
    - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
    - Godot Headless `test_suite.gd`: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Loại Bỏ Hoàn Toàn Tấm Phông Nền Trắng Sky Backdrop (Sub-agent blender-helper)
+1. **Loại Bỏ `SM_Sky_Backdrop_Plane` Khỏi `map_25d_fixed.blend`**:
+   - Sử dụng Blender 5.4 CLI: Xác định tấm plane 54m x 45m tại tọa độ (13, 13, 7.5) mang vật liệu `Mat_Sky_Gradient` che khuất bầu trời Procedural Sky và dãy núi background phía Bắc.
+   - Xóa bỏ triệt để object `SM_Sky_Backdrop_Plane`, orphan mesh `Plane` và orphan material `Mat_Sky_Gradient`.
+   - Bảo tồn 100% nguyên vẹn toàn bộ các thực thể khác: `SM_Terrain_Chunk`, `SM_Staircase_01`, `SM_Staircase_02`, `SM_Tier2_Pavers`, `SM_Mountains_Background`, 17 cây thông & phong, 7 tảng đá lớn, các phiến đá bước, 4 đám mây hoạt hình `SM_Cloud_*` và toàn bộ hoa cúc, bụi cỏ.
+   - Tuân thủ quy tắc bảo toàn tài nguyên gốc: Tuyệt đối không ghi đè `map_25d.blend`.
+   - Lưu trữ an toàn cập nhật vào `Assets/Blender_Source/map_25d_fixed.blend`.
+2. **Xuất Model `.glb` Chuẩn Godot & Re-import**:
+   - Xuất mô hình sang `Assets/Models_Exported/map_25d.glb` (`export_yup=True`, `export_materials='EXPORT'`).
+   - Kiểm tra import GLB: Số lượng objects giảm chính xác từ 232 xuống 231 (xác nhận `SM_Sky_Backdrop_Plane` và mesh `Plane` đã bị xóa hoàn toàn).
+   - Re-import tài nguyên thành công trong Godot Editor Headless.
+3. **Kiểm Định & Biên Dịch Tự Động**:
+   - Bổ sung bài kiểm tra `assert_true(sky_plane == null, "SM_Sky_Backdrop_Plane removed (sky is clear and unobstructed)")` vào `test_suite.gd`.
+   - Godot Headless `test_suite.gd`: **92 / 92 Test cases Passed (100% Pass, 0 Fail)**.
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Triển Khai Chế Độ Camera Tự Do (Free Cam), Tích Hợp Gamepad Controller Toàn Diện & Xóa Triệt Để Vùng Trắng Bầu Trời (Sub-agent csharp-coder)
+1. **Bộ Lọc Xóa Bỏ Phông Nền Trắng Trong Mã Nguồn (`MapAutoCollision.cs`)**:
+   - Bổ sung hàm nhận diện `IsSkyBackdrop`: Quét các node mesh chứa từ khóa `sky_backdrop`, `backdrop`, `sky_plane`.
+   - Tự động ẩn và giải phóng (`meshInstance.Visible = false; meshInstance.QueueFree();`), không tạo va chạm và ngăn chặn hoàn toàn việc che lấp bầu trời `ProceduralSky` tự nhiên.
+2. **Chế Độ Camera Tự Do (Free Camera Mode 6-DOF) & Nâng Cấp Dev Mode**:
+   - Xây dựng component `Scripts/Core/FreeCameraController.cs` (156 dòng):
+     * Điều khiển bay 6 bậc tự do: Phím `W/A/S/D` hoặc Cần gạt trái Gamepad theo hướng camera (`Transform.Basis`).
+     * Nâng/hạ độ cao: Phím `Space/E` (bay lên), `Ctrl/Q` (bay xuống); Cò phải `R2` hoặc `RB` (bay lên), Cò trái `L2` hoặc `LB` (bay xuống).
+     * Xoay góc nhìn Pitch & Yaw 360°: Giữ Chuột Phải rê chuột (Mouse Motion) hoặc Cần gạt phải Gamepad (Right Stick).
+     * Tinh chỉnh tốc độ bay: Cuộn con lăn chuột hoặc bấm cần gạt trái `L3` (5.0 - 50.0 m/s).
+   - Nâng cấp `Scripts/Core/CameraFollow.cs` (155 dòng):
+     * Tích hợp `SetFreeCamActive(bool active)`: Chuyển đổi linh hoạt giữa góc nhìn Isometric (Orthogonal) và FreeCam (Perspective FOV 75°).
+     * Tích hợp `ResetToPlayer()`: Tự động đưa Camera quay về khóa ngắm nhân vật chính.
+     * Hỗ trợ thu phóng mượt mà bằng Cần gạt phải Gamepad (Right Stick) trong chế độ Isometric.
+   - Tạo `Scripts/UI/DevWorldTab.cs` (161 dòng) & Nâng cấp `Scenes/UI/DevOverlay.tscn`:
+     * CheckBox `[🎥 Bật/Tắt Camera Tự Do (Free Cam)]` đồng bộ trực tiếp camera.
+     * Slider `Tốc độ FreeCam` (5.0 đến 50.0) tinh chỉnh tức thời.
+     * Nút `[🔄 Quay Về Góc Nhìn Player (Isometric)]` khôi phục camera ngay lập tức.
+     * Nhãn hiển thị trạng thái camera thời gian thực (`🎥 Free Cam 6-DOF` / `🎯 Khóa góc nhìn Isometric`).
+     * Đảm bảo an toàn bộ nhớ 100% trong `_ExitTree()` hủy đăng ký mọi sự kiện UI.
+3. **Tích Hợp Tay Cầm (Gamepad / Joypad Controller) Toàn Diện**:
+   - Cấu hình `project.godot` `[input]`: Bổ sung toàn diện các sự kiện Joypad cho `move_left`, `move_right`, `move_forward`, `move_backward`, `jump` (JoyButton.A), `interact` (JoyButton.X / Y).
+   - Bảng điều khiển Dev Mode (`DevOverlay.cs`):
+     * Phím tắt bật/tắt bằng tay cầm: Nút `Back` / `Select` (`JoyButton.Back`), `Start` hoặc ấn cần phải `R3` (`JoyButton.RightStick`).
+     * Chuyển đổi qua lại giữa các tab Dev Mode mượt mà bằng 2 nút vai `LB` / `RB`.
+4. **Kiểm Định Chất Lượng & Clean Code Standards**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả 15 files C# đều < 195 dòng (< 200 dòng), 100% hàm < 20 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt.
+   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 117 bài test: **117 / 117 Test cases Passed (100% Pass, 0 Fail)**.
 
 
 

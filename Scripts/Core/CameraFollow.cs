@@ -3,7 +3,7 @@ using Godot;
 namespace Game.Core;
 
 /// <summary>
-/// Điều khiển Camera Isometric luôn bám theo nhân vật chính và hỗ trợ thu phóng mượt mà bằng con lăn chuột.
+/// Camera điều khiển góc nhìn Isometric bám theo nhân vật và hỗ trợ Chế Độ Tự Do (Free Cam).
 /// </summary>
 public partial class CameraFollow : Camera3D
 {
@@ -19,61 +19,59 @@ public partial class CameraFollow : Camera3D
 	[Export] public float ZoomSpeed { get; set; } = 1.5f;
 	[Export] public float ZoomSmoothness { get; set; } = 10.0f;
 
-	/// <summary>
-	/// Kích thước phóng to mục tiêu của camera (Orthographic Size).
-	/// </summary>
+	[ExportGroup("Camera Tự Do (Free Cam)")]
+	[Export] public bool IsFreeCamActive { get; set; }
+	[Export] public float FreeCamSpeed { get => _freeCam.Speed; set => _freeCam.Speed = value; }
+	[Export] public float FreeCamLookSensitivity { get => _freeCam.LookSensitivity; set => _freeCam.LookSensitivity = value; }
+
 	public float TargetZoomSize
 	{
 		get => _targetZoomSize;
 		set => _targetZoomSize = Mathf.Clamp(value, MinZoomSize, MaxZoomSize);
 	}
 
+	private readonly FreeCameraController _freeCam = new();
 	private float _targetZoomSize;
+	private ProjectionType _savedProjection = ProjectionType.Orthogonal;
 
-	/// <summary>
-	/// Khởi tạo camera, gán kích thước zoom ban đầu và tìm kiếm mục tiêu nếu cần.
-	/// </summary>
 	public override void _Ready()
 	{
 		Current = true;
 		_targetZoomSize = Size;
-		Target ??= (Node3D?)GetTree().GetFirstNodeInGroup("Player") ?? (Node3D?)GetParent()?.FindChild("Player");
-
-		if (Target != null)
-		{
-			GlobalPosition = Target.GlobalPosition + Offset;
-			LookAt(Target.GlobalPosition + LookAtOffset, Vector3.Up);
-		}
+		_savedProjection = Projection;
+		LocatePlayerTarget();
+		SnapToTarget();
 	}
 
-	/// <summary>
-	/// Bắt sự kiện con lăn chuột để điều chỉnh kích thước phóng to / thu nhỏ.
-	/// </summary>
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		if (IsFreeCamActive)
+		{
+			_freeCam.HandleInput(@event);
+			return;
+		}
+
 		if (@event is InputEventMouseButton mouseBtn && mouseBtn.Pressed)
 		{
-			HandleZoomInput(mouseBtn.ButtonIndex);
+			HandleIsometricZoomInput(mouseBtn.ButtonIndex);
 		}
 	}
 
-	/// <summary>
-	/// Nội suy mượt mà kích thước phóng to / thu nhỏ theo từng khung hình hiển thị.
-	/// </summary>
 	public override void _Process(double delta)
 	{
-		if (Projection == ProjectionType.Orthogonal)
+		float dt = (float)delta;
+		if (IsFreeCamActive)
 		{
-			Size = Mathf.Lerp(Size, _targetZoomSize, ZoomSmoothness * (float)delta);
+			_freeCam.Update(this, dt);
+			return;
 		}
+
+		UpdateIsometricZoom(dt);
 	}
 
-	/// <summary>
-	/// Cập nhật vị trí camera mượt mà bám theo mục tiêu trong vòng lặp vật lý.
-	/// </summary>
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Target == null) return;
+		if (IsFreeCamActive || Target == null) return;
 
 		float dt = (float)delta;
 		Vector3 targetPos = Target.GlobalPosition + Offset;
@@ -82,17 +80,76 @@ public partial class CameraFollow : Camera3D
 	}
 
 	/// <summary>
-	/// Tính toán độ phóng to mục tiêu khi cuộn con lăn chuột.
+	/// Bật hoặc tắt Chế Độ Camera Tự Do (Free Cam).
 	/// </summary>
-	private void HandleZoomInput(MouseButton buttonIndex)
+	public void SetFreeCamActive(bool active)
+	{
+		if (IsFreeCamActive == active) return;
+		IsFreeCamActive = active;
+
+		if (active)
+		{
+			_savedProjection = Projection;
+			Projection = ProjectionType.Perspective;
+			Fov = 75.0f;
+			_freeCam.Initialize(this);
+		}
+		else
+		{
+			Projection = _savedProjection;
+			Size = _targetZoomSize;
+			ResetToPlayer();
+		}
+	}
+
+	/// <summary>
+	/// Đưa Camera quay lại bám theo nhân vật chính ở góc nhìn mặc định.
+	/// </summary>
+	public void ResetToPlayer()
+	{
+		if (IsFreeCamActive) SetFreeCamActive(false);
+		SnapToTarget();
+	}
+
+	private void LocatePlayerTarget()
+	{
+		Target ??= (Node3D?)GetTree().GetFirstNodeInGroup("Player") ?? (Node3D?)GetParent()?.FindChild("Player");
+	}
+
+	private void SnapToTarget()
+	{
+		if (Target == null) return;
+		GlobalPosition = Target.GlobalPosition + Offset;
+		LookAt(Target.GlobalPosition + LookAtOffset, Vector3.Up);
+	}
+
+	private void UpdateIsometricZoom(float dt)
+	{
+		HandleGamepadZoom(dt);
+		if (Projection == ProjectionType.Orthogonal)
+		{
+			Size = Mathf.Lerp(Size, _targetZoomSize, ZoomSmoothness * dt);
+		}
+	}
+
+	private void HandleIsometricZoomInput(MouseButton buttonIndex)
 	{
 		if (buttonIndex == MouseButton.WheelUp)
 		{
-			_targetZoomSize = Mathf.Clamp(_targetZoomSize - ZoomSpeed, MinZoomSize, MaxZoomSize);
+			TargetZoomSize -= ZoomSpeed;
 		}
 		else if (buttonIndex == MouseButton.WheelDown)
 		{
-			_targetZoomSize = Mathf.Clamp(_targetZoomSize + ZoomSpeed, MinZoomSize, MaxZoomSize);
+			TargetZoomSize += ZoomSpeed;
+		}
+	}
+
+	private void HandleGamepadZoom(float dt)
+	{
+		float rightY = Input.GetJoyAxis(0, JoyAxis.RightY);
+		if (Mathf.Abs(rightY) > 0.25f)
+		{
+			TargetZoomSize += rightY * ZoomSpeed * 4.0f * dt;
 		}
 	}
 }

@@ -161,4 +161,37 @@
   - `dotnet build`: **0 Warning(s), 0 Error(s)**.
   - Godot Headless `test_suite.gd`: **91 / 91 Test cases Passed (100% Pass, 0 Fail)**.
 
+## Phiên làm việc: 2026-11-06 (Sáng - Sub-agent blender-helper: Loại Bỏ Phông Nền Trắng Sky Backdrop)
+- **Loại bỏ triệt để tấm phông nền trắng `SM_Sky_Backdrop_Plane`**:
+  - Mở file `Assets/Blender_Source/map_25d_fixed.blend` bằng Blender 5.4 CLI.
+  - Xác định và xóa sạch object `SM_Sky_Backdrop_Plane` (tấm plane 54x45m ở (13, 13, 7.5)), orphan mesh `Plane` và orphan material `Mat_Sky_Gradient` (vốn gây hiện tượng bức tường trắng xóa che khuất bầu trời ProceduralSky phía sau dãy núi).
+  - Giữ nguyên vẹn 100% tất cả các đối tượng địa hình, cầu thang, nền gạch dày 0.42m thảm cỏ, dãy núi, mây và cây cỏ khác.
+  - Tuân thủ quy tắc bảo toàn: Giữ nguyên vẹn 100% file gốc `map_25d.blend`.
+  - Lưu file blend cập nhật an toàn vào `Assets/Blender_Source/map_25d_fixed.blend`.
+- **Xuất mô hình ra Godot**:
+  - Xuất sang `Assets/Models_Exported/map_25d.glb` (`export_yup=True`, `export_materials='EXPORT'`).
+  - Kiểm tra import GLB: Số lượng objects giảm từ 232 xuống 231, không còn `SM_Sky_Backdrop_Plane` hay mesh `Plane`.
+  - Re-import tài nguyên thành công trong Godot Editor Headless.
+- **Kiểm định chất lượng**:
+  - Bổ sung kiểm thử `assert_true(sky_plane == null, "SM_Sky_Backdrop_Plane removed (sky is clear and unobstructed)")` vào `test_suite.gd`.
+  - Chạy Godot Headless `test_suite.gd`: **92 / 92 Test cases Passed (100% Pass, 0 Fail)**.
+  - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+## Phiên làm việc: 2026-11-06 (Trưa - Sub-agent csharp-coder: Chế Độ Camera Tự Do, Gamepad Toàn Diện & Khử Vùng Trắng Bầu Trời)
+- **Xóa bỏ triệt để phông trắng trong mã nguồn (`MapAutoCollision.cs`)**:
+  - Bổ sung hàm nhận diện `IsSkyBackdrop(string nodeName)`: quét các node chứa `sky_backdrop`, `backdrop`, `sky_plane`.
+  - Tự động ẩn và giải phóng (`Visible = false; QueueFree();`), bảo đảm không có phông trắng nào che lấp bầu trời `ProceduralSky`.
+- **Triển khai Chế độ Camera Tự Do (Free Cam Mode 6-DOF)**:
+  - Tạo `Scripts/Core/FreeCameraController.cs` (156 dòng): Điều khiển bay 6 bậc tự do (WASD/LeftStick, Space/Ctrl/EQ/Triggers L2/R2, cuộn chuột/L3 đổi tốc độ 5-50 m/s, Right Click rê chuột hoặc RightStick xoay 360° Pitch/Yaw).
+  - Nâng cấp `Scripts/Core/CameraFollow.cs` (155 dòng): Hỗ trợ `SetFreeCamActive(bool)` chuyển đổi linh hoạt Perspective/Orthogonal, `ResetToPlayer()` đưa góc nhìn về nhân vật, Zoom Isometric bằng cần gạt phải Gamepad.
+  - Tách `Scripts/UI/DevWorldTab.cs` (161 dòng) & Nâng cấp `DevOverlay.tscn`: CheckBox bật/tắt FreeCam, Slider tốc độ, Nút quay về Player, hiển thị trạng thái camera, dọn dẹp sạch sẽ trong `_ExitTree()`.
+- **Hỗ trợ kết nối Tay Cầm Gamepad toàn diện**:
+  - Cấu hình `project.godot`: Bổ sung Joypad events cho `move_left`, `move_right`, `move_forward`, `move_backward`, `jump`, `interact`.
+  - Nâng cấp `DevOverlay.cs` (153 dòng): Bật/tắt HUD bằng nút `Back`/`Select`, `Start` hoặc `R3`; chuyển đổi qua lại giữa các tab bằng nút vai `LB`/`RB`.
+- **Kiểm định chất lượng & Clean Code**:
+  - 100% file C# < 195 dòng (< 200 dòng), 100% hàm < 20 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt.
+  - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+  - Mở rộng `test_suite.gd`: **117 / 117 Test cases Passed (100% Pass, 0 Fail)**.
+
+
 

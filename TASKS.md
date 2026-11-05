@@ -27,6 +27,7 @@
 - [x] **[AI - csharp-coder]** Xây dựng Chế Độ Dev (Dev Mode / Debug Overlay HUD - `DevOverlay.cs`, `DevPlayerTab.cs`, `DevNpcTab.cs`): phím tắt `F1`/`~`/`F3`, tinh chỉnh `MoveSpeed`, `JumpVelocity`, `Gravity`, `InfiniteJump`, dịch chuyển tức thời `TeleportTo`, Live Dialogue Editor sửa câu thoại NPC trực tiếp khi chơi, slider zoom camera, hiển thị FPS & tọa độ Player theo thời gian thực. (Build 0 lỗi 0 cảnh báo, 66/66 test cases Pass).
 - [x] **[AI - csharp-coder]** Tái thiết ánh sáng môi trường (ACES Tonemap, ProceduralSky dịu mát, SSAO, bóng đổ PSSM) và xây dựng hệ thống dốc va chạm phẳng `StairRampBuilder` (`ConvexPolygonShape3D`) + `FloorMaxAngle >= 58°` giúp leo cầu thang trơn tru. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
 - [x] **[AI - blender-helper]** Khắc phục lỗi đất xung quanh trắng xóa: Gán vật liệu cỏ xanh `Mat_Grass_Plain` (#529934) kèm texture `tex_grass_grid.png` đóng gói và UV mapping planar projection `(x/4, y/4)` cho `Terrain_Plains_Mesh` trong `map_surroundings.blend`, xuất `map_surroundings.glb`; đo đạc chính xác AABB, bước bậc và độ dốc (51.11° & 57.12°) của 2 cầu thang `SM_Staircase_01` & `SM_Staircase_02` trong `map_25d_fixed.blend`. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
+- [x] **[AI - blender-helper]** Loại bỏ phông nền trắng khổng lồ: Xóa object `SM_Sky_Backdrop_Plane` và vật liệu `Mat_Sky_Gradient` khỏi `map_25d_fixed.blend`, xuất `map_25d.glb` chuẩn Godot, bảo tồn nguyên vẹn 100% file gốc `map_25d.blend` và các thành phần khác, giải phóng tầm nhìn thông thoáng cho bầu trời Procedural Sky. (Build 0 lỗi 0 cảnh báo, 92/92 test cases Pass).
 
 ---
 
@@ -34,4 +35,9 @@
 
 ### Phân Nhóm 1: Gameplay & Lập Trình (AI / Developer)
 - [ ] **[AI - csharp-coder]** Lập trình hệ thống đòn đánh / tấn công cơ bản (`PlayerCombat.cs`) sử dụng animation `Attack` có sẵn trong model `character_25d.glb`.
-- [ ] **[AI - csharp-coder]** Lập trình thanh máu, thể lực hoặc giao d
+- [ ] **[AI - csharp-coder]** Lập trình thanh máu, thể lực hoặc giao diện UI cơ bản (`Scripts/UI/`).
+- [ ] **[AI - csharp-coder]** Lập trình AI cho quái vật tuần tra và tấn công (`Scripts/Enemies/`).
+- [ ] **[AI - code-reviewer]** Rà soát Clean Code và kiểm tra build `dotnet build` sau mỗi tính năng mới.
+
+### Phân Nhóm 2: Đồ Họa, Âm Thanh & Cấp Độ (Human / 3D Artist)
+- [ ] **[HUMAN]** Dựng model quái vật / kẻ địch mới trong Blender (ví dụ: Slime, Goblin) và xu�

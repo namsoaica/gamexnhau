@@ -47,6 +47,8 @@ func run_suite():
 	test_paver_stair_gap_and_thickness()
 	test_surroundings_mountains()
 	test_camera_zoom()
+	test_free_camera_mode()
+	test_dev_mode_overlay_and_gamepad()
 	test_npc_ground_position()
 	test_backface_collision()
 	test_lighting_and_sky()
@@ -55,19 +57,39 @@ func run_suite():
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
-	print("\n-- Testing Input Actions --")
+	print("\n-- Testing Input Actions & Gamepad Bindings --")
 	var actions = ["move_left", "move_right", "move_forward", "move_backward", "jump", "interact"]
 	for act in actions:
 		assert_true(InputMap.has_action(act), "Action '" + act + "' exists in InputMap")
 	
 	var ev_left = InputMap.action_get_events("move_left")
-	assert_true(ev_left.size() >= 2, "move_left has at least 2 events")
+	assert_true(ev_left.size() >= 3, "move_left has keyboard, joypad motion & joypad button")
+	var has_joy_motion_left = false
+	var has_joy_btn_left = false
+	for ev in ev_left:
+		if ev is InputEventJoypadMotion and ev.axis == JOY_AXIS_LEFT_X and is_equal_approx(ev.axis_value, -1.0):
+			has_joy_motion_left = true
+		if ev is InputEventJoypadButton and ev.button_index == JOY_BUTTON_DPAD_LEFT:
+			has_joy_btn_left = true
+	assert_true(has_joy_motion_left, "move_left mapped to Joypad LeftStick Left")
+	assert_true(has_joy_btn_left, "move_left mapped to Joypad DpadLeft")
 
 	var ev_jump = InputMap.action_get_events("jump")
-	assert_true(ev_jump.size() >= 1, "jump has at least 1 event")
+	var has_joy_jump = false
+	for ev in ev_jump:
+		if ev is InputEventJoypadButton and ev.button_index == JOY_BUTTON_A:
+			has_joy_jump = true
+	assert_true(has_joy_jump, "jump mapped to Joypad Button A")
 
 	var ev_interact = InputMap.action_get_events("interact")
-	assert_true(ev_interact.size() >= 1, "interact has at least 1 event")
+	var has_joy_x = false
+	var has_joy_y = false
+	for ev in ev_interact:
+		if ev is InputEventJoypadButton:
+			if ev.button_index == JOY_BUTTON_X: has_joy_x = true
+			if ev.button_index == JOY_BUTTON_Y: has_joy_y = true
+	assert_true(has_joy_x, "interact mapped to Joypad Button X")
+	assert_true(has_joy_y, "interact mapped to Joypad Button Y")
 
 func test_layers():
 	print("\n-- Testing 3D Physics Layers --")
@@ -327,6 +349,10 @@ func test_lighting_and_sky():
 	assert_true(light.directional_shadow_mode == DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS, "Directional shadow mode is PSSM 4 splits (2)")
 	assert_true(is_equal_approx(light.directional_shadow_max_distance, 70.0), "Directional shadow max distance is 70.0")
 
+	var map_25d = test_map.find_child("Map_25D")
+	var sky_plane = map_25d.find_child("SM_Sky_Backdrop_Plane") if map_25d != null else null
+	assert_true(sky_plane == null, "SM_Sky_Backdrop_Plane removed (sky is clear and unobstructed)")
+
 func test_staircase_ramp_collision():
 	print("\n-- Testing Staircase Ramp Collision (Smooth Climbing) --")
 	var map_25d = test_map.find_child("Map_25D")
@@ -361,6 +387,62 @@ func test_plains_recolor():
 	var plains = map_surr.find_child("Terrain_Plains_Mesh") as MeshInstance3D
 	assert_true(plains != null, "Terrain_Plains_Mesh exists")
 	assert_true(plains.material_override != null, "Terrain_Plains_Mesh has grass MaterialOverride applied (no white terrain)")
+
+func test_free_camera_mode():
+	print("\n-- Testing Free Camera Mode (6-DOF) --")
+	var cam = test_map.find_child("IsometricCamera") as Camera3D
+	assert_true(cam != null, "IsometricCamera exists")
+	assert_true(cam.get("IsFreeCamActive") != null, "IsFreeCamActive property exists")
+	assert_true(cam.get("FreeCamSpeed") != null, "FreeCamSpeed property exists")
+	assert_true(cam.get("FreeCamLookSensitivity") != null, "FreeCamLookSensitivity property exists")
+	assert_true(cam.get("IsFreeCamActive") == false, "IsFreeCamActive defaults to false")
+
+	# Test switching to FreeCam
+	cam.call("SetFreeCamActive", true)
+	assert_true(cam.get("IsFreeCamActive") == true, "IsFreeCamActive is true after SetFreeCamActive(true)")
+	assert_true(cam.projection == Camera3D.PROJECTION_PERSPECTIVE, "Camera switches to Perspective mode in FreeCam")
+	assert_true(is_equal_approx(cam.fov, 75.0), "Camera FOV set to 75 deg in FreeCam")
+
+	# Test switching back to Isometric
+	cam.call("SetFreeCamActive", false)
+	assert_true(cam.get("IsFreeCamActive") == false, "IsFreeCamActive is false after SetFreeCamActive(false)")
+	assert_true(cam.projection == Camera3D.PROJECTION_ORTHOGONAL, "Camera restored to Orthogonal in Isometric mode")
+
+	# Test ResetToPlayer
+	cam.call("SetFreeCamActive", true)
+	cam.call("ResetToPlayer")
+	assert_true(cam.get("IsFreeCamActive") == false, "ResetToPlayer disables FreeCam mode")
+	assert_true(cam.projection == Camera3D.PROJECTION_ORTHOGONAL, "ResetToPlayer restores Orthogonal projection")
+
+func test_dev_mode_overlay_and_gamepad():
+	print("\n-- Testing Dev Mode Overlay & Gamepad Support --")
+	var overlay = test_map.find_child("DevOverlay")
+	assert_true(overlay != null, "DevOverlay node exists in WorldMap")
+
+	var world_tab = overlay.find_child("DevWorldTab")
+	assert_true(world_tab != null, "DevWorldTab exists in DevOverlay")
+
+	var freecam_check = world_tab.find_child("FreeCamCheck")
+	assert_true(freecam_check != null, "FreeCamCheck checkbox exists in DevWorldTab")
+
+	var speed_slider = world_tab.find_child("SpeedSlider")
+	assert_true(speed_slider != null, "FreeCam SpeedSlider exists in DevWorldTab")
+
+	var reset_cam_btn = world_tab.find_child("ResetCameraBtn")
+	assert_true(reset_cam_btn != null, "ResetCameraBtn exists in DevWorldTab")
+
+	var status_label = world_tab.find_child("FreeCamStatusLabel")
+	assert_true(status_label != null, "FreeCamStatusLabel exists in DevWorldTab")
+
+	# Test Dev Mode Toggle
+	var panel = overlay.find_child("DevPanel") as Control
+	assert_true(panel != null, "DevPanel exists")
+	assert_true(panel.visible == false, "DevPanel initially hidden")
+	overlay.call("ToggleDevMode")
+	assert_true(panel.visible == true, "DevPanel visible after ToggleDevMode()")
+	overlay.call("ToggleDevMode")
+	assert_true(panel.visible == false, "DevPanel hidden after second ToggleDevMode()")
+
 
 
 

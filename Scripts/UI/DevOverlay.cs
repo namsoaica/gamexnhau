@@ -5,7 +5,7 @@ using Game.Core;
 namespace Game.UI;
 
 /// <summary>
-/// Bảng điều khiển Chế Độ Dev (Debug Overlay HUD) cho phép tinh chỉnh chỉ số nhân vật, hội thoại NPC và thế giới.
+/// Bảng điều khiển Chế Độ Dev (Debug Overlay HUD) hỗ trợ Bàn phím & Tay cầm Gamepad.
 /// </summary>
 public partial class DevOverlay : CanvasLayer
 {
@@ -17,13 +17,10 @@ public partial class DevOverlay : CanvasLayer
 	[ExportGroup("Tham Chiếu Controls")]
 	[Export] public Control? MainPanel { get; set; }
 	[Export] public Button? CloseBtn { get; set; }
+	[Export] public TabContainer? Tabs { get; set; }
 	[Export] public DevPlayerTab? PlayerTab { get; set; }
 	[Export] public DevNpcTab? NpcTab { get; set; }
-	[Export] public HSlider? ZoomSlider { get; set; }
-	[Export] public Label? ZoomValLabel { get; set; }
-	[Export] public Label? FpsLabel { get; set; }
-	[Export] public Label? PosLabel { get; set; }
-	[Export] public Button? ReloadBtn { get; set; }
+	[Export] public DevWorldTab? WorldTab { get; set; }
 
 	private PlayerMovement? _player;
 	private SimpleNpc? _npc;
@@ -33,25 +30,20 @@ public partial class DevOverlay : CanvasLayer
 	{
 		FindControlsIfNull();
 		LocateGameTargets();
-		InitializeSubTabs();
-		SetupWorldControls();
+		InitializeTabs();
 		SetDevModeVisible(false);
-	}
-
-	public override void _ExitTree()
-	{
-		DisconnectWorldEvents();
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (@event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo) return;
-
-		if (keyEvent.Keycode == ToggleKeyPrimary ||
-			keyEvent.Keycode == ToggleKeySecondary ||
-			keyEvent.Keycode == ToggleKeyTertiary)
+		if (HandleToggleInput(@event))
 		{
-			ToggleDevMode();
+			GetViewport().SetInputAsHandled();
+			return;
+		}
+
+		if (MainPanel != null && MainPanel.Visible && HandleTabNavigationInput(@event))
+		{
 			GetViewport().SetInputAsHandled();
 		}
 	}
@@ -59,7 +51,7 @@ public partial class DevOverlay : CanvasLayer
 	public override void _Process(double delta)
 	{
 		if (MainPanel == null || !MainPanel.Visible) return;
-		UpdateRealtimeStats();
+		WorldTab?.UpdateRealtimeStats();
 	}
 
 	/// <summary>
@@ -76,9 +68,55 @@ public partial class DevOverlay : CanvasLayer
 		if (isVisible) Input.MouseMode = Input.MouseModeEnum.Visible;
 	}
 
-	/// <summary>
-	/// Tự động dò tìm các node Gameplay trong Scene hiện tại.
-	/// </summary>
+	private bool HandleToggleInput(InputEvent @event)
+	{
+		if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+		{
+			if (keyEvent.Keycode == ToggleKeyPrimary ||
+			    keyEvent.Keycode == ToggleKeySecondary ||
+			    keyEvent.Keycode == ToggleKeyTertiary)
+			{
+				ToggleDevMode();
+				return true;
+			}
+		}
+
+		if (@event is InputEventJoypadButton joyBtn && joyBtn.Pressed)
+		{
+			if (joyBtn.ButtonIndex == JoyButton.Back ||
+			    joyBtn.ButtonIndex == JoyButton.Start ||
+			    joyBtn.ButtonIndex == JoyButton.RightStick)
+			{
+				ToggleDevMode();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private bool HandleTabNavigationInput(InputEvent @event)
+	{
+		if (Tabs == null || @event is not InputEventJoypadButton joyBtn || !joyBtn.Pressed) return false;
+
+		int tabCount = Tabs.GetTabCount();
+		if (tabCount <= 1) return false;
+
+		if (joyBtn.ButtonIndex == JoyButton.LeftShoulder)
+		{
+			Tabs.CurrentTab = (Tabs.CurrentTab - 1 + tabCount) % tabCount;
+			return true;
+		}
+
+		if (joyBtn.ButtonIndex == JoyButton.RightShoulder)
+		{
+			Tabs.CurrentTab = (Tabs.CurrentTab + 1) % tabCount;
+			return true;
+		}
+
+		return false;
+	}
+
 	private void LocateGameTargets()
 	{
 		SceneTree tree = GetTree();
@@ -87,91 +125,29 @@ public partial class DevOverlay : CanvasLayer
 		_camera = (CameraFollow?)GetParent()?.FindChild("IsometricCamera") ?? (CameraFollow?)tree.Root.FindChild("IsometricCamera", true, false);
 	}
 
-	/// <summary>
-	/// Khởi tạo và liên kết dữ liệu cho các Tab con.
-	/// </summary>
-	private void InitializeSubTabs()
+	private void InitializeTabs()
 	{
-		TabContainer? tabs = GetNodeOrNull<TabContainer>("DevPanel/VBox/Tabs");
-		if (tabs != null)
+		if (Tabs != null)
 		{
-			tabs.SetTabTitle(0, "🎮 Nhân Vật");
-			tabs.SetTabTitle(1, "💬 Hội Thoại");
-			tabs.SetTabTitle(2, "📷 Môi Trường");
+			Tabs.SetTabTitle(0, "🎮 Nhân Vật");
+			Tabs.SetTabTitle(1, "💬 Hội Thoại");
+			Tabs.SetTabTitle(2, "📷 Môi Trường");
 		}
 
 		PlayerTab?.Setup(_player);
 		NpcTab?.Setup(_npc);
-	}
+		WorldTab?.Setup(_camera, _player);
 
-	/// <summary>
-	/// Cấu hình giá trị ban đầu và sự kiện cho Tab Camera & Thế giới.
-	/// </summary>
-	private void SetupWorldControls()
-	{
-		if (_camera != null && ZoomSlider != null)
-		{
-			ZoomSlider.MinValue = _camera.MinZoomSize;
-			ZoomSlider.MaxValue = _camera.MaxZoomSize;
-			ZoomSlider.Value = _camera.Size;
-			if (ZoomValLabel != null) ZoomValLabel.Text = $"{_camera.Size:F1}";
-			ZoomSlider.ValueChanged += OnZoomChanged;
-		}
-
-		if (ReloadBtn != null) ReloadBtn.Pressed += OnReloadPressed;
 		if (CloseBtn != null) CloseBtn.Pressed += () => SetDevModeVisible(false);
 	}
 
-	/// <summary>
-	/// Hủy liên kết sự kiện tab Thế giới.
-	/// </summary>
-	private void DisconnectWorldEvents()
-	{
-		if (ZoomSlider != null) ZoomSlider.ValueChanged -= OnZoomChanged;
-		if (ReloadBtn != null) ReloadBtn.Pressed -= OnReloadPressed;
-	}
-
-	/// <summary>
-	/// Cập nhật nhãn hiển thị FPS và tọa độ Player trong thời gian thực.
-	/// </summary>
-	private void UpdateRealtimeStats()
-	{
-		if (FpsLabel != null) FpsLabel.Text = $"FPS: {Engine.GetFramesPerSecond()}";
-		if (PosLabel == null) return;
-
-		if (_player != null)
-		{
-			Vector3 p = _player.GlobalPosition;
-			PosLabel.Text = $"Player Pos: ({p.X:F1}, {p.Y:F1}, {p.Z:F1})";
-		}
-		else
-		{
-			PosLabel.Text = "Player: (Không tìm thấy)";
-		}
-	}
-
-	private void OnZoomChanged(double val)
-	{
-		if (_camera == null) return;
-		_camera.TargetZoomSize = (float)val;
-		if (ZoomValLabel != null) ZoomValLabel.Text = $"{val:F1}";
-	}
-
-	private void OnReloadPressed() => GetTree().ReloadCurrentScene();
-
-	/// <summary>
-	/// Tự động tìm kiếm các node con nếu chưa gắn trên Godot Inspector.
-	/// </summary>
 	private void FindControlsIfNull()
 	{
 		MainPanel ??= GetNodeOrNull<Control>("DevPanel");
 		CloseBtn ??= GetNodeOrNull<Button>("DevPanel/VBox/HeaderBar/CloseBtn");
+		Tabs ??= GetNodeOrNull<TabContainer>("DevPanel/VBox/Tabs");
 		PlayerTab ??= GetNodeOrNull<DevPlayerTab>("DevPanel/VBox/Tabs/DevPlayerTab");
 		NpcTab ??= GetNodeOrNull<DevNpcTab>("DevPanel/VBox/Tabs/DevNpcTab");
-		ZoomSlider ??= GetNodeOrNull<HSlider>("DevPanel/VBox/Tabs/DevWorldTab/ZoomRow/ZoomSlider");
-		ZoomValLabel ??= GetNodeOrNull<Label>("DevPanel/VBox/Tabs/DevWorldTab/ZoomRow/ZoomVal");
-		FpsLabel ??= GetNodeOrNull<Label>("DevPanel/VBox/Tabs/DevWorldTab/StatsBox/FpsLabel");
-		PosLabel ??= GetNodeOrNull<Label>("DevPanel/VBox/Tabs/DevWorldTab/StatsBox/PosLabel");
-		ReloadBtn ??= GetNodeOrNull<Button>("DevPanel/VBox/Tabs/DevWorldTab/ReloadBtn");
+		WorldTab ??= GetNodeOrNull<DevWorldTab>("DevPanel/VBox/Tabs/DevWorldTab");
 	}
 }
