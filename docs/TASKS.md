@@ -22,6 +22,9 @@
 - [x] **[AI - blender-helper]** Cải tạo bản đồ 3D: chỉ giữ lại 1 dãy núi phía Bắc hùng vĩ, xóa 3 dãy núi che tầm nhìn, đổi màu xanh cỏ cho nền gạch và làm phẳng kết nối đảo trung tâm.
 - [x] **[AI - code-reviewer]** Rà soát toàn bộ 9 file C# trong `Scripts/`: 100% hàm <= 19 dòng (< 25 dòng), file < 195 dòng (< 200 dòng), Guard Clauses, XML tiếng Việt, an toàn bộ nhớ trong `_ExitTree()`.
 - [x] **[AI - code-reviewer]** Kiểm định tự động chất lượng cao: Biên dịch `dotnet build` đạt 0 Warning 0 Error và chạy Godot Headless `test_suite.gd` đạt 53/53 test cases Passed (100%).
+- [x] **[AI - blender-helper]** Cải tạo mô hình 3D bản đồ: Gán vật liệu Mat_Grass kèm texture tex_grass_grid.png và UV phẳng cho SM_Tier2_Pavers, mở rộng mép tiếp giáp về Y=6.99m đóng kín khe hở bậc thềm 3.6cm, extrude độ dày 0.42m thành khối 3D đặc chống xuyên vật lý, xuất map_25d.glb và lưu an toàn map_25d_fixed.blend. (Test suite: 66/66 Pass).
+- [x] **[AI - csharp-coder]** Bổ sung tính năng Zoom Camera bằng con lăn chuột (`CameraFollow.cs`), đưa NPC xuống mặt đất và hoàn thiện hội thoại (`SimpleNpc.cs`, `WorldMap.tscn`).
+- [x] **[AI - csharp-coder]** Xây dựng Chế Độ Dev (Dev Mode / Debug Overlay HUD - `DevOverlay.cs`, `DevPlayerTab.cs`, `DevNpcTab.cs`): phím tắt `F1`/`~`/`F3`, tinh chỉnh `MoveSpeed`, `JumpVelocity`, `Gravity`, `InfiniteJump`, dịch chuyển tức thời `TeleportTo`, Live Dialogue Editor sửa câu thoại NPC trực tiếp khi chơi, slider zoom camera, hiển thị FPS & tọa độ Player theo thời gian thực. (Build 0 lỗi 0 cảnh báo, 66/66 test cases Pass).
 
 ---
 

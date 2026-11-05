@@ -19,11 +19,14 @@ public partial class PlayerMovement : CharacterBody3D
 	[ExportGroup("Hỗ Trợ Nhảy")]
 	[Export] public float CoyoteTime { get; set; } = 0.15f;
 	[Export] public float JumpBufferTime { get; set; } = 0.15f;
+	[Export] public bool InfiniteJump { get; set; } = false;
 
 	[ExportGroup("Xoay Hướng & Node")]
 	[Export] public float RotationSpeed { get; set; } = 12.0f;
 	[Export] public Node3D? VisualNode { get; set; }
 	[Export] public Camera3D? ReferenceCamera { get; set; }
+
+	public Vector3 SpawnPosition { get; private set; }
 
 	private Vector2 _inputVector = Vector2.Zero;
 	private float _coyoteTimer;
@@ -40,8 +43,12 @@ public partial class PlayerMovement : CharacterBody3D
 		FloorStopOnSlope = true;
 		FloorBlockOnWall = true;
 		FloorMaxAngle = Mathf.DegToRad(DefaultMaxFloorAngle);
+		SafeMargin = 0.08f;
+		MaxSlides = 6;
+		WallMinSlideAngle = Mathf.DegToRad(15.0f);
 		if (!IsInGroup("Player")) AddToGroup("Player");
 		VisualNode ??= (Node3D?)FindChild("Character_Armature") ?? (Node3D?)FindChild("CharacterModel");
+		SpawnPosition = GlobalPosition;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -78,7 +85,7 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private void UpdateTimers(float delta)
 	{
-		_coyoteTimer = IsOnFloor() ? CoyoteTime : _coyoteTimer - delta;
+		_coyoteTimer = (IsOnFloor() || InfiniteJump) ? CoyoteTime : _coyoteTimer - delta;
 		if (Input.IsActionJustPressed("jump"))
 		{
 			_jumpBufferTimer = JumpBufferTime;
@@ -166,7 +173,7 @@ public partial class PlayerMovement : CharacterBody3D
 		if (horizontalVelocity.LengthSquared() < MinMoveThreshold) return;
 
 		Node3D targetNode = VisualNode ?? this;
-		float targetAngle = Mathf.Atan2(-horizontalVelocity.X, -horizontalVelocity.Y);
+		float targetAngle = Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y);
 		Vector3 currentRotation = targetNode.Rotation;
 
 		currentRotation.Y = Mathf.LerpAngle(currentRotation.Y, targetAngle, RotationSpeed * delta);

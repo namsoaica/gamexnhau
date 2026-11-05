@@ -44,7 +44,11 @@ func run_suite():
 	test_dialogue_and_interaction()
 	test_physics_floorsnap()
 	test_paver_recolor()
+	test_paver_stair_gap_and_thickness()
 	test_surroundings_mountains()
+	test_camera_zoom()
+	test_npc_ground_position()
+	test_backface_collision()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -120,37 +124,37 @@ func test_player_facing_direction():
 	if visual == null:
 		visual = player
 	
+	# Model character_25d.glb mặt mặc định hướng +Z, nên hướng mặt thực tế là basis.z
 	# Test moving right (+X): Velocity = (6, 0, 0)
-	player.velocity = Vector3(6, 0, 0)
-	# Call 10 physics frames of rotation
 	for i in range(10):
+		player.velocity = Vector3(6, 0, 0)
 		player._physics_process(0.1)
 	
-	var facing_dir = -visual.transform.basis.z
+	var facing_dir = visual.transform.basis.z
 	print("Moving (+X): facing = ", facing_dir)
 	assert_true(facing_dir.x > 0.8, "Player faces right (+X) when moving right")
 
 	# Test moving left (-X): Velocity = (-6, 0, 0)
-	player.velocity = Vector3(-6, 0, 0)
 	for i in range(10):
+		player.velocity = Vector3(-6, 0, 0)
 		player._physics_process(0.1)
-	facing_dir = -visual.transform.basis.z
+	facing_dir = visual.transform.basis.z
 	print("Moving (-X): facing = ", facing_dir)
 	assert_true(facing_dir.x < -0.8, "Player faces left (-X) when moving left")
 
 	# Test moving forward (-Z): Velocity = (0, 0, -6)
-	player.velocity = Vector3(0, 0, -6)
 	for i in range(10):
+		player.velocity = Vector3(0, 0, -6)
 		player._physics_process(0.1)
-	facing_dir = -visual.transform.basis.z
+	facing_dir = visual.transform.basis.z
 	print("Moving (-Z): facing = ", facing_dir)
 	assert_true(facing_dir.z < -0.8, "Player faces forward (-Z) when moving forward")
 
 	# Test moving backward (+Z): Velocity = (0, 0, 6)
-	player.velocity = Vector3(0, 0, 6)
 	for i in range(10):
+		player.velocity = Vector3(0, 0, 6)
 		player._physics_process(0.1)
-	facing_dir = -visual.transform.basis.z
+	facing_dir = visual.transform.basis.z
 	print("Moving (+Z): facing = ", facing_dir)
 	assert_true(facing_dir.z > 0.8, "Player faces backward (+Z) when moving backward")
 
@@ -223,6 +227,25 @@ func test_paver_recolor():
 	assert_true(paver_mesh != null, "SM_Tier2_Pavers exists in Map_25D")
 	assert_true(paver_mesh.material_override != null, "Paver mesh has grass MaterialOverride applied")
 
+func test_paver_stair_gap_and_thickness():
+	print("\n-- Testing Paver Gap Elimination and 3D Extrusion --")
+	var map_25d = test_map.find_child("Map_25D")
+	var paver = map_25d.find_child("SM_Tier2_Pavers") as MeshInstance3D
+	var stair = map_25d.find_child("SM_Staircase_02") as MeshInstance3D
+	assert_true(paver != null and stair != null, "Paver and Staircase_02 exist in Map_25D")
+
+	var paver_aabb = paver.get_aabb()
+	var stair_aabb = stair.get_aabb()
+	print("Paver AABB: ", paver_aabb)
+	print("Stair AABB: ", stair_aabb)
+
+	assert_true(paver_aabb.size.y >= 0.40, "Paver extruded thickness >= 0.40m (solid 3D block)")
+
+	var paver_front_z = paver_aabb.position.z + paver_aabb.size.z
+	var stair_end_z = stair_aabb.position.z
+	print("Stair end Z: ", stair_end_z, " | Paver front Z: ", paver_front_z)
+	assert_true(paver_front_z >= stair_end_z, "Paver overlaps Staircase_02 (0 gap, no clipping seam)")
+
 func test_surroundings_mountains():
 	print("\n-- Testing Surroundings Mountains & Plains --")
 	var map_surr = test_map.find_child("Map_Surroundings")
@@ -242,5 +265,37 @@ func test_surroundings_mountains():
 
 	var plains = map_surr.find_child("Terrain_Plains_Mesh")
 	assert_true(plains != null, "Terrain_Plains_Mesh exists and connects island to surroundings")
+
+func test_camera_zoom():
+	print("\n-- Testing Isometric Camera Zoom Feature --")
+	var cam = test_map.find_child("IsometricCamera")
+	assert_true(cam != null, "IsometricCamera exists in WorldMap")
+	assert_true(cam.get("MinZoomSize") != null, "MinZoomSize property exists")
+	assert_true(cam.get("MaxZoomSize") != null, "MaxZoomSize property exists")
+	assert_true(cam.get("ZoomSpeed") != null, "ZoomSpeed property exists")
+	assert_true(cam.get("ZoomSmoothness") != null, "ZoomSmoothness property exists")
+
+func test_npc_ground_position():
+	print("\n-- Testing NPC Ground Placement --")
+	var npc = test_map.find_child("NPC")
+	assert_true(npc != null, "NPC exists in WorldMap")
+	print("NPC Position: ", npc.position)
+	assert_true(npc.position.y <= 1.0, "NPC placed on ground level (Y <= 1.0m)")
+	assert_true(is_equal_approx(npc.position.x, 5.0), "NPC X coordinate is near player main pathway")
+
+func test_backface_collision():
+	print("\n-- Testing BackfaceCollision on Trimesh Surfaces --")
+	var map_25d = test_map.find_child("Map_25D")
+	var terrain = map_25d.find_child("SM_Terrain_Chunk") if map_25d else null
+	assert_true(terrain != null, "SM_Terrain_Chunk exists in Map_25D")
+	var found_concave_backface = false
+	for child in terrain.get_children():
+		if child is StaticBody3D:
+			for sub_child in child.get_children():
+				if sub_child is CollisionShape3D and sub_child.shape is ConcavePolygonShape3D:
+					if sub_child.shape.backface_collision:
+						found_concave_backface = true
+	assert_true(found_concave_backface, "ConcavePolygonShape3D has BackfaceCollision enabled")
+
 
 

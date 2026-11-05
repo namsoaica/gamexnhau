@@ -19,29 +19,33 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, chống moonwalk, dịch chuyển tức thời `TeleportTo`. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, dịch chuyển tức thời `TeleportTo`. |
 | `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip. |
 | `Scripts/Player/PlayerInteractor.cs` | `uid://cwt2g2l1041b` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/IInteractable.cs` | `uid://cb38i1wmsj35b` | Interface chuẩn định nghĩa thực thể tương tác (`PromptText`, `CanInteract()`, `Interact()`, `OnFocusGained()`, `OnFocusLost()`). |
 | `Scripts/Core/InteractableArea.cs` | `uid://b45c22501e5v` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
-| `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
+| `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
-| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà và tự động `LookAt` vào Player chuẩn góc Isometric. |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` cho các mesh địa hình (`Terrain`, `Staircase`, `Path`, `Paver`), chướng ngại vật (`Rock`, `Fence`) và ranh giới núi (`Mountain`, `Cliff`). |
+| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera bám theo Player mượt mà, tự động `LookAt` vào Player chuẩn góc Isometric, hỗ trợ thu phóng con lăn chuột mượt mà (`MinZoomSize = 8`, `MaxZoomSize = 30`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`). |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` chống xuyên mép rìa bậc thềm cho các mesh địa hình (`Terrain`, `Staircase`, `Path`, `Paver`, `Rock`, `Mountain`), đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho nền gạch. |
+| `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt phím `F1`/`~`/`F3`, mở khóa chuột, tự động tìm kiếm node, cập nhật FPS & tọa độ Player theo thời gian thực, điều khiển Zoom Camera, tải lại Scene. |
+| `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
+| `Scripts/UI/DevNpcTab.cs` | (C# Script) | Tab Live Dialogue Editor: Hiển thị tên NPC, danh sách thoại trong `ItemList`, ô nhập `LineEdit`, nút thêm thoại mới, phát thoại ngay, xoay vòng thoại, xóa câu thoại. |
 
 ### B. Scenes (`Scenes/`)
 | File Scene | UID | Cấu Trúc Node Chính |
 | :--- | :--- | :--- |
 | `Scenes/Characters/Player.tscn` | `uid://ciy0uaygbkns3` | `CharacterBody3D` (PlayerMovement) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `CharacterModel` (`character_25d.glb`) -> `PlayerAnimation` -> `PlayerInteractor` (Area3D). |
 | `Scenes/Characters/NPC.tscn` | (PackedScene) | `Node3D` (SimpleNpc) -> `CharacterModel` (`character_25d.glb`) -> `InteractableArea` (Area3D). |
-| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | `WorldMap` (Node3D) -> `WorldEnvironment` -> `DirectionalLight3D` -> `MapAutoCollision` -> `Map_25D` (`map_25d.glb`) -> `Map_Surroundings` (`map_surroundings.glb`) -> `Player` -> `IsometricCamera` (CameraFollow) -> `NPC` -> `VoidKillZone` (Area3D). |
+| `Scenes/UI/DevOverlay.tscn` | `uid://b8d2y01devhud` | `CanvasLayer` (DevOverlay, layer 100) -> `PanelContainer` (StyleBoxFlat bán trong suốt bo góc) -> `VBoxContainer` -> HeaderBar -> `TabContainer` (`DevPlayerTab`, `DevNpcTab`, `DevWorldTab`). |
+| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | `WorldMap` (Node3D) -> `WorldEnvironment` -> `DirectionalLight3D` -> `MapAutoCollision` -> `Map_25D` (`map_25d.glb`) -> `Map_Surroundings` (`map_surroundings.glb`) -> `Player` -> `IsometricCamera` (CameraFollow) -> `NPC` -> `VoidKillZone` (Area3D) -> `DevOverlay` (CanvasLayer). |
 | `Scenes/Levels/TestLevel.tscn` | `uid://c66126flaj42w` | Level kiểm thử mặt sàn phẳng ban đầu. |
 
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
-- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã đồng bộ màu xanh cỏ).
+- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm).
 - **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; chỉ giữ lại DUY NHẤT 1 dãy núi hùng vĩ phía Bắc `Mountain_Mesh_North` làm phông nền background xa, đã loại bỏ các dãy núi South, West, East che tầm nhìn Isometric; dọn sạch vật cản tiền cảnh).
-- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File nguồn môi trường: `map_surroundings.blend`).
+- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
 
@@ -166,4 +170,15 @@
    - Biên dịch `dotnet build "C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
    - Chạy kiểm thử tự động Godot Headless `test_suite.gd`: **53 / 53 Test cases Passed (100% Pass, 0 Fail)**.
 
-
+### [2026-11-06] - Sửa Hướng Quay Nhân Vật, Chống Xuyên Mép Bậc Thềm, Thu Phóng Camera & Đồng Bộ Nền Gạch
+1. **Sửa Hướng Quay Mặt Nhân Vật Chuẩn Xác (`PlayerMovement.cs`)**:
+   - Model `character_25d.glb` có mặt hướng chuẩn theo trục `+Z`.
+   - Loại bỏ dấu âm gây hiện tượng moonwalk (đi giật lùi), sửa công thức xoay chuẩn: `float targetAngle = Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y);`.
+   - Nhân vật quay mặt nhìn thẳng chính xác 100% theo hướng chuyển động thực tế.
+2. **Chống Xuyên Qua Mép / Rìa Bậc Thềm (`PlayerMovement.cs` & `MapAutoCollision.cs`)**:
+   - `PlayerMovement.cs`: Trong `_Ready()`, cấu hình `SafeMargin = 0.08f;`, `MaxSlides = 6;`, `WallMinSlideAngle = Mathf.DegToRad(15.0f);` chống lọt mép góc nhọn bậc thềm và trôi dốc.
+   - `MapAutoCollision.cs`: Duyệt tìm `ConcavePolygonShape3D` của các mesh địa hình sau khi gọi `CreateTrimeshCollision()`, tự động kích hoạt `concave.BackfaceCollision = true;` để các bề mặt tam giác có va chạm hai mặt, triệt tiêu hoàn toàn lỗi rơi xuyên mép bậc thang.
+3. **Đồng Bộ Nền Gạch Sang Màu & Texture Cỏ (`MapAutoCollision.cs`)**:
+   - Gán `StandardMaterial3D` với texture `tex_grass_grid.png` (fallback `map_25d_Tex_Grass_Grid.png`), `AlbedoColor = Colors.White` và `TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps`.
+   - Giúp bề mặt nền gạch `SM_Tier2_Pavers` đồng nhất tuyệt đối về họa tiết ô cỏ và sắc độ với thảm cỏ xung quanh.
+4. **Bổ Sung 

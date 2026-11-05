@@ -1,0 +1,255 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/DevOverlay.cs" id="1_overlay"]
+[ext_resource type="Script" path="res://Scripts/UI/DevPlayerTab.cs" id="2_player_tab"]
+[ext_resource type="Script" path="res://Scripts/UI/DevNpcTab.cs" id="3_npc_tab"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.08, 0.1, 0.14, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.42, 0.65, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="DevOverlay" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_overlay")
+
+[node name="DevPanel" type="PanelContainer" parent="."]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 470.0
+offset_bottom = 580.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="DevPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderBar" type="HBoxContainer" parent="DevPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="DevPanel/VBox/HeaderBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "🛠️ CHẾ ĐỘ DEV (DEBUG HUD)"
+
+[node name="KeyHint" type="Label" parent="DevPanel/VBox/HeaderBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "[F1 / ~]"
+
+[node name="CloseBtn" type="Button" parent="DevPanel/VBox/HeaderBar"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+text = " ✕ "
+
+[node name="HSeparator" type="HSeparator" parent="DevPanel/VBox"]
+layout_mode = 2
+
+[node name="Tabs" type="TabContainer" parent="DevPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="DevPlayerTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 12
+script = ExtResource("2_player_tab")
+
+[node name="SpeedRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/SpeedRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Tốc độ chạy:"
+
+[node name="SpeedSlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevPlayerTab/SpeedRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 2.0
+max_value = 25.0
+step = 0.5
+value = 6.0
+
+[node name="SpeedVal" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/SpeedRow"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "6.0"
+horizontal_alignment = 2
+
+[node name="JumpRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/JumpRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Lực nhảy:"
+
+[node name="JumpSlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevPlayerTab/JumpRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 5.0
+max_value = 25.0
+step = 0.5
+value = 9.0
+
+[node name="JumpVal" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/JumpRow"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "9.0"
+horizontal_alignment = 2
+
+[node name="GravityRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/GravityRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Trọng lực:"
+
+[node name="GravitySlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevPlayerTab/GravityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 5.0
+max_value = 40.0
+step = 1.0
+value = 20.0
+
+[node name="GravityVal" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/GravityRow"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "20.0"
+horizontal_alignment = 2
+
+[node name="Sep" type="HSeparator" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+
+[node name="InfiniteJumpCheck" type="CheckBox" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+text = "✨ Nhảy Vô Hạn / Bất Tử (Infinite Jump)"
+
+[node name="RespawnBtn" type="Button" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "🔄 Về Điểm Xuất Phát (Teleport Spawn)"
+
+[node name="DevNpcTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("3_npc_tab")
+
+[node name="NpcNameLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "NPC: Dân Làng"
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Danh sách câu thoại hiện có:"
+
+[node name="DialogueList" type="ItemList" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DialogueInput" type="LineEdit" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+placeholder_text = "Nhập câu thoại mới tại đây..."
+clear_button_enabled = true
+
+[node name="ActionsRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+
+[node name="AddBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "➕ Thêm Thoại"
+
+[node name="SpeakNowBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🗣️ Nói Ngay"
+
+[node name="ActionsRow2" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+
+[node name="CycleBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔄 Xoay Vòng"
+
+[node name="DeleteBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🗑️ Xóa Đã Chọn"
+
+[node name="DevWorldTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ZoomRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/ZoomRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Camera Zoom:"
+
+[node name="ZoomSlider" type="HSlider" parent="DevPanel/VBox/Tabs/DevWorldTab/ZoomRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 8.0
+max_value = 35.0
+step = 0.5
+value = 17.5
+
+[node name="ZoomVal" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/ZoomRow"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "17.5"
+horizontal_alignment = 2
+
+[node name="Sep" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+
+[node name="StatsBox" type="VBoxContainer" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FpsLabel" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/StatsBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+text = "FPS: 60"
+
+[node name="PosLabel" type="Label" parent="DevPanel/VBox/Tabs/DevWorldTab/StatsBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+text = "Player Pos: (0.0, 0.0, 0.0)"
+
+[node name="Sep2" type="HSeparator" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+layout_mode = 2
+
+[node name="ReloadBtn" type="Button" parent="DevPanel/VBox/Tabs/DevWorldTab"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "🔄 Tải Lại Màn Chơi (Reload)"

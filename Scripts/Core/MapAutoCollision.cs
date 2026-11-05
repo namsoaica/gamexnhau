@@ -12,7 +12,8 @@ public partial class MapAutoCollision : Node
 
 	[ExportGroup("Cấu hình Đổi Màu Nền Gạch")]
 	[Export] public bool RecolorPaversToGrass { get; set; } = true;
-	[Export] public Color GrassGreenColor { get; set; } = new Color(0.35f, 0.65f, 0.25f);
+	[Export] public Color PaverAlbedoColor { get; set; } = Colors.White;
+	[Export] public string GrassTexturePath { get; set; } = "res://Assets/Models_Exported/tex_grass_grid.png";
 
 	private StandardMaterial3D? _cachedPaverMaterial;
 
@@ -62,18 +63,49 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Áp dụng vật liệu màu xanh cỏ tươi mát cho các mesh nền gạch để đồng bộ cảnh quan.
+	/// Áp dụng vật liệu cỏ đồng bộ texture cho các mesh nền gạch.
 	/// </summary>
 	private void ApplyGrassMaterialToPaver(MeshInstance3D meshInstance)
 	{
-		_cachedPaverMaterial ??= new StandardMaterial3D
+		meshInstance.MaterialOverride = GetOrCreatePaverMaterial();
+		GD.Print($"[MapAutoCollision] Đã đồng bộ texture cỏ cho nền gạch: {meshInstance.Name}");
+	}
+
+	/// <summary>
+	/// Tạo hoặc trả về vật liệu cỏ với texture đồng bộ cho nền gạch.
+	/// </summary>
+	private StandardMaterial3D GetOrCreatePaverMaterial()
+	{
+		if (_cachedPaverMaterial != null) return _cachedPaverMaterial;
+
+		Texture2D? grassTex = LoadGrassTexture();
+		_cachedPaverMaterial = new StandardMaterial3D
 		{
-			AlbedoColor = GrassGreenColor,
+			AlbedoColor = PaverAlbedoColor,
+			AlbedoTexture = grassTex,
+			TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps,
 			Roughness = 0.85f
 		};
+		return _cachedPaverMaterial;
+	}
 
-		meshInstance.MaterialOverride = _cachedPaverMaterial;
-		GD.Print($"[MapAutoCollision] Đã đổi màu xanh cỏ cho nền gạch: {meshInstance.Name}");
+	/// <summary>
+	/// Tải texture cỏ từ đường dẫn cấu hình hoặc texture dự phòng.
+	/// </summary>
+	private Texture2D? LoadGrassTexture()
+	{
+		if (ResourceLoader.Exists(GrassTexturePath))
+		{
+			return GD.Load<Texture2D>(GrassTexturePath);
+		}
+
+		const string fallbackPath = "res://Assets/Models_Exported/map_25d_Tex_Grass_Grid.png";
+		if (ResourceLoader.Exists(fallbackPath))
+		{
+			return GD.Load<Texture2D>(fallbackPath);
+		}
+
+		return null;
 	}
 
 	/// <summary>
@@ -83,7 +115,26 @@ public partial class MapAutoCollision : Node
 	{
 		if (meshInstance.Mesh == null || HasStaticBodyChild(meshInstance)) return;
 		meshInstance.CreateTrimeshCollision();
-		GD.Print($"[MapAutoCollision] Đã tạo va chạm cho: {meshInstance.Name}");
+		EnableBackfaceCollision(meshInstance);
+		GD.Print($"[MapAutoCollision] Đã tạo va chạm (BackfaceCollision bật) cho: {meshInstance.Name}");
+	}
+
+	/// <summary>
+	/// Bật BackfaceCollision cho ConcavePolygonShape3D để chống lọt mép, rìa bậc thềm.
+	/// </summary>
+	private void EnableBackfaceCollision(Node parentNode)
+	{
+		foreach (Node child in parentNode.GetChildren())
+		{
+			if (child is CollisionShape3D colShape && colShape.Shape is ConcavePolygonShape3D concave)
+			{
+				concave.BackfaceCollision = true;
+			}
+			else if (child.GetChildCount() > 0)
+			{
+				EnableBackfaceCollision(child);
+			}
+		}
 	}
 
 	/// <summary>

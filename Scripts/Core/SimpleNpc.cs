@@ -44,10 +44,7 @@ public partial class SimpleNpc : Node3D, IInteractable
 	/// <summary>
 	/// Kiểm tra xem NPC có đang sẵn sàng trò chuyện hay không.
 	/// </summary>
-	public bool CanInteract()
-	{
-		return IsInsideTree() && Visible;
-	}
+	public bool CanInteract() => IsInsideTree() && Visible;
 
 	/// <summary>
 	/// Kích hoạt nói chuyện: chuyển tiếp câu thoại và hiển thị nhãn chữ 3D.
@@ -117,8 +114,9 @@ public partial class SimpleNpc : Node3D, IInteractable
 		newLabel.Name = "FloatingLabel";
 		newLabel.Position = new Vector3(0.0f, 2.3f, 0.0f);
 		newLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
-		newLabel.FontSize = 28;
-		newLabel.OutlineSize = 6;
+		newLabel.NoDepthTest = true;
+		newLabel.FontSize = 36;
+		newLabel.OutlineSize = 8;
 		newLabel.Modulate = Colors.White;
 		newLabel.OutlineModulate = Colors.Black;
 
@@ -129,8 +127,10 @@ public partial class SimpleNpc : Node3D, IInteractable
 	/// <summary>
 	/// Đọc câu thoại tiếp theo trong danh sách và cập nhật hiển thị.
 	/// </summary>
-	private void SpeakNextLine()
+	public void SpeakNextLine()
 	{
+		if (DialogueLines.Length == 0) return;
+		_dialogueIndex %= DialogueLines.Length;
 		string currentMessage = DialogueLines[_dialogueIndex];
 		_dialogueIndex = (_dialogueIndex + 1) % DialogueLines.Length;
 
@@ -142,7 +142,7 @@ public partial class SimpleNpc : Node3D, IInteractable
 	/// <summary>
 	/// Hiển thị lời thoại lên nhãn 3D và tự động hẹn giờ ẩn sau 4 giây.
 	/// </summary>
-	private void DisplayMessage(string message)
+	public void DisplayMessage(string message)
 	{
 		if (FloatingLabel == null)
 		{

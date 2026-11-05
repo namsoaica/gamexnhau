@@ -62,3 +62,62 @@
 - **Kiểm định tự động**:
   - `dotnet build`: **0 Warning(s), 0 Error(s)**.
   - Godot Headless `test_suite.gd`: **Passed: 53 / Failed: 0 (100% Pass)**.
+
+## Phiên làm việc: 2026-11-06 (Rạng sáng - Sửa Hướng Quay Mặt, Chống Xuyên Mép, Zoom Camera, Tương Tác NPC)
+- **Sửa hướng quay mặt nhân vật (`PlayerMovement.cs`)**:
+  - Xóa bỏ dấu âm làm ngược 180 độ; sửa công thức tính góc quay `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)` khớp chuẩn với model `character_25d.glb` (mặt hướng +Z). Nhân vật nhìn thẳng về phía trước theo hướng di chuyển.
+- **Chống lọt mép & xuyên rìa bậc thềm (`PlayerMovement.cs` & `MapAutoCollision.cs`)**:
+  - `PlayerMovement.cs`: Thêm cấu hình `SafeMargin = 0.08f;`, `MaxSlides = 6;`, `WallMinSlideAngle = Mathf.DegToRad(15.0f);`.
+  - `MapAutoCollision.cs`: Kích hoạt `concave.BackfaceCollision = true;` cho mọi `ConcavePolygonShape3D` của mesh địa hình, triệt tiêu lỗi xuyên mép bậc thang.
+- **Đồng bộ nền gạch sang họa tiết & màu cỏ (`MapAutoCollision.cs`)**:
+  - Sử dụng texture cỏ `tex_grass_grid.png` với `AlbedoColor = Colors.White` và `TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps`.
+- **Thêm tính năng Zoom Camera bằng con lăn chuột (`CameraFollow.cs`)**:
+  - Bắt sự kiện `MouseButton.WheelUp` (Zoom In) và `MouseButton.WheelDown` (Zoom Out), giới hạn từ 8.0 đến 30.0, nội suy Lerp mượt mà theo từng frame trong `_Process`.
+- **Đưa NPC xuống mặt đất & hoàn thiện hội thoại (`WorldMap.tscn`, `SimpleNpc.cs`)**:
+  - Đưa NPC từ `(3, 2.5, -6)` xuống `(5.0, 0.5, -4.0)` trên mặt đất đảo trung tâm.
+  - Bật `NoDepthTest = true;`, tăng `FontSize = 36;`, `OutlineSize = 8;` cho `Label3D` trên đầu NPC giúp lời thoại hiển thị rõ ràng, không bị chìm hay che khuất.
+- **Kiểm định tự động**:
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+  - Godot Headless `test_suite.gd`: **Passed: 63 / Failed: 0 (100% Pass)**.
+
+## Phiên làm việc: 2026-11-06 (Sáng sớm - Sub-agent blender-helper: Cải tạo mô hình 3D bản đồ)
+- **Đồng bộ thảm cỏ nền gạch `SM_Tier2_Pavers`**:
+  - Gán vật liệu `Mat_Grass` kèm texture `Tex_Grass_Grid` (`tex_grass_grid.png`).
+  - Cấu hình UV mapping phẳng (planar projection) chiếu đứng `(u, v) = (x, y)` cho mặt trên, họa tiết lưới cỏ ăn khớp 1:1 với địa hình đảo trung tâm.
+- **Khắc phục triệt để khe hở bậc thềm & chống xuyên mép**:
+  - Đo đạc thực tế: Cầu thang kết thúc ở Y = 7.004m, nền gạch cũ bắt đầu ở Y = 7.040m (hở 3.6cm, chỉ dày 2.5cm).
+  - Mở rộng mép tiếp giáp của `SM_Tier2_Pavers` về `Y = 6.99m`, đè lên bậc thang 1.4cm đóng kín 100% khe hở.
+  - Kéo đùn (extrude) độ dày sâu xuống đất thêm 0.40m (`Z` từ 2.10m đến 2.52m), kèm khối móng đặc liên kết tạo thành khối 3D đặc vững chắc chống xuyên mép/rìa.
+- **Quy tắc bảo toàn Blender**:
+  - File gốc `map_25d.blend` được bảo tồn nguyên vẹn 100%.
+  - Lưu an toàn file cập nhật vào `Assets/Blender_Source/map_25d_fixed.blend`.
+  - Xuất mô hình `Assets/Models_Exported/map_25d.glb` chuẩn Godot (-Z forward, Y up).
+- **Kiểm định tự động**:
+  - Bổ sung test case `test_paver_stair_gap_and_thickness` vào `test_suite.gd`.
+  - Godot Headless `test_suite.gd`: **Passed: 66 / Failed: 0 (100% Pass)**.
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+## Phiên làm việc: 2026-11-06 (Sáng sớm - Sub-agent csharp-coder: Xây Dựng Chế Độ Dev Mode / Debug Overlay HUD)
+- **Hệ thống phím tắt Toggle & Quản lý chuột (`DevOverlay.cs`)**:
+  - Hỗ trợ phím tắt `F1`, `~` (QuoteLeft / Tilde) và `F3` để bật/tắt HUD trên cùng (`CanvasLayer` layer 100).
+  - Tự động mở khóa chuột (`Input.MouseMode = Visible`) khi mở bảng điều khiển.
+  - Tự động dò tìm các node `PlayerMovement`, `CameraFollow`, `SimpleNpc` trong scene tree.
+- **Tab 1: Nhân Vật (`DevPlayerTab.cs`)**:
+  - Tinh chỉnh tốc độ chạy (`MoveSpeed`: 2.0 -> 25.0), lực nhảy (`JumpVelocity`: 5.0 -> 25.0), trọng lực (`Gravity`: 5.0 -> 40.0) với nhãn hiển thị số thực trực tiếp.
+  - Bật/tắt chế độ Nhảy Vô Hạn / Bất Tử (`InfiniteJump`) cho phép nhảy liên tục trên không.
+  - Nút dịch chuyển tức thời về điểm xuất phát ban đầu (`TeleportTo(SpawnPosition)`).
+- **Tab 2: Trình Chỉnh Sửa Hội Thoại Trực Tiếp (`DevNpcTab.cs`)**:
+  - Hiển thị tên NPC, danh sách câu thoại dạng `ItemList`.
+  - Ô nhập `LineEdit` và nút Thêm Thoại (ghi trực tiếp vào mảng `DialogueLines`).
+  - Nút Nói Ngay (`DisplayMessage`) và Xoay Vòng Thoại (`SpeakNextLine`).
+  - Nút Xóa Thoại đã chọn.
+- **Tab 3: Camera & Môi Trường (`DevWorldTab`)**:
+  - Thanh trượt Zoom Camera (8.0 -> 35.0) đồng bộ trực tiếp với `CameraFollow.TargetZoomSize`.
+  - Hiển thị thông số thời gian thực: FPS và tọa độ `Player Pos: (X, Y, Z)`.
+  - Nút Tải lại màn chơi (`ReloadCurrentScene`).
+- **Tích hợp Scene (`Scenes/UI/DevOverlay.tscn` & `Scenes/Levels/WorldMap.tscn`)**:
+  - Giao diện PanelContainer bán trong suốt, bo góc, tích hợp sẵn vào `WorldMap.tscn`.
+- **Kiểm định Clean Code & Biên dịch**:
+  - 100% file < 200 dòng, mọi hàm < 20 dòng (< 25 dòng), an toàn bộ nhớ hủy sự kiện trong `_ExitTree()`.
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
