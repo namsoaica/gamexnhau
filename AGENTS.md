@@ -36,3 +36,10 @@ Mỗi khi khởi tạo Sub-agent, prompt giao việc BẮT BUỘC phải kèm c�
 - Workflows tự động nằm tại: `.agents/workflows/`
   - `dev_and_review.py`: Tự động chuỗi Lập trình C# -> Rà soát Clean Code -> Kiểm tra build -> Cập nhật trạng thái.
   - `checkpoint_and_reset.py`: Đóng gói trạng thái và chuẩn bị reset token.
+
+## 3. Luật Tối Ưu Hóa Texture & Material (Chống Phình Dung Lượng)
+- **Nguồn tra cứu bắt buộc**: Trước khi tạo hoặc chỉnh sửa bất kỳ cảnh 3D, bản đồ, nhân vật hay vật liệu nào, BẮT BUỘC phải đọc `Assets/Textures/TEXTURE_CATALOG.md` và áp dụng quy tắc của `@texture-architect`.
+- **Nguyên tắc Ưu tiên**:
+  1. Ưu tiên dùng lại `.tres` trong `Assets/Materials_Shared/`.
+  2. Ưu tiên dùng lại ảnh trong `Assets/Textures/Grayscale_Masks/` hoặc `Tileable/` kết hợp đổi `albedo_color` / `uv1_scale` trong Godot.
+  3. Khi thấy tài nguyên cũ KHÔNG phù hợp với yêu cầu mới: Chủ động tạo Texture mới có khả năng tái sử dụng cao (Seamless hoặc Grayscale), lưu vào `Assets/Textures/`, tạo `.tres` trong `Assets/Materials_Shared/` và ghi danh ngay vào `Assets/Textures/TEXTURE_CATALOG.md`.

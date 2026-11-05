@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://bkow053hg3twe" path="res://Assets/Textures/Tileable/tex_metal_seamless.png" id="1_metal"]
+
+[resource]
+albedo_texture = ExtResource("1_metal")
+metallic = 0.85
+roughness = 0.35

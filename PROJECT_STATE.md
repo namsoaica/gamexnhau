@@ -28,7 +28,7 @@
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), cung cấp `SetFreeCamActive()` và `ResetToPlayer()`, an toàn bộ nhớ trong `_ExitTree()`. |
 | `Scripts/Core/FreeCameraController.cs` | (C# Script) | Bộ điều khiển Camera Tự Do (6-DOF Fly Cam) độc lập, hỗ trợ bàn phím WASD / Space / Ctrl / EQ, xoay góc nhìn chuột phải + Mouse Motion hoặc Right Stick cần phải, nâng/hạ độ cao bằng cò L2/R2 hoặc LB/RB, cuộn chuột điều chỉnh tốc độ bay (5.0 - 50.0). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ mịn sạch không có đường kẻ ô vuông (`tex_grass_clean.png`, fallback `#529934`), tự động loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky. |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tải và tái sử dụng bộ vật liệu dùng chung `res://Assets/Materials_Shared/` (`M_Grass.tres`, `M_Dirt.tres`, `M_Rock.tres`, `M_Wood_Fence.tres`, `M_Rock_Mountain_Purple.tres`), tự động gán vật liệu chuẩn cho nền gạch, cánh đồng, lối mòn đất, hàng rào gỗ, vách núi tím viễn cảnh và đá tảng; loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky; tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình và điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`. Tuân thủ Clean Code 168 dòng, mỗi hàm < 15 dòng, dọn dẹp biến trong `_ExitTree()`. |
 | `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
 | `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt linh hoạt bằng phím `F1`/`~`/`F3` hoặc tay cầm Gamepad (`Back`/`Select`, `Start`, `RightStick`), chuyển đổi các tab bằng nút vai `LB`/`RB`, mở khóa chuột, điều phối các tab con. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
@@ -46,9 +46,37 @@
 
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
-- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; toàn bộ địa hình sử dụng texture cỏ mịn tự nhiên không có đường kẻ ô vuông `tex_grass_clean.png` [#529934]; đã loại bỏ hoàn toàn phông nền trắng `SM_Sky_Backdrop_Plane`).
-- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói không ô vuông `tex_grass_clean.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
-- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
+- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; đã liên kết bộ texture seamless mới: `tex_grass_seamless.png` (`Mat_Grass`), `tex_dirt_seamless.png` (`Mat_Cliff_Dirt`, `Mat_Dirt_Path`), `tex_wood_seamless.png` (`Mat_Wood`), `tex_rock_seamless.png` (`Mat_Stone`, `Mat_Cliff_Rock`); toàn bộ texture được pack trực tiếp vào file blend an toàn `map_25d_fixed.blend` và xuất sang `.glb` chuẩn Godot `export_yup=True`, `export_materials='EXPORT'`).
+- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` liên kết texture chuẩn `tex_grass_seamless.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; toàn bộ 45 tảng đá `Rock_Mesh_*` được gán vật liệu `Mat_Stone` liên kết texture `tex_rock_seamless.png`; toàn bộ texture được pack trực tiếp vào `map_surroundings.blend` và xuất sang `.glb` chuẩn Godot; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
+- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn tuyệt đối; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
+
+### D. Hệ Thống Texture & Vật Liệu Dùng Chung (`Assets/Textures/` & `Assets/Materials_Shared/`)
+- **Tra cứu bắt buộc trước khi tạo Model / Scene**: `Assets/Textures/TEXTURE_CATALOG.md`.
+- **Tileable Textures (512x512 Seamless 100%)**:
+  * `tex_grass_seamless.png` (`uid://drvty0xy4e6jc`): Thảm cỏ xanh mát Stylized `#529934`.
+  * `tex_dirt_seamless.png` (`uid://cj7r7nm3t4kwv`): Đất/đường mòn nâu tự nhiên hữu cơ `#8A5C35`.
+  * `tex_rock_seamless.png` (`uid://u5lhns2a7ofk`): Vách đá xám phiến Stylized, vết nứt sắc nét.
+  * `tex_wood_seamless.png` (`uid://cylrbgem14pnb`): Thớ vân gỗ sồi ấm áp tự nhiên `#A8764A`.
+  * `tex_metal_seamless.png` (`uid://bkow053hg3twe`): Mặt kim loại phay xước nhẹ Stylized ánh bạc xám.
+- **Grayscale Masks (512x512 Tương phản cao [0.25 - 1.0] để đổi màu tự do bằng `albedo_color`)**:
+  * `mask_grass_detail.png` (`uid://dl88hu1ndt3py`): Mặt nạ cụm vi sợi cỏ cách điệu.
+  * `mask_dirt_detail.png` (`uid://ctmnogu3s05aq`): Mặt nạ lấm tấm sỏi đất hữu cơ.
+  * `mask_rock_detail.png` (`uid://6q8pf6plns63`): Mặt nạ vách đá nứt rạn góc cạnh.
+  * `mask_wood_grain.png` (`uid://2smk488wwfdu`): Mặt nạ thớ sợi vân gỗ uốn lượn tự nhiên.
+  * `mask_metal_surface.png` (`uid://cn7gdogjuc8ir`): Mặt nạ phay xước kim loại.
+- **Palettes (Bảng màu Stylized chuẩn)**:
+  * `palette_standard_stylized.png` (`uid://dukjgixx0vrrb`): Bảng màu 256x64 px gồm 16 dải màu chuyển sắc (Cỏ, Rừng, Đất mòn, Đất sét, Đá xám, Núi đá tím, Gỗ sồi, Gỗ sáng, Sắt thép, Vàng đồng, Tông da, Vải đỏ, Vải lam, Mặt nước bọt sóng, Mây trời, Hoa văn ma pháp) cho UV Palette Mapping.
+- **Shared Materials (`Assets/Materials_Shared/*.tres` - StandardMaterial3D Godot 4)**:
+  * `M_Grass.tres`, `M_Dirt.tres`, `M_Rock.tres`, `M_Wood.tres`, `M_Metal.tres`: Vật liệu cơ bản theo texture seamless.
+  * `M_Palette_Stylized.tres`: Vật liệu dùng chung cho toàn bộ model dùng kỹ thuật UV Color Palette.
+  * `M_Wood_Fence.tres`: Gỗ sồi tối màu rustic cho hàng rào.
+  * `M_Rock_Mountain_Purple.tres`: Núi tím huyền ảo viễn cảnh (biến tấu từ `mask_rock_detail.png` + `Color(0.72, 0.58, 0.84, 1.0)`).
+  * `M_Grass_Dry.tres`: Cỏ khô vàng úa mùa thu.
+  * `M_Dirt_RedClay.tres`: Đất đỏ bazan / mỏ đất sét.
+  * `M_Metal_DarkIron.tres`: Sắt đen rèn thô.
+  * `M_Character_Body.tres`: Chuẩn vật liệu thân nhân vật Player / NPC Box (`character_box_texture.png`, Roughness = 0.60).
+  * `M_Character_Face.tres`: Chuẩn vật liệu khuôn mặt nhân vật Player (`character_face.png`, Roughness = 0.60).
+
 
 ---
 
@@ -435,3 +463,94 @@
    - Đồng bộ tự động giữa C:\xnhaugame\README.md và C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\README.md qua HardLink.
    - Xác nhận biên dịch dotnet build: **0 Warning(s), 0 Error(s)**.
    - Xác nhận kiểm thử tự động Godot Headless: **131 / 131 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Khởi Tạo Hệ Thống Texture Nền Tảng & Shared Materials (Sub-agent texture-architect)
+1. **Khảo sát & Tối ưu hóa kho tài nguyên**:
+   - Khảo sát các tài nguyên ảnh trong `Assets/Blender_Source/` và `Assets/Models_Exported/`.
+   - Thiết lập nguyên tắc tái sử dụng tài nguyên (Luật Tối Ưu Hóa Texture & Material): Không tạo ảnh `.png` trùng lặp, dùng chung `.tres` hoặc biến tấu nhẹ bằng Grayscale Mask kết hợp `albedo_color`.
+2. **Sinh bộ Texture nền tảng chuẩn Stylized & Lũy thừa 2 (512x512)**:
+   - Viết kịch bản Python tự động tạo texture chu kỳ tuần hoàn (Seamless UV Wrap 100% không mối nối) tại `.agents/skills/texture-architect/scripts/generate_textures.py`.
+   - **`Assets/Textures/Tileable/` (512x512 Seamless)**:
+     * `tex_grass_seamless.png`: Thảm cỏ xanh mướt mát mắt `#529934`, mịn màng không ô vuông.
+     * `tex_dirt_seamless.png`: Đất/đường mòn nâu tự nhiên `#8A5C35` rải sỏi nhỏ hữu cơ.
+     * `tex_rock_seamless.png`: Vách đá/sỏi xám phiến Stylized góc cạnh có vết nứt tự nhiên.
+     * `tex_wood_seamless.png`: Thớ vân gỗ sồi ấm áp tự nhiên `#A8764A`.
+     * `tex_metal_seamless.png`: Mặt kim loại phay xước nhẹ Stylized ánh bạc xám.
+   - **`Assets/Textures/Grayscale_Masks/` (512x512 Trắng đen tương phản cao [0.25 - 1.0])**:
+     * `mask_grass_detail.png`: Mặt nạ vi sợi cụm cỏ cách điệu.
+     * `mask_dirt_detail.png`: Mặt nạ lấm tấm sỏi đất hữu cơ.
+     * `mask_rock_detail.png`: Mặt nạ vách đá nứt rạn góc cạnh Stylized.
+     * `mask_wood_grain.png`: Mặt nạ thớ sợi vân gỗ uốn lượn tự nhiên.
+     * `mask_metal_surface.png`: Mặt nạ phay xước bóng kim loại.
+   - **`Assets/Textures/Palettes/` (Bảng màu chuẩn Stylized)**:
+     * `palette_standard_stylized.png`: Bảng màu 256x64 px gồm 16 dải màu chuyển sắc mượt mà (Cỏ, Rừng, Đất mòn, Đất sét, Đá xám, Núi đá tím, Gỗ sồi, Gỗ sáng, Sắt thép, Vàng đồng, Tông da, Vải đỏ, Vải lam, Mặt nước bọt sóng, Mây trời, Hoa văn ma pháp) cho kỹ thuật Palette UV Mapping.
+3. **Tạo 11 vật liệu dùng chung `Assets/Materials_Shared/*.tres` (StandardMaterial3D Godot 4)**:
+   - `M_Grass.tres`: Albedo texture = `tex_grass_seamless.png`, Roughness = 0.85.
+   - `M_Dirt.tres`: Albedo texture = `tex_dirt_seamless.png`, Roughness = 0.90.
+   - `M_Rock.tres`: Albedo texture = `tex_rock_seamless.png`, Roughness = 0.80.
+   - `M_Wood.tres`: Albedo texture = `tex_wood_seamless.png`, Roughness = 0.70.
+   - `M_Metal.tres`: Albedo texture = `tex_metal_seamless.png`, Metallic = 0.85, Roughness = 0.35.
+   - `M_Palette_Stylized.tres`: Albedo texture = `palette_standard_stylized.png`, Roughness = 0.60.
+   - `M_Wood_Fence.tres`: `tex_wood_seamless.png` + `albedo_color = Color(0.65, 0.48, 0.32, 1.0)`, Roughness = 0.75.
+   - `M_Rock_Mountain_Purple.tres`: `mask_rock_detail.png` + `albedo_color = Color(0.72, 0.58, 0.84, 1.0)`, Roughness = 0.85.
+   - `M_Grass_Dry.tres`: `mask_grass_detail.png` + `albedo_color = Color(0.85, 0.76, 0.42, 1.0)`, Roughness = 0.90.
+   - `M_Dirt_RedClay.tres`: `mask_dirt_detail.png` + `albedo_color = Color(0.78, 0.42, 0.28, 1.0)`, Roughness = 0.90.
+   - `M_Metal_DarkIron.tres`: `mask_metal_surface.png` + `albedo_color = Color(0.35, 0.38, 0.42, 1.0)`, Metallic = 0.90, Roughness = 0.40.
+4. **Cập nhật tài liệu tra cứu bắt buộc `Assets/Textures/TEXTURE_CATALOG.md`**:
+   - Trình bày 3 bảng danh mục toàn diện với đường dẫn `res://`, độ phân giải, đặc tính và hướng dẫn tái sử dụng.
+   - Quét nạp Godot Engine 4.7.2 Headless thành công, tự động gán UID hợp lệ cho toàn bộ tài nguyên mới.
+
+### [2026-11-06] - Áp Dụng Bộ Material Dùng Chung Vào Map Và Player (Sub-agent csharp-coder)
+1. **Chuẩn hóa vật liệu cho Player & Nhân vật**:
+   - Tạo `Assets/Materials_Shared/M_Character_Body.tres` (`StandardMaterial3D`, Roughness = 0.60, liên kết texture `character_box_texture.png`, UID `uid://bp6j51qtlw6fp`).
+   - Tạo `Assets/Materials_Shared/M_Character_Face.tres` (`StandardMaterial3D`, Roughness = 0.60, liên kết texture `character_face.png`, UID `uid://b2v12hdnjeipu`).
+   - Bổ sung cả 2 vật liệu vào bảng 3 của `Assets/Textures/TEXTURE_CATALOG.md`.
+2. **Refactor `Scripts/Core/MapAutoCollision.cs`**:
+   - Tải sẵn và tái sử dụng bộ vật liệu `.tres` trong `res://Assets/Materials_Shared/`:
+     * Nền gạch `SM_Tier2_Pavers` và cánh đồng `Terrain_Plains_Mesh` -> gán `M_Grass.tres`.
+     * Đường đất `SM_Dirt_Path_Main`, `SM_Dirt_Path_Tier1` -> gán `M_Dirt.tres`.
+     * Hàng rào gỗ `SM_Fence_Wood_Overlook` -> gán `M_Wood_Fence.tres`.
+     * Vách núi viễn cảnh `SM_Mountains_Background` -> gán `M_Rock_Mountain_Purple.tres`.
+     * Toàn bộ tảng đá `SM_Rock_Boulder_*` và `Rock_Mesh_*` -> gán `M_Rock.tres`.
+   - Giữ nguyên cơ chế tự động xóa phông nền trời `SM_Sky_Backdrop_Plane`, tạo `BackfaceCollision = true` cho Trimesh và điều phối dốc phẳng cho cầu thang qua `StairRampBuilder`.
+   - Đảm bảo 100% Clean Code: 168 dòng (< 200 dòng), 11 hàm (mỗi hàm < 15 dòng, đạt chuẩn < 25 dòng), Guard Clauses, giải phóng tham chiếu an toàn trong `_ExitTree()`.
+3. **Mở rộng kịch bản kiểm định tự động `test_suite.gd`**:
+   - Thêm `test_shared_materials_loading()`: Kiểm tra toàn bộ 13 file `.tres` trong `Assets/Materials_Shared/` tồn tại, nạp thành công và đúng kiểu `StandardMaterial3D`.
+   - Thêm `test_character_shared_materials()`: Kiểm tra `M_Character_Body.tres` và `M_Character_Face.tres` hợp lệ, có texture gán kèm và Roughness = 0.60.
+   - Thêm `test_map_shared_materials_applied()`: Kiểm tra toàn diện các mesh trên bản đồ được tự động gán đúng các file vật liệu `.tres` tương ứng.
+4. **Biên dịch & Xác thực chất lượng**:
+   - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **193 / 193 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Áp Dụng Bộ Texture Nền Tảng Mới Vào Map Trong Blender & Xuất GLB Chuẩn Godot (Sub-agent blender-helper)
+1. **Áp Dụng Bộ Texture Chuẩn Vào `map_25d_fixed.blend`**:
+   - Tuân thủ nguyên tắc Vùng cấm ghi đè: Tuyệt đối không chạm vào `map_25d.blend`.
+   - Mở file an toàn `Assets/Blender_Source/map_25d_fixed.blend`:
+     * Vật liệu cỏ `Mat_Grass` -> liên kết trực tiếp với `Assets/Textures/Tileable/tex_grass_seamless.png`.
+     * Vật liệu vách đất `Mat_Cliff_Dirt` & đường mòn `Mat_Dirt_Path` -> liên kết trực tiếp với `Assets/Textures/Tileable/tex_dirt_seamless.png`.
+     * Vật liệu gỗ hàng rào & biển báo `Mat_Wood` -> liên kết trực tiếp với `Assets/Textures/Tileable/tex_wood_seamless.png`.
+     * Vật liệu đá `Mat_Stone` & vách đá `Mat_Cliff_Rock` -> liên kết trực tiếp với `Assets/Textures/Tileable/tex_rock_seamless.png`.
+   - Sinh chuẩn UV mapping cho các đối tượng trước đây chưa có UV layer:
+     * `SM_Dirt_Path_Main` & `SM_Dirt_Path_Tier1`: Tạo lớp planar `UVMap` theo tọa độ X, Y lặp chu kỳ 2.0m.
+     * `SM_Staircase_01`, `SM_Staircase_02`, `SM_Signpost_Overlook`, `SM_Signpost_Tier1`: Tự động Unwrap Smart UV Project sắc nét.
+     * `SM_Tier2_Pavers` & `SM_Fence_Wood_Overlook`: Chuẩn hóa tên lớp UV từ `Float2` thành `UVMap`.
+   - Đóng gói toàn bộ 5 textures vào file blend qua `bpy.ops.file.pack_all()`.
+   - Lưu an toàn vào `Assets/Blender_Source/map_25d_fixed.blend`.
+   - Xuất mô hình sang `Assets/Models_Exported/map_25d.glb` (`export_yup=True`, `export_materials='EXPORT'`, `export_apply=True`, `export_texcoords=True`).
+2. **Áp Dụng Bộ Texture Chuẩn Vào `map_surroundings.blend`**:
+   - Mở file `Assets/Blender_Source/map_surroundings.blend`:
+     * Cánh đồng cỏ `Mat_Grass_Plain` -> liên kết với `tex_grass_seamless.png`.
+     * Toàn bộ 45 tảng đá `Rock_Mesh_*` (`Mat_Stone`) -> liên kết với `tex_rock_seamless.png`.
+   - Đóng gói texture qua `bpy.ops.file.pack_all()`.
+   - Lưu an toàn vào `Assets/Blender_Source/map_surroundings.blend`.
+   - Xuất mô hình sang `Assets/Models_Exported/map_surroundings.glb` (`export_yup=True`, `export_materials='EXPORT'`, `export_apply=True`, `export_texcoords=True`).
+3. **Re-import Headless Vào Godot & Mở Rộng Bộ Kiểm Thử**:
+   - Chạy Godot Console Headless re-import cập nhật toàn diện tài nguyên cho cả 2 file `.blend` và `.glb`.
+   - Thêm phương thức kiểm định `test_blender_exported_models_and_textures()` vào `test_suite.gd`:
+     * Kiểm tra `map_25d.glb` và `map_surroundings.glb` nạp hợp lệ dưới dạng `PackedScene`.
+     * Xác nhận bảo toàn nguyên vẹn `map_25d.blend` gốc cùng sự hiện diện của `map_25d_fixed.blend` và `map_surroundings.blend`.
+     * Xác nhận sự tồn tại và tính hợp lệ của toàn bộ 5 textures trong `Assets/Textures/Tileable/`.
+4. **Biên Dịch & Kết Quả Kiểm Định**:
+   - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
+

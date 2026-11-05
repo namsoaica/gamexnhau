@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cp7w16qtoupo5"
-path="res://.godot/imported/map_25d_tex_grass_clean.png-b18828f5e458542dcae28150a9d4c8ca.ctex"
+path.s3tc="res://.godot/imported/map_25d_tex_grass_clean.png-b18828f5e458542dcae28150a9d4c8ca.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f60e96e372c77deb099c08d823998ba3"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://Assets/Models_Exported/map_25d_tex_grass_clean.png"
-dest_files=["res://.godot/imported/map_25d_tex_grass_clean.png-b18828f5e458542dcae28150a9d4c8ca.ctex"]
+dest_files=["res://.godot/imported/map_25d_tex_grass_clean.png-b18828f5e458542dcae28150a9d4c8ca.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

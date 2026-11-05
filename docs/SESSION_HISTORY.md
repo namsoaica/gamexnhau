@@ -254,6 +254,81 @@
   - Kết quả Godot Headless `test_suite.gd`: **131 / 131 Test cases Passed (100% Pass, 0 Fail)**.
   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
 
+## Phiên làm việc: 2026-11-06 (Đêm - Sub-agent texture-architect: Khởi Tạo Hệ Thống Texture & Shared Material Nền Tảng)
+- **Khởi tạo bộ Texture nền tảng Stylized chuẩn lũy thừa 2 (Power-of-Two 512x512)**:
+  - Viết thuật toán tạo ảnh chu kỳ tuần hoàn (Periodic Harvester & Worley Toroidal Distance) sinh texture seamless 100% không mối nối tại `.agents/skills/texture-architect/scripts/generate_textures.py`.
+  - Bộ Seamless Tileable (`Assets/Textures/Tileable/`):
+    * `tex_grass_seamless.png`: Cỏ xanh Stylized `#529934` mềm mại, không kẻ ô.
+    * `tex_dirt_seamless.png`: Đất nâu hữu cơ `#8A5C35` rải sỏi nhỏ.
+    * `tex_rock_seamless.png`: Vách đá xám phiến nứt rạn Stylized.
+    * `tex_wood_seamless.png`: Thớ sợi vân gỗ sồi ấm áp `#A8764A`.
+    * `tex_metal_seamless.png`: Mặt kim loại phay xước nhẹ Stylized ánh bạc xám.
+  - Bộ Grayscale Masks (`Assets/Textures/Grayscale_Masks/`):
+    * `mask_grass_detail.png`, `mask_dirt_detail.png`, `mask_rock_detail.png`, `mask_wood_grain.png`, `mask_metal_surface.png`: Tương phản cao [0.25 - 1.0], sẵn sàng nhân với `albedo_color` trong Godot để tạo vô số biến thể màu mà không tốn dung lượng VRAM.
+  - Bộ Palette (`Assets/Textures/Palettes/`):
+    * `palette_standard_stylized.png`: 256x64 px gồm 16 dải màu chuẩn (Cỏ, Rừng, Đất, Đất sét, Đá, Núi tím, Gỗ sồi, Gỗ sáng, Thép, Vàng đồng, Da, Vải đỏ, Vải lam, Nước, Mây, Ma thuật).
+- **Khởi tạo 11 file vật liệu dùng chung `Assets/Materials_Shared/*.tres` (StandardMaterial3D Godot 4)**:
+  - `M_Grass.tres`, `M_Dirt.tres`, `M_Rock.tres`, `M_Wood.tres`, `M_Metal.tres`, `M_Palette_Stylized.tres`.
+  - `M_Wood_Fence.tres` (Gỗ rào rustic sẫm màu).
+  - `M_Rock_Mountain_Purple.tres` (Đá núi tím viễn cảnh pha từ `mask_rock_detail.png` + `Color(0.72, 0.58, 0.84, 1.0)`).
+  - `M_Grass_Dry.tres` (Cỏ úa), `M_Dirt_RedClay.tres` (Đất đỏ), `M_Metal_DarkIron.tres` (Sắt rèn đen).
+- **Hoàn thiện tài liệu `Assets/Textures/TEXTURE_CATALOG.md`**:
+  - Biên soạn danh mục 3 bảng trực quan với đường dẫn `res://`, độ phân giải, đặc tính và hướng dẫn tái sử dụng bắt buộc.
+- **Kiểm định Godot Engine**:
+  - Quét nạp Godot 4.7.2 Headless Editor hoàn tất không có lỗi, tự sinh UID chuẩn cho toàn bộ 11 textures và 11 materials.
+
+## Phiên làm việc: 2026-11-06 (Sáng sớm - Sub-agent csharp-coder: Chuẩn Hóa Vật Liệu Player & Áp Dụng Shared Materials Map)
+- **Chuẩn hóa vật liệu cho Player (`M_Character_Body.tres`, `M_Character_Face.tres`)**:
+  - Tạo `Assets/Materials_Shared/M_Character_Body.tres` (`StandardMaterial3D`, liên kết `character_box_texture.png`, Roughness = 0.60).
+  - Tạo `Assets/Materials_Shared/M_Character_Face.tres` (`StandardMaterial3D`, liên kết `character_face.png`, Roughness = 0.60).
+  - Bổ sung cả 2 vật liệu vào bảng 3 của `Assets/Textures/TEXTURE_CATALOG.md`.
+- **Refactor `Scripts/Core/MapAutoCollision.cs` tải và gán Shared Materials**:
+  - Tải trước bộ tài nguyên dùng chung trong `Assets/Materials_Shared/`: `M_Grass.tres`, `M_Dirt.tres`, `M_Rock.tres`, `M_Wood_Fence.tres`, `M_Rock_Mountain_Purple.tres`.
+  - Phân loại và gán tự động khi quét mesh:
+    * `SM_Tier2_Pavers`, `Terrain_Plains_Mesh` -> gán `M_Grass.tres`.
+    * `SM_Dirt_Path_Main`, `SM_Dirt_Path_Tier1` -> gán `M_Dirt.tres`.
+    * `SM_Fence_Wood_Overlook` -> gán `M_Wood_Fence.tres`.
+    * `SM_Mountains_Background` -> gán `M_Rock_Mountain_Purple.tres`.
+    * `SM_Rock_Boulder_*`, `Rock_Mesh_*` -> gán `M_Rock.tres`.
+  - Giữ vững toàn vẹn cơ chế tự động xóa phông nền trời `SM_Sky_Backdrop_Plane`, dốc phẳng cho cầu thang qua `StairRampBuilder`, và bật `BackfaceCollision = true` cho Trimesh.
+  - Tuân thủ 100% `CODING_STANDARDS.md`: File 168 dòng (< 200 dòng), 11 hàm (mỗi hàm < 15 dòng, đạt chuẩn < 25 dòng), Guard Clauses, giải phóng an toàn biến tham chiếu trong `_ExitTree()`.
+- **Mở rộng kịch bản kiểm thử tự động `test_suite.gd`**:
+  - Thêm test nạp toàn bộ 13 file `.tres` trong `Assets/Materials_Shared/`.
+  - Thêm test tính hợp lệ và thông số của `M_Character_Body.tres` & `M_Character_Face.tres`.
+  - Thêm test gán đúng shared materials trên từng loại mesh của bản đồ.
+- **Biên dịch & Kiểm định tự động 100%**:
+  - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Chạy Godot Headless `test_suite.gd`: **193 / 193 Test cases Passed (100% Pass, 0 Fail)**.
+
+## Phiên làm việc: 2026-11-06 (Sáng sớm - Sub-agent blender-helper: Áp Dụng Bộ Texture Nền Tảng Mới Vào Map & Xuất GLB)
+- **Áp dụng bộ Texture chuẩn vào `map_25d_fixed.blend`**:
+  - Bảo tồn tuyệt đối 100% file gốc `map_25d.blend`.
+  - Mở `Assets/Blender_Source/map_25d_fixed.blend` bằng Blender 5.4 CLI:
+    * Cập nhật `Mat_Grass` -> liên kết texture `tex_grass_seamless.png`.
+    * Cập nhật `Mat_Cliff_Dirt` & `Mat_Dirt_Path` -> liên kết texture `tex_dirt_seamless.png`.
+    * Cập nhật `Mat_Wood` (`SM_Fence_Wood_Overlook`, biển báo) -> liên kết texture `tex_wood_seamless.png`.
+    * Cập nhật `Mat_Stone` (`SM_Rock_Boulder_*`, đá bước, cầu thang) & `Mat_Cliff_Rock` -> liên kết texture `tex_rock_seamless.png`.
+  - Bổ sung và chuẩn hóa UV mapping:
+    * `SM_Dirt_Path_Main` & `SM_Dirt_Path_Tier1`: Tạo lớp planar `UVMap` chu kỳ 2.0m.
+    * `SM_Staircase_01`, `SM_Staircase_02`, `SM_Signpost_Overlook`, `SM_Signpost_Tier1`: Tự động Unwrap Smart UV Project.
+    * `SM_Tier2_Pavers` & `SM_Fence_Wood_Overlook`: Đổi tên lớp UV `Float2` thành chuẩn `UVMap`.
+  - Đóng gói toàn bộ textures vào file blend và lưu an toàn vào `map_25d_fixed.blend`.
+  - Xuất mô hình sang `Assets/Models_Exported/map_25d.glb` (`export_yup=True`, `export_materials='EXPORT'`).
+- **Áp dụng bộ Texture chuẩn vào `map_surroundings.blend`**:
+  - Mở `Assets/Blender_Source/map_surroundings.blend`:
+    * Cập nhật cánh đồng cỏ `Terrain_Plains_Mesh` (`Mat_Grass_Plain`) -> liên kết `tex_grass_seamless.png`.
+    * Cập nhật toàn bộ 45 tảng đá `Rock_Mesh_*` (`Mat_Stone`) -> liên kết `tex_rock_seamless.png`.
+  - Đóng gói textures vào file blend và lưu an toàn vào `map_surroundings.blend`.
+  - Xuất mô hình sang `Assets/Models_Exported/map_surroundings.glb` (`export_yup=True`, `export_materials='EXPORT'`).
+- **Re-import vào Godot & Mở rộng bộ kiểm thử tự động**:
+  - Chạy Godot Headless import cập nhật toàn bộ tài nguyên cho `.blend` và `.glb`.
+  - Bổ sung test case `test_blender_exported_models_and_textures()` vào `test_suite.gd`.
+  - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
+
+
+
+
 
 
 

@@ -57,6 +57,10 @@ func run_suite():
 	test_expanded_platform_and_fence()
 	test_clean_grass_texture()
 	test_unobstructed_mountains()
+	test_shared_materials_loading()
+	test_character_shared_materials()
+	test_map_shared_materials_applied()
+	test_blender_exported_models_and_textures()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -498,6 +502,114 @@ func test_unobstructed_mountains():
 	var m_aabb = mountains.get_aabb()
 	print("Mountains AABB: ", m_aabb)
 	assert_true(m_aabb.position.z <= -7.5, "Mountains background pushed back, clear sky behind overlook deck")
+
+func test_shared_materials_loading():
+	print("\n-- Testing Shared Materials Loading (.tres) --")
+	var mat_files = [
+		"M_Grass.tres",
+		"M_Grass_Dry.tres",
+		"M_Dirt.tres",
+		"M_Dirt_RedClay.tres",
+		"M_Rock.tres",
+		"M_Rock_Mountain_Purple.tres",
+		"M_Wood.tres",
+		"M_Wood_Fence.tres",
+		"M_Metal.tres",
+		"M_Metal_DarkIron.tres",
+		"M_Palette_Stylized.tres",
+		"M_Character_Body.tres",
+		"M_Character_Face.tres"
+	]
+	var base_path = "res://Assets/Materials_Shared/"
+	for file_name in mat_files:
+		var path = base_path + file_name
+		assert_true(ResourceLoader.exists(path), "File exists: " + file_name)
+		var mat = ResourceLoader.load(path)
+		assert_true(mat != null, "Successfully loaded: " + file_name)
+		assert_true(mat is StandardMaterial3D, file_name + " is StandardMaterial3D")
+
+func test_character_shared_materials():
+	print("\n-- Testing Character Shared Materials Properties --")
+	var body_mat = ResourceLoader.load("res://Assets/Materials_Shared/M_Character_Body.tres") as StandardMaterial3D
+	assert_true(body_mat != null, "M_Character_Body.tres is valid")
+	assert_true(body_mat.albedo_texture != null, "M_Character_Body has albedo_texture assigned")
+	assert_true(is_equal_approx(body_mat.roughness, 0.6), "M_Character_Body roughness is 0.60")
+
+	var face_mat = ResourceLoader.load("res://Assets/Materials_Shared/M_Character_Face.tres") as StandardMaterial3D
+	assert_true(face_mat != null, "M_Character_Face.tres is valid")
+	assert_true(face_mat.albedo_texture != null, "M_Character_Face has albedo_texture assigned")
+	assert_true(is_equal_approx(face_mat.roughness, 0.6), "M_Character_Face roughness is 0.60")
+
+func test_map_shared_materials_applied():
+	print("\n-- Testing Map Shared Materials Applied on Meshes --")
+	var map_25d = test_map.find_child("Map_25D")
+	var map_surr = test_map.find_child("Map_Surroundings")
+	assert_true(map_25d != null and map_surr != null, "Map nodes exist")
+
+	# 1. Nền gạch & Plains -> M_Grass.tres
+	var paver = map_25d.find_child("SM_Tier2_Pavers") as MeshInstance3D
+	assert_true(paver != null and paver.material_override != null, "Paver has material override")
+	assert_true(paver.material_override.resource_path.ends_with("M_Grass.tres"), "Paver uses M_Grass.tres")
+
+	var plains = map_surr.find_child("Terrain_Plains_Mesh") as MeshInstance3D
+	assert_true(plains != null and plains.material_override != null, "Plains has material override")
+	assert_true(plains.material_override.resource_path.ends_with("M_Grass.tres"), "Plains uses M_Grass.tres")
+
+	# 2. Đường đất -> M_Dirt.tres
+	var dirt_path = map_25d.find_child("SM_Dirt_Path_Main") as MeshInstance3D
+	assert_true(dirt_path != null and dirt_path.material_override != null, "SM_Dirt_Path_Main has material override")
+	assert_true(dirt_path.material_override.resource_path.ends_with("M_Dirt.tres"), "SM_Dirt_Path_Main uses M_Dirt.tres")
+
+	var dirt_tier1 = map_25d.find_child("SM_Dirt_Path_Tier1") as MeshInstance3D
+	assert_true(dirt_tier1 != null and dirt_tier1.material_override != null, "SM_Dirt_Path_Tier1 has material override")
+	assert_true(dirt_tier1.material_override.resource_path.ends_with("M_Dirt.tres"), "SM_Dirt_Path_Tier1 uses M_Dirt.tres")
+
+	# 3. Hàng rào gỗ -> M_Wood_Fence.tres
+	var fence = map_25d.find_child("SM_Fence_Wood_Overlook") as MeshInstance3D
+	assert_true(fence != null and fence.material_override != null, "SM_Fence_Wood_Overlook has material override")
+	assert_true(fence.material_override.resource_path.ends_with("M_Wood_Fence.tres"), "SM_Fence_Wood_Overlook uses M_Wood_Fence.tres")
+
+	# 4. Núi tím viễn cảnh -> M_Rock_Mountain_Purple.tres
+	var mountains = map_25d.find_child("SM_Mountains_Background") as MeshInstance3D
+	assert_true(mountains != null and mountains.material_override != null, "SM_Mountains_Background has material override")
+	assert_true(mountains.material_override.resource_path.ends_with("M_Rock_Mountain_Purple.tres"), "SM_Mountains_Background uses M_Rock_Mountain_Purple.tres")
+
+	# 5. Tảng đá -> M_Rock.tres
+	var boulder = map_25d.find_child("SM_Rock_Boulder_01") as MeshInstance3D
+	assert_true(boulder != null and boulder.material_override != null, "SM_Rock_Boulder_01 has material override")
+	assert_true(boulder.material_override.resource_path.ends_with("M_Rock.tres"), "SM_Rock_Boulder_01 uses M_Rock.tres")
+
+	var rock_mesh = map_surr.find_child("Rock_Mesh_001") as MeshInstance3D
+	assert_true(rock_mesh != null and rock_mesh.material_override != null, "Rock_Mesh_001 has material override")
+	assert_true(rock_mesh.material_override.resource_path.ends_with("M_Rock.tres"), "Rock_Mesh_001 uses M_Rock.tres")
+
+func test_blender_exported_models_and_textures():
+	print("\n-- Testing Blender Exported Models & Seamless Textures Pipeline --")
+	# Check GLB models exist and load
+	var map_glb = ResourceLoader.load("res://Assets/Models_Exported/map_25d.glb")
+	assert_true(map_glb != null, "map_25d.glb loaded successfully as PackedScene")
+
+	var surr_glb = ResourceLoader.load("res://Assets/Models_Exported/map_surroundings.glb")
+	assert_true(surr_glb != null, "map_surroundings.glb loaded successfully as PackedScene")
+
+	# Check Blender source files
+	assert_true(FileAccess.file_exists("res://Assets/Blender_Source/map_25d.blend"), "Original map_25d.blend preserved")
+	assert_true(FileAccess.file_exists("res://Assets/Blender_Source/map_25d_fixed.blend"), "Safe map_25d_fixed.blend exists")
+	assert_true(FileAccess.file_exists("res://Assets/Blender_Source/map_surroundings.blend"), "Safe map_surroundings.blend exists")
+
+	# Check Tileable Textures
+	var textures = [
+		"res://Assets/Textures/Tileable/tex_grass_seamless.png",
+		"res://Assets/Textures/Tileable/tex_dirt_seamless.png",
+		"res://Assets/Textures/Tileable/tex_rock_seamless.png",
+		"res://Assets/Textures/Tileable/tex_wood_seamless.png",
+		"res://Assets/Textures/Tileable/tex_metal_seamless.png"
+	]
+	for tex_path in textures:
+		var tex = ResourceLoader.load(tex_path)
+		assert_true(tex != null and tex is Texture2D, "Texture exists and is Texture2D: " + tex_path)
+
+
 
 
 

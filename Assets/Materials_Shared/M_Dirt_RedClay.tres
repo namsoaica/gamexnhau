@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://ctmnogu3s05aq" path="res://Assets/Textures/Grayscale_Masks/mask_dirt_detail.png" id="1_mask_dirt"]
+
+[resource]
+albedo_color = Color(0.78, 0.42, 0.28, 1)
+albedo_texture = ExtResource("1_mask_dirt")
+roughness = 0.9

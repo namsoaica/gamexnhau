@@ -3,34 +3,56 @@ using Godot;
 namespace Game.Core;
 
 /// <summary>
-/// Tự động quét tạo va chạm vật lý (Trimesh / Stair Ramp), loại bỏ phông trắng và đồng bộ cỏ xanh cho Map.
+/// Tự động quét gán bộ vật liệu dùng chung (Shared Materials) và tạo va chạm vật lý cho Map.
 /// </summary>
 public partial class MapAutoCollision : Node
 {
 	[ExportGroup("Cấu hình Va Chạm")]
 	[Export] public bool EnableAutoCollision { get; set; } = true;
 
-	[ExportGroup("Cấu hình Đổi Màu Nền Cỏ")]
+	[ExportGroup("Cấu hình Vật Liệu Dùng Chung")]
 	[Export] public bool RecolorPaversToGrass { get; set; } = true;
-	[Export] public Color PaverAlbedoColor { get; set; } = Colors.White;
 	[Export] public string GrassTexturePath { get; set; } = "res://Assets/Models_Exported/tex_grass_clean.png";
+	[Export] public string SharedMaterialsDir { get; set; } = "res://Assets/Materials_Shared/";
 
-	private StandardMaterial3D? _cachedPaverMaterial;
+	private StandardMaterial3D? _matGrass;
+	private StandardMaterial3D? _matDirt;
+	private StandardMaterial3D? _matRock;
+	private StandardMaterial3D? _matWoodFence;
+	private StandardMaterial3D? _matRockMountainPurple;
 
 	public override void _Ready()
 	{
+		LoadSharedMaterials();
 		if (!EnableAutoCollision) return;
+
 		Node rootNode = GetParent() ?? this;
 		ScanAndProcessMeshes(rootNode);
 	}
 
 	public override void _ExitTree()
 	{
-		_cachedPaverMaterial = null;
+		_matGrass = null;
+		_matDirt = null;
+		_matRock = null;
+		_matWoodFence = null;
+		_matRockMountainPurple = null;
 	}
 
 	/// <summary>
-	/// Quét đệ quy toàn bộ cây Node để tìm các MeshInstance3D phù hợp.
+	/// Tải sẵn các vật liệu chuẩn dùng chung từ thư mục Assets/Materials_Shared/.
+	/// </summary>
+	private void LoadSharedMaterials()
+	{
+		_matGrass = LoadSharedMaterial($"{SharedMaterialsDir}M_Grass.tres");
+		_matDirt = LoadSharedMaterial($"{SharedMaterialsDir}M_Dirt.tres");
+		_matRock = LoadSharedMaterial($"{SharedMaterialsDir}M_Rock.tres");
+		_matWoodFence = LoadSharedMaterial($"{SharedMaterialsDir}M_Wood_Fence.tres");
+		_matRockMountainPurple = LoadSharedMaterial($"{SharedMaterialsDir}M_Rock_Mountain_Purple.tres");
+	}
+
+	/// <summary>
+	/// Quét đệ quy toàn bộ cây Node để tìm và xử lý các MeshInstance3D.
 	/// </summary>
 	private void ScanAndProcessMeshes(Node parentNode)
 	{
@@ -49,7 +71,7 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Xử lý từng MeshInstance3D: xóa phông nền trắng, phủ vật liệu cỏ và tạo va chạm nếu cần.
+	/// Xử lý từng mesh: xóa phông nền trời, gán vật liệu dùng chung và tạo va chạm.
 	/// </summary>
 	private void ProcessMeshInstance(MeshInstance3D meshInstance)
 	{
@@ -60,10 +82,7 @@ public partial class MapAutoCollision : Node
 			return;
 		}
 
-		if (RecolorPaversToGrass && ShouldRecolorToGrass(meshInstance.Name))
-		{
-			ApplyGrassMaterial(meshInstance);
-		}
+		ApplyMaterialIfMatching(meshInstance);
 
 		if (IsWalkableSurface(meshInstance.Name))
 		{
@@ -72,50 +91,33 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Áp dụng vật liệu cỏ đồng bộ texture cho các mesh nền gạch và đồng bằng.
+	/// Gán vật liệu dùng chung tương ứng theo phân loại tên Mesh.
 	/// </summary>
-	private void ApplyGrassMaterial(MeshInstance3D meshInstance)
+	private void ApplyMaterialIfMatching(MeshInstance3D meshInstance)
 	{
-		meshInstance.MaterialOverride = GetOrCreatePaverMaterial();
-		GD.Print($"[MapAutoCollision] Đã đồng bộ texture cỏ cho: {meshInstance.Name}");
+		StandardMaterial3D? mat = GetSharedMaterialForMesh(meshInstance.Name);
+		if (mat == null) return;
+
+		meshInstance.MaterialOverride = mat;
+		GD.Print($"[MapAutoCollision] Đã gán vật liệu dùng chung cho: {meshInstance.Name}");
 	}
 
 	/// <summary>
-	/// Tạo hoặc trả về vật liệu cỏ với texture đồng bộ cho nền đất và gạch.
+	/// Xác định vật liệu phù hợp cho từng mesh theo quy chuẩn thư mục Shared Materials.
 	/// </summary>
-	private StandardMaterial3D GetOrCreatePaverMaterial()
+	private StandardMaterial3D? GetSharedMaterialForMesh(string nodeName)
 	{
-		if (_cachedPaverMaterial != null) return _cachedPaverMaterial;
-
-		Texture2D? grassTex = LoadGrassTexture();
-		Color cleanGrassColor = new Color(0.32f, 0.60f, 0.20f, 1.0f); // Tông xanh cỏ #529934
-		_cachedPaverMaterial = new StandardMaterial3D
-		{
-			AlbedoColor = grassTex != null ? PaverAlbedoColor : cleanGrassColor,
-			AlbedoTexture = grassTex,
-			TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps,
-			Roughness = 0.85f
-		};
-		return _cachedPaverMaterial;
-	}
-
-	/// <summary>
-	/// Tải texture cỏ mịn sạch không có đường kẻ ô vuông từ cấu hình hoặc file dự phòng.
-	/// </summary>
-	private Texture2D? LoadGrassTexture()
-	{
-		string[] paths = { GrassTexturePath, "res://Assets/Models_Exported/tex_grass_clean.png",
-			"res://Assets/Blender_Source/textures/tex_grass_clean.png",
-			"res://Assets/Models_Exported/map_surroundings_tex_grass_clean.png" };
-		foreach (string path in paths)
-		{
-			if (!string.IsNullOrEmpty(path) && ResourceLoader.Exists(path)) return GD.Load<Texture2D>(path);
-		}
+		string lower = nodeName.ToLower();
+		if (lower.Contains("paver") || lower.Contains("plains")) return _matGrass;
+		if (lower.Contains("dirt_path")) return _matDirt;
+		if (lower.Contains("fence")) return _matWoodFence;
+		if (lower.Contains("mountains_background")) return _matRockMountainPurple;
+		if (lower.Contains("rock_boulder") || lower.Contains("rock_mesh")) return _matRock;
 		return null;
 	}
 
 	/// <summary>
-	/// Tạo va chạm phù hợp: dốc phẳng trơn cho cầu thang, hoặc Trimesh cho địa hình.
+	/// Tạo va chạm dốc trơn cho cầu thang hoặc Trimesh có bật BackfaceCollision cho địa hình.
 	/// </summary>
 	private void CreateCollisionIfMissing(MeshInstance3D meshInstance)
 	{
@@ -133,7 +135,7 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Bật BackfaceCollision cho ConcavePolygonShape3D để chống lọt mép, rìa bậc thềm.
+	/// Kích hoạt BackfaceCollision cho ConcavePolygonShape3D để chống rơi xuyên địa hình.
 	/// </summary>
 	private void EnableBackfaceCollision(Node parentNode)
 	{
@@ -151,7 +153,16 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Kiểm tra xem node con đã có StaticBody3D hay chưa để tránh tạo trùng lặp.
+	/// Tải an toàn tài nguyên StandardMaterial3D từ đường dẫn.
+	/// </summary>
+	private static StandardMaterial3D? LoadSharedMaterial(string path)
+	{
+		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path)) return null;
+		return GD.Load<StandardMaterial3D>(path);
+	}
+
+	/// <summary>
+	/// Kiểm tra Node con đã có StaticBody3D hay chưa.
 	/// </summary>
 	private static bool HasStaticBodyChild(Node node)
 	{
@@ -163,7 +174,7 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Nhận diện mesh phông nền trắng cần xóa bỏ để lộ bầu trời xanh ProceduralSky.
+	/// Nhận diện mesh phông nền trắng cần xóa bỏ.
 	/// </summary>
 	private static bool IsSkyBackdrop(string nodeName)
 	{
@@ -172,16 +183,7 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Nhận diện mesh cần đổi sang cỏ xanh (gạch paver hoặc cánh đồng plains).
-	/// </summary>
-	private static bool ShouldRecolorToGrass(string nodeName)
-	{
-		string lower = nodeName.ToLower();
-		return lower.Contains("paver") || lower.Contains("tier2_pavers") || lower.Contains("plains");
-	}
-
-	/// <summary>
-	/// Lọc tên các Mesh cần tạo bề mặt va chạm cho nhân vật đi lại hoặc cản trở chuyển động.
+	/// Lọc tên các Mesh cần tạo va chạm tương tác cho nhân vật.
 	/// </summary>
 	private static bool IsWalkableSurface(string nodeName)
 	{
