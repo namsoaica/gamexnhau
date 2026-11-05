@@ -193,5 +193,67 @@
   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
   - Mở rộng `test_suite.gd`: **117 / 117 Test cases Passed (100% Pass, 0 Fail)**.
 
+## Phiên làm việc: 2026-11-06 (Chiều - Sub-agent blender-helper: Mở Rộng Đài Cao Tầng 2, Xóa Đường Kẻ Ô Vuông Nền Cỏ & Dọn Bớt Núi Nón Tím)
+- **Mở rộng đài cao (Tier 2 Terrace / Pavers) & Lan can hàng rào gỗ**:
+  - Khảo sát hình học thực tế: Trước đây `SM_Tier2_Pavers` chỉ có kích thước 0.94m x 0.97m (~0.91 m²) rất chật hẹp, hàng rào gỗ cũ chắn ngang ngay trước mặt nhân vật tại Y=7.50m.
+  - Tái thiết kế & mở rộng `SM_Tier2_Pavers`:
+    * Chiều rộng mới theo trục X: từ 4.80m đến 7.40m (**Rộng 2.60m**, gấp ~2.76 lần).
+    * Chiều dài mới theo trục Y: từ 6.99m đến 9.40m (**Dài 2.41m**, gấp ~2.48 lần).
+    * Độ dày Z: từ 2.10m đến 2.52m (**Dày 0.42m** dạng khối 3D đặc monolithic vững chắc, móng cắm sâu vào địa hình).
+    * Diện tích mặt sàn đài cao mới: **6.27 m²** (gấp ~6.8 lần diện tích cũ 0.91 m²), tạo thành một đài vọng cảnh/ban công tầng 2 rộng rãi, thoáng đãng.
+    * Điểm tiếp giáp đỉnh thang: Bắt đầu tại Y = 6.990m đè nhẹ 1.4cm lên đỉnh cầu thang `SM_Staircase_02` (kết thúc ở Y = 7.004m), đảm bảo **0 gap**, kín khít tuyệt đối không có khe hở cho nhân vật rơi.
+  - Tái thiết kế hàng rào gỗ `SM_Fence_Wood_Overlook`:
+    * Gồm 9 cột gỗ (tiết diện 0.12x0.12m, cao 0.78m kèm chóp nhọn pyramid 0.10m) và các thanh ray đôi chạy quanh 3 mặt mép đài cao (Tây: X=4.88m, Bắc: Y=9.32m, Đông: X=7.32m).
+    * Chừa lối thông thoáng rộng 1.24m tại mép Nam (X in [5.08, 6.32] tại Y=7.06m) thông thẳng từ đầu cầu thang bước lên đài vọng cảnh, không còn vật cản trước mặt nhân vật.
+  - Tinh chỉnh bố cục: Xóa miếng dán decal `SM_Overlook_Dirt_Pad` để đài cao là thảm cỏ xanh liền mạch; dời biển báo `SM_Signpost_Overlook` về góc đẹp Tây Bắc (5.25, 8.85).
+- **Xóa triệt để các đường kẻ ô vuông trên nền cỏ (Clean Organic Grass Texture)**:
+  - Viết script Python tạo texture cỏ mới `tex_grass_clean.png` (512x512):
+    * Màu xanh tươi mát tự nhiên chuẩn `#529934` (sRGB RGB: 0.322, 0.600, 0.204), Roughness 0.85.
+    * Thảm cỏ mềm mịn hữu cơ (multi-octave value noise + vi sợi organic), tuần hoàn seamless 100%.
+    * **TUYỆT ĐỐI KHÔNG CÓ CÁC ĐƯỜNG KẺ Ô VUÔNG, LƯỚI GRID HAY CHECKERBOARD BÀN CỜ**.
+  - Triển khai và đồng bộ:
+    * Đặt file texture tại `Assets/Blender_Source/textures/tex_grass_clean.png`, `Assets/Blender_Source/tex_grass_clean.png`, và `Assets/Models_Exported/tex_grass_clean.png`.
+    * Đồng bộ ghi đè toàn bộ các file `tex_grass_grid.png` cũ để triệt tiêu vĩnh viễn tàn dư ô lưới.
+    * Cập nhật `Mat_Grass` trong `map_25d_fixed.blend` và `Mat_Grass_Plain` trong `map_surroundings.blend`, đóng gói (pack) trực tiếp vào file `.blend`.
+    * Cập nhật `MapAutoCollision.cs`: `GrassTexturePath = "res://Assets/Models_Exported/tex_grass_clean.png"`.
+- **Xóa bớt các ngọn núi nón tím chen chúc (`SM_Mountains_Background`)**:
+  - Khảo sát: Cụm núi tím cũ có 7 peaks chen chúc, trong đó Peak 4 và Peak 5 nằm sát sàn sạt ngay sau đài cao (Y in [6, 13]) che kín toàn bộ bầu trời.
+  - Xóa bỏ 5 chóp núi nón chật chội: Peak 0, Peak 2, Peak 4, Peak 5, Peak 6.
+  - Giữ lại đúng 2 ngọn núi nền phía xa tạo điểm nhấn thanh thoát: Peak 1 (ngọn núi chính cao nhất 9.8m ở xa Y=[9.15, 16.81]) và Peak 3 (núi xa phía Đông). Mở toang không gian bầu trời xanh ProceduralSky và mây hoạt hình phía sau đài cao.
+- **Quy tắc bảo toàn Blender**:
+  - File gốc `map_25d.blend` và `character_25d.blend` được bảo tồn nguyên vẹn 100% (không ghi đè).
+  - Lưu trữ an toàn cập nhật vào `Assets/Blender_Source/map_25d_fixed.blend` và `Assets/Blender_Source/map_surroundings.blend`.
+  - Xuất mô hình `Assets/Models_Exported/map_25d.glb` và `Assets/Models_Exported/map_surroundings.glb` chuẩn Godot (-Z forward, Y up, `export_yup=True`).
+- **Kiểm định chất lượng & Tự động hóa**:
+  - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 128 bài test (kiểm tra kích thước đài cao, hàng rào, texture cỏ sạch không ô vuông, núi thoáng đãng).
+  - Kết quả Godot Headless `test_suite.gd`: **128 / 128 Test cases Passed (100% Pass, 0 Fail)**.
+  - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+## Phiên làm việc: 2026-11-06 (Chiều muộn - Sub-agent csharp-coder: Khóa Nhân Vật Đứng Im Khi Bật Free Cam & Đồng Bộ Mã Nguồn Cỏ Không Ô Vuông)
+- **Khóa nhân vật đứng im hoàn toàn trong Chế độ Camera Tự Do (Free Cam)**:
+  - Khắc phục triệt để hiện tượng khi bật Free Cam 6-DOF, phím WASD / cần gạt Gamepad vừa điều khiển camera bay vừa làm Player chạy và xoay mặt theo.
+  - Cập nhật `Scripts/Core/CameraFollow.cs` (140 dòng):
+    * Khai báo static accessor chuẩn mực: `public static CameraFollow? Instance { get; private set; }`.
+    * Đăng ký `Instance = this;` trong `_Ready()` và hủy `Instance = null;` an toàn bộ nhớ trong `_ExitTree()`.
+  - Nâng cấp `Scripts/Player/PlayerMovement.cs` (167 dòng):
+    * Bổ sung kiểm tra Guard Clause `IsFreeCamActive()` (`CameraFollow.Instance?.IsFreeCamActive == true`).
+    * Khi FreeCam đang bật: Triệt tiêu hoàn toàn vận tốc ngang `StopHorizontalMovement()` (`Velocity = new Vector3(0, Velocity.Y, 0)`), bỏ qua việc đọc input di chuyển `_inputVector`, bỏ qua xử lý nhảy `HandleJump()`, không cập nhật gia tốc ngang `ApplyMovement()` và dừng quay mặt `ApplyRotation()`. Vẫn giữ trọng lực và snap sàn `MoveAndSlide()` để nhân vật tiếp đất ổn định, không bị kẹt hay rơi xuyên map.
+    * Khi tắt FreeCam quay về Isometric: Nhân vật lập tức nhận lại toàn bộ điều khiển di chuyển bình thường mượt mà.
+  - Nâng cấp `Scripts/Player/PlayerAnimation.cs` (174 dòng):
+    * Bổ sung hàm `PlayIdleState(float delta)`: Khi FreeCam đang bật, giữ nguyên clip hoạt ảnh `Idle` (hoặc model ở tư thế chuẩn) và gọi `ResetProcedural(delta)` để triệt tiêu toàn bộ hiệu ứng nghiêng mình (lean) và nhấp nhô (bobbing) thủ tục.
+- **Đồng bộ mã nguồn vật liệu cỏ không đường kẻ ô vuông (`MapAutoCollision.cs`)**:
+  - Cập nhật `GrassTexturePath = "res://Assets/Models_Exported/tex_grass_clean.png"`.
+  - Cải tiến `LoadGrassTexture()` quét danh sách các ứng viên texture cỏ mịn sạch (`tex_grass_clean.png` tại `Assets/Models_Exported/` và `Assets/Blender_Source/textures/`).
+  - Trong `GetOrCreatePaverMaterial()`: Tạo fallback vật liệu `StandardMaterial3D` chuẩn màu xanh cỏ tươi mịn tự nhiên `#529934` (`AlbedoColor = new Color(0.32f, 0.60f, 0.20f, 1.0f)`, `Roughness = 0.85f`), đảm bảo tuyệt đối không còn đường kẻ ô vuông nào xuất hiện trên toàn bộ bản đồ.
+- **Đảm bảo va chạm kín khít cho đài cao tầng 2 và cầu thang**:
+  - Xác nhận `MapAutoCollision.cs` và `StairRampBuilder.cs` tự động tính toán kích thước AABB thực tế khi đài cao tầng 2 (`SM_Tier2_Pavers`, `SM_Terrain_Chunk`, `SM_Fence_Wood_Overlook`) được mở rộng.
+  - Tạo khối dốc phẳng `ConvexPolygonShape3D` và kích hoạt `BackfaceCollision = true` cho mọi bề mặt `ConcavePolygonShape3D`, đảm bảo chuyển tiếp bậc thang êm ru, kín khít, 0 khe hở.
+- **Kiểm định chất lượng, Clean Code & Tự động hóa**:
+  - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả 15 file C# đều < 175 dòng (< 200 dòng), 100% hàm <= 16 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt, dọn dẹp bộ nhớ sạch sẽ trong `_ExitTree()`.
+  - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 131 bài test (bổ sung bài kiểm tra nhân vật đứng im khi FreeCam bật và di chuyển bình thường khi FreeCam tắt).
+  - Kết quả Godot Headless `test_suite.gd`: **131 / 131 Test cases Passed (100% Pass, 0 Fail)**.
+  - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+
+
 
 

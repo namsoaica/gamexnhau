@@ -56,6 +56,13 @@ public partial class PlayerMovement : CharacterBody3D
 		float dt = (float)delta;
 		UpdateTimers(dt);
 		ApplyGravity(dt);
+		if (IsFreeCamActive())
+		{
+			StopHorizontalMovement();
+			UpdateFloorSnap();
+			MoveAndSlide();
+			return;
+		}
 		ReadInput();
 		HandleJump();
 		ApplyMovement(dt);
@@ -85,15 +92,15 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private void UpdateTimers(float delta)
 	{
+		if (IsFreeCamActive())
+		{
+			_jumpBufferTimer = 0.0f;
+			_coyoteTimer = (IsOnFloor() || InfiniteJump) ? CoyoteTime : _coyoteTimer - delta;
+			return;
+		}
 		_coyoteTimer = (IsOnFloor() || InfiniteJump) ? CoyoteTime : _coyoteTimer - delta;
-		if (Input.IsActionJustPressed("jump"))
-		{
-			_jumpBufferTimer = JumpBufferTime;
-		}
-		else if (_jumpBufferTimer > 0.0f)
-		{
-			_jumpBufferTimer -= delta;
-		}
+		if (Input.IsActionJustPressed("jump")) _jumpBufferTimer = JumpBufferTime;
+		else if (_jumpBufferTimer > 0.0f) _jumpBufferTimer -= delta;
 	}
 
 	/// <summary>
@@ -179,4 +186,9 @@ public partial class PlayerMovement : CharacterBody3D
 		currentRotation.Y = Mathf.LerpAngle(currentRotation.Y, targetAngle, RotationSpeed * delta);
 		targetNode.Rotation = currentRotation;
 	}
+
+	/// <summary>
+	/// Kiểm tra trạng thái Chế Độ Camera Tự Do (Free Cam) đang kích hoạt hay không.
+	/// </summary>
+	private static bool IsFreeCamActive() => Game.Core.CameraFollow.Instance?.IsFreeCamActive == true;
 }

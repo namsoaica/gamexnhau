@@ -54,6 +54,9 @@ func run_suite():
 	test_lighting_and_sky()
 	test_staircase_ramp_collision()
 	test_plains_recolor()
+	test_expanded_platform_and_fence()
+	test_clean_grass_texture()
+	test_unobstructed_mountains()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -414,6 +417,24 @@ func test_free_camera_mode():
 	assert_true(cam.get("IsFreeCamActive") == false, "ResetToPlayer disables FreeCam mode")
 	assert_true(cam.projection == Camera3D.PROJECTION_ORTHOGONAL, "ResetToPlayer restores Orthogonal projection")
 
+	# Test Player Immobility during FreeCam mode
+	var player = test_map.find_child("Player") as CharacterBody3D
+	assert_true(player != null, "Player exists in WorldMap")
+
+	cam.call("SetFreeCamActive", true)
+	player.velocity = Vector3(6.0, 0.0, 6.0)
+	player._physics_process(0.016)
+	print("Player velocity during FreeCam: ", player.velocity)
+	assert_true(is_equal_approx(player.velocity.x, 0.0) and is_equal_approx(player.velocity.z, 0.0),
+		"Player stands still (horizontal velocity = 0) when FreeCam is active")
+
+	# Test Player regains movement when FreeCam is deactivated
+	cam.call("SetFreeCamActive", false)
+	player.velocity = Vector3(6.0, 0.0, 0.0)
+	player._physics_process(0.016)
+	assert_true(abs(player.velocity.x) > 0.1,
+		"Player regains normal movement when FreeCam is deactivated")
+
 func test_dev_mode_overlay_and_gamepad():
 	print("\n-- Testing Dev Mode Overlay & Gamepad Support --")
 	var overlay = test_map.find_child("DevOverlay")
@@ -442,6 +463,42 @@ func test_dev_mode_overlay_and_gamepad():
 	assert_true(panel.visible == true, "DevPanel visible after ToggleDevMode()")
 	overlay.call("ToggleDevMode")
 	assert_true(panel.visible == false, "DevPanel hidden after second ToggleDevMode()")
+
+func test_expanded_platform_and_fence():
+	print("\n-- Testing Expanded Tier 2 Platform & Overlook Fence --")
+	var map_25d = test_map.find_child("Map_25D")
+	var paver = map_25d.find_child("SM_Tier2_Pavers") as MeshInstance3D
+	assert_true(paver != null, "SM_Tier2_Pavers exists in Map_25D")
+	var aabb = paver.get_aabb()
+	print("Expanded Paver AABB: ", aabb)
+	assert_true(aabb.size.x >= 2.5, "Tier 2 platform width >= 2.5m (expanded 2.6m)")
+	assert_true(aabb.size.z >= 2.2, "Tier 2 platform length >= 2.2m (expanded 2.41m)")
+
+	var fence = map_25d.find_child("SM_Fence_Wood_Overlook") as MeshInstance3D
+	assert_true(fence != null, "SM_Fence_Wood_Overlook exists in Map_25D")
+	var fence_aabb = fence.get_aabb()
+	print("Expanded Fence AABB: ", fence_aabb)
+	assert_true(fence_aabb.size.x >= 2.4, "Fence perimeter width >= 2.4m")
+	assert_true(fence_aabb.size.z >= 2.2, "Fence perimeter length >= 2.2m")
+
+func test_clean_grass_texture():
+	print("\n-- Testing Clean Grass Texture (No Grid Lines) --")
+	var auto_col = test_map.find_child("MapAutoCollision")
+	assert_true(auto_col != null, "MapAutoCollision node exists")
+	var tex_path = auto_col.get("GrassTexturePath") as String
+	print("Current GrassTexturePath: ", tex_path)
+	assert_true(tex_path.contains("tex_grass_clean.png"), "GrassTexturePath points to tex_grass_clean.png")
+	assert_true(ResourceLoader.exists(tex_path), "tex_grass_clean.png resource exists and loaded in Godot")
+
+func test_unobstructed_mountains():
+	print("\n-- Testing Unobstructed Mountains (Removed Crowded Peaks) --")
+	var map_25d = test_map.find_child("Map_25D")
+	var mountains = map_25d.find_child("SM_Mountains_Background") as MeshInstance3D
+	assert_true(mountains != null, "SM_Mountains_Background exists in Map_25D")
+	var m_aabb = mountains.get_aabb()
+	print("Mountains AABB: ", m_aabb)
+	assert_true(m_aabb.position.z <= -7.5, "Mountains background pushed back, clear sky behind overlook deck")
+
 
 
 

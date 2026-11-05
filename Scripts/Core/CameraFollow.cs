@@ -24,6 +24,8 @@ public partial class CameraFollow : Camera3D
 	[Export] public float FreeCamSpeed { get => _freeCam.Speed; set => _freeCam.Speed = value; }
 	[Export] public float FreeCamLookSensitivity { get => _freeCam.LookSensitivity; set => _freeCam.LookSensitivity = value; }
 
+	public static CameraFollow? Instance { get; private set; }
+
 	public float TargetZoomSize
 	{
 		get => _targetZoomSize;
@@ -36,11 +38,17 @@ public partial class CameraFollow : Camera3D
 
 	public override void _Ready()
 	{
+		Instance = this;
 		Current = true;
 		_targetZoomSize = Size;
 		_savedProjection = Projection;
 		LocatePlayerTarget();
 		SnapToTarget();
+	}
+
+	public override void _ExitTree()
+	{
+		if (Instance == this) Instance = null;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)

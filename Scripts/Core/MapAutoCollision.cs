@@ -13,7 +13,7 @@ public partial class MapAutoCollision : Node
 	[ExportGroup("Cấu hình Đổi Màu Nền Cỏ")]
 	[Export] public bool RecolorPaversToGrass { get; set; } = true;
 	[Export] public Color PaverAlbedoColor { get; set; } = Colors.White;
-	[Export] public string GrassTexturePath { get; set; } = "res://Assets/Models_Exported/tex_grass_grid.png";
+	[Export] public string GrassTexturePath { get; set; } = "res://Assets/Models_Exported/tex_grass_clean.png";
 
 	private StandardMaterial3D? _cachedPaverMaterial;
 
@@ -88,9 +88,10 @@ public partial class MapAutoCollision : Node
 		if (_cachedPaverMaterial != null) return _cachedPaverMaterial;
 
 		Texture2D? grassTex = LoadGrassTexture();
+		Color cleanGrassColor = new Color(0.32f, 0.60f, 0.20f, 1.0f); // Tông xanh cỏ #529934
 		_cachedPaverMaterial = new StandardMaterial3D
 		{
-			AlbedoColor = PaverAlbedoColor,
+			AlbedoColor = grassTex != null ? PaverAlbedoColor : cleanGrassColor,
 			AlbedoTexture = grassTex,
 			TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmaps,
 			Roughness = 0.85f
@@ -99,13 +100,18 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Tải texture cỏ từ đường dẫn cấu hình hoặc texture dự phòng.
+	/// Tải texture cỏ mịn sạch không có đường kẻ ô vuông từ cấu hình hoặc file dự phòng.
 	/// </summary>
 	private Texture2D? LoadGrassTexture()
 	{
-		if (ResourceLoader.Exists(GrassTexturePath)) return GD.Load<Texture2D>(GrassTexturePath);
-		const string fallback = "res://Assets/Models_Exported/map_25d_Tex_Grass_Grid.png";
-		return ResourceLoader.Exists(fallback) ? GD.Load<Texture2D>(fallback) : null;
+		string[] paths = { GrassTexturePath, "res://Assets/Models_Exported/tex_grass_clean.png",
+			"res://Assets/Blender_Source/textures/tex_grass_clean.png",
+			"res://Assets/Models_Exported/map_surroundings_tex_grass_clean.png" };
+		foreach (string path in paths)
+		{
+			if (!string.IsNullOrEmpty(path) && ResourceLoader.Exists(path)) return GD.Load<Texture2D>(path);
+		}
+		return null;
 	}
 
 	/// <summary>
@@ -183,6 +189,6 @@ public partial class MapAutoCollision : Node
 		return lower.Contains("terrain") || lower.Contains("stair") || lower.Contains("path") ||
 		       lower.Contains("paver") || lower.Contains("fence") || lower.Contains("floor") ||
 		       lower.Contains("ground") || lower.Contains("rock") || lower.Contains("mountain") ||
-		       lower.Contains("cliff");
+		       lower.Contains("cliff") || lower.Contains("overlook");
 	}
 }

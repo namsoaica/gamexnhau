@@ -19,16 +19,16 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, dịch chuyển tức thời `TeleportTo`. |
-| `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, dịch chuyển tức thời `TeleportTo`, **tự động khóa đứng im hoàn toàn khi Chế Độ Camera Tự Do (Free Cam) đang bật**. |
+| `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip, **giữ nguyên trạng thái `Idle` và triệt tiêu lean/bobbing khi Free Cam đang bật**. |
 | `Scripts/Player/PlayerInteractor.cs` | `uid://cwt2g2l1041b` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/IInteractable.cs` | `uid://cb38i1wmsj35b` | Interface chuẩn định nghĩa thực thể tương tác (`PromptText`, `CanInteract()`, `Interact()`, `OnFocusGained()`, `OnFocusLost()`). |
 | `Scripts/Core/InteractableArea.cs` | `uid://b45c22501e5v` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
 | `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
-| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), cung cấp `SetFreeCamActive()` và `ResetToPlayer()`. |
+| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), cung cấp `SetFreeCamActive()` và `ResetToPlayer()`, an toàn bộ nhớ trong `_ExitTree()`. |
 | `Scripts/Core/FreeCameraController.cs` | (C# Script) | Bộ điều khiển Camera Tự Do (6-DOF Fly Cam) độc lập, hỗ trợ bàn phím WASD / Space / Ctrl / EQ, xoay góc nhìn chuột phải + Mouse Motion hoặc Right Stick cần phải, nâng/hạ độ cao bằng cò L2/R2 hoặc LB/RB, cuộn chuột điều chỉnh tốc độ bay (5.0 - 50.0). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ texture `tex_grass_grid.png` cho cả nền gạch và cánh đồng `plains`, tự động loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky. |
+| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình, điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`, đồng bộ vật liệu cỏ mịn sạch không có đường kẻ ô vuông (`tex_grass_clean.png`, fallback `#529934`), tự động loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky. |
 | `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
 | `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt linh hoạt bằng phím `F1`/`~`/`F3` hoặc tay cầm Gamepad (`Back`/`Select`, `Start`, `RightStick`), chuyển đổi các tab bằng nút vai `LB`/`RB`, mở khóa chuột, điều phối các tab con. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
@@ -46,8 +46,8 @@
 
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
-- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng mép tiếp giáp về Y=6.99m đóng kín hoàn toàn khe hở 3.6cm với `SM_Staircase_02`, kéo đùn độ dày 0.42m thành khối 3D đặc vững chắc Z=[2.10, 2.52], gán `Mat_Grass` kèm texture `tex_grass_grid.png` và UV mapping phẳng chiếu đứng 1:1 đồng nhất với thảm cỏ đảo trung tâm; đã loại bỏ hoàn toàn phông nền trắng `SM_Sky_Backdrop_Plane` để lộ trọn vẹn bầu trời Procedural Sky điện ảnh).
-- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói `tex_grass_grid.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
+- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; toàn bộ địa hình sử dụng texture cỏ mịn tự nhiên không có đường kẻ ô vuông `tex_grass_clean.png` [#529934]; đã loại bỏ hoàn toàn phông nền trắng `SM_Sky_Backdrop_Plane`).
+- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` với Base Color `#529934` / Color(0.32, 0.60, 0.20, 1.0), kết nối texture cỏ đóng gói không ô vuông `tex_grass_clean.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
 - **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
@@ -364,6 +364,54 @@
    - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả 15 files C# đều < 195 dòng (< 200 dòng), 100% hàm < 20 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt.
    - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
    - Mở rộng kịch bản kiểm thử `test_suite.gd` lên 117 bài test: **117 / 117 Test cases Passed (100% Pass, 0 Fail)**.
+
+### [2026-11-06] - Mở Rộng Đài Cao Tầng 2, Xóa Sạch Đường Kẻ Ô Vuông Nền Cỏ & Dọn Bớt Núi Nón Tím (Sub-agent blender-helper)
+1. **Mở Rộng Đài Cao (Tier 2 Terrace / Pavers) & Lan Can Hàng Rào Gỗ**:
+   - Tái thiết kế `SM_Tier2_Pavers`: Mở rộng từ diện tích cũ 0.94m x 0.97m (~0.91 m²) lên kích thước mới **2.60m x 2.41m** (Diện tích: **6.27 m²**, gấp gần 7 lần cũ, gấp 2.76x chiều rộng và 2.48x chiều dài).
+   - Tiếp giáp kín khít đỉnh thang: Bắt đầu tại Y = 6.990m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` (Y = 7.004m), đảm bảo **0 gap**, không có khe hở cho nhân vật lọt.
+   - Độ dày móng: Z=[2.10, 2.52], dày 0.42m dạng khối monolithic đặc vững chắc.
+   - Tái thiết kế hàng rào `SM_Fence_Wood_Overlook`: Gồm 9 cột gỗ (tiết diện 0.12x0.12m cao 0.78m kèm chóp nhọn 0.10m) và thanh ray ngang đôi chạy quanh 3 mặt Tây (X=4.88), Bắc (Y=9.32), Đông (X=7.32).
+   - Chừa lối vào thang thoáng đãng rộng 1.24m tại mép Nam (X in [5.08, 6.32] tại Y=7.06m) thông thẳng từ cầu thang bước lên, không còn vật cản trước mặt người chơi.
+   - Xóa bỏ `SM_Overlook_Dirt_Pad` để nền đài cao là thảm cỏ xanh liền mạch; dời biển báo `SM_Signpost_Overlook` về góc Tây Bắc (5.25, 8.85).
+2. **Xóa Triệt Để Đường Kẻ Ô Vuông Nền Cỏ (Clean Organic Grass Texture)**:
+   - Tạo texture cỏ mới `tex_grass_clean.png` (512x512) qua Blender Python: Màu xanh tươi mát chuẩn `#529934` (sRGB RGB: 0.322, 0.600, 0.204), thảm cỏ mềm mịn tự nhiên hữu cơ, tuần hoàn seamless 100%, **tuyệt đối không có các đường kẻ ô vuông / lưới grid / bàn cờ**.
+   - Cập nhật và đóng gói trực tiếp vào `map_25d_fixed.blend` (`Mat_Grass`) và `map_surroundings.blend` (`Mat_Grass_Plain`).
+   - Cập nhật `MapAutoCollision.cs` sử dụng `GrassTexturePath = "res://Assets/Models_Exported/tex_grass_clean.png"`.
+3. **Xóa Bớt Các Ngọn Núi Nón Tím Chen Chúc (`SM_Mountains_Background`)**:
+   - Xóa bỏ 5 chóp núi nón chật chội chắn ngay sau đài cao: Peak 0, Peak 2, Peak 4, Peak 5, Peak 6.
+   - Giữ lại 2 ngọn núi nền phía xa tạo điểm nhấn thanh thoát: Peak 1 (ngọn núi chính cao nhất 9.8m ở xa Y=[9.15, 16.81]) và Peak 3 (núi xa phía Đông).
+   - Giải phóng tầm nhìn bầu trời ProceduralSky và mây hoạt hình thông thoáng, khoáng đạt.
+4. **Quy Tắc Bảo Toàn Tài Nguyên & Kiểm Định Tự Động**:
+   - Bảo tồn 100% nguyên vẹn file gốc `map_25d.blend` và `character_25d.blend`.
+   - Lưu trữ an toàn cập nhật vào `map_25d_fixed.blend` và `map_surroundings.blend`.
+   - Xuất mô hình `Assets/Models_Exported/map_25d.glb` và `map_surroundings.glb` chuẩn Godot.
+   - Mở rộng bộ kiểm thử `test_suite.gd` lên 128 bài test: **128 / 128 Test cases Passed (100% Pass, 0 Fail)**.
+   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Khóa Nhân Vật Đứng Im Khi Bật Camera Tự Do & Đồng Bộ Mã Nguồn Cỏ Không Ô Vuông (Sub-agent csharp-coder)
+1. **Khóa Nhân Vật Đứng Im Hoàn Toàn Trong Chế Độ Camera Tự Do (Free Cam)**:
+   - Khắc phục triệt để hiện tượng khi bật Free Cam 6-DOF trong Dev Mode, phím WASD và cần gạt Gamepad vừa di chuyển Camera vừa làm Nhân vật chạy và quay mặt theo.
+   - Nâng cấp `CameraFollow.cs` (140 dòng): Khai báo `public static CameraFollow? Instance { get; private set; }`, gán `Instance = this;` trong `_Ready()`, dọn dẹp `Instance = null;` trong `_ExitTree()`.
+   - Nâng cấp `PlayerMovement.cs` (167 dòng):
+     * Kiểm tra Guard Clause `IsFreeCamActive()` (`CameraFollow.Instance?.IsFreeCamActive == true`).
+     * Khi FreeCam bật: Triệt tiêu toàn bộ vận tốc ngang `StopHorizontalMovement()` (`Velocity = new Vector3(0, Velocity.Y, 0)`), bỏ qua việc đọc input di chuyển `_inputVector`, bỏ qua xử lý nhảy `HandleJump()`, không cập nhật gia tốc ngang `ApplyMovement()` và dừng quay mặt `ApplyRotation()`.
+     * Vẫn duy trì trọng lực và snap sàn `MoveAndSlide()` để nhân vật tiếp đất ổn định, không bị kẹt hay rơi xuyên map nếu người chơi bật FreeCam khi đang trên không.
+     * Khi tắt FreeCam: Nhân vật lập tức nhận lại quyền điều khiển di chuyển bình thường, trơn tru.
+   - Nâng cấp `PlayerAnimation.cs` (174 dòng):
+     * Bổ sung `PlayIdleState(float delta)`: Khi FreeCam đang bật, giữ nguyên hoạt ảnh `Idle` (hoặc tư thế chuẩn của model) và gọi `ResetProcedural(delta)` để triệt tiêu toàn bộ hiệu ứng nghiêng mình (lean) và nhấp nhô (bobbing) thủ tục.
+2. **Đồng Bộ Mã Nguồn Vật Liệu Cỏ Không Ô Vuông (`MapAutoCollision.cs`)**:
+   - Cập nhật `GrassTexturePath = "res://Assets/Models_Exported/tex_grass_clean.png"`.
+   - Cải tiến `LoadGrassTexture()` quét tìm các file texture cỏ sạch không có ô vuông (`tex_grass_clean.png` tại `Assets/Models_Exported/` và `Assets/Blender_Source/textures/`).
+   - Trong `GetOrCreatePaverMaterial()`: Tạo fallback vật liệu `StandardMaterial3D` chuẩn màu xanh cỏ tươi mịn tự nhiên `#529934` (`AlbedoColor = new Color(0.32f, 0.60f, 0.20f, 1.0f)`, `Roughness = 0.85f`), đảm bảo tuyệt đối không còn đường kẻ ô vuông nào xuất hiện trên toàn bộ bản đồ.
+3. **Đảm Bảo Va Chạm Kín Khít Cho Đài Cao Tầng 2 & Cầu Thang**:
+   - Đảm bảo `MapAutoCollision.cs` và `StairRampBuilder.cs` tự động tính toán kích thước AABB thực tế khi đài cao tầng 2 (`SM_Tier2_Pavers`, `SM_Terrain_Chunk`, `SM_Fence_Wood_Overlook`) được mở rộng.
+   - Tạo khối dốc phẳng `ConvexPolygonShape3D` và kích hoạt `BackfaceCollision = true` cho mọi bề mặt `ConcavePolygonShape3D`, đảm bảo chuyển tiếp bậc thang êm ru, kín khít, 0 khe hở.
+4. **Kiểm Định Clean Code & Tự Động Hóa**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả 15 files C# đều < 175 dòng (< 200 dòng), 100% hàm <= 16 dòng (< 25 dòng), Guard Clauses, XML tiếng Việt, dọn dẹp bộ nhớ sạch sẽ trong `_ExitTree()`.
+   - Bổ sung bài kiểm tra vào `test_suite.gd`: Xác thực nhân vật đứng im khi `CameraFollow.IsFreeCamActive = true` và di chuyển bình thường khi `CameraFollow.IsFreeCamActive = false`.
+   - Biên dịch `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Chạy kiểm thử tự động Godot Headless `test_suite.gd`: **131 / 131 Test cases Passed (100% Pass, 0 Fail)**.
+
 
 
 

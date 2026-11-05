@@ -30,16 +30,12 @@ public partial class PlayerAnimation : Node
 	private const float MoveThreshold = 0.1f;
 	private const float ReferenceSpeed = 6.0f;
 
-	public override void _Ready()
-	{
-		ResolveReferences();
-		StoreInitialVisualTransform();
-	}
+	public override void _Ready() => ResolveReferences();
 
 	public override void _Process(double delta) => UpdateAnimation((float)delta);
 
 	/// <summary>
-	/// Tự động tìm kiếm các thành phần cần thiết nếu chưa cấu hình trên Inspector.
+	/// Tự động tìm kiếm các thành phần cần thiết và lưu transform gốc của visual node.
 	/// </summary>
 	private void ResolveReferences()
 	{
@@ -47,16 +43,11 @@ public partial class PlayerAnimation : Node
 		if (TargetCharacter == null) return;
 		AnimPlayer ??= (AnimationPlayer?)TargetCharacter.FindChild("AnimationPlayer");
 		VisualNode ??= (Node3D?)TargetCharacter.FindChild("CharacterModel") ?? (Node3D?)TargetCharacter.FindChild("Character_Armature");
-	}
-
-	/// <summary>
-	/// Lưu lại vị trí và góc xoay gốc của model để làm mốc chuyển động thủ tục.
-	/// </summary>
-	private void StoreInitialVisualTransform()
-	{
-		if (VisualNode == null) return;
-		_initialVisualPosition = VisualNode.Position;
-		_initialVisualRotation = VisualNode.Rotation;
+		if (VisualNode != null)
+		{
+			_initialVisualPosition = VisualNode.Position;
+			_initialVisualRotation = VisualNode.Rotation;
+		}
 	}
 
 	/// <summary>
@@ -65,6 +56,11 @@ public partial class PlayerAnimation : Node
 	private void UpdateAnimation(float delta)
 	{
 		if (TargetCharacter == null) return;
+		if (IsFreeCamActive())
+		{
+			PlayIdleState(delta);
+			return;
+		}
 
 		string animName = DetermineCurrentAnimName();
 		if (!ForceProcedural && HasPlayableTracks(animName))
@@ -75,6 +71,15 @@ public partial class PlayerAnimation : Node
 		}
 
 		ApplyProceduralAnimation(delta);
+	}
+
+	/// <summary>
+	/// Giữ nhân vật đứng yên ở trạng thái Idle và triệt tiêu lean/bobbing khi bật Free Cam.
+	/// </summary>
+	private void PlayIdleState(float delta)
+	{
+		if (!ForceProcedural && HasPlayableTracks(IdleAnimName)) PlayAnimation(IdleAnimName);
+		ResetProcedural(delta);
 	}
 
 	/// <summary>
@@ -92,8 +97,10 @@ public partial class PlayerAnimation : Node
 	/// </summary>
 	private void PlayAnimation(string animName)
 	{
-		if (AnimPlayer == null || string.IsNullOrEmpty(animName)) return;
-		if (AnimPlayer.CurrentAnimation != animName) AnimPlayer.Play(animName);
+		if (AnimPlayer != null && !string.IsNullOrEmpty(animName) && AnimPlayer.CurrentAnimation != animName)
+		{
+			AnimPlayer.Play(animName);
+		}
 	}
 
 	/// <summary>
@@ -112,22 +119,15 @@ public partial class PlayerAnimation : Node
 	private void ApplyProceduralAnimation(float delta)
 	{
 		if (VisualNode == null) return;
-		Vector2 hVel = new Vector2(TargetCharacter!.Velocity.X, TargetCharacter.Velocity.Z);
-		float speed = hVel.Length();
-
-		if (!TargetCharacter.IsOnFloor())
+		if (!TargetCharacter!.IsOnFloor())
 		{
 			ApplyProceduralJump(delta);
 			return;
 		}
 
-		if (speed > MoveThreshold)
-		{
-			ApplyProceduralMove(delta, speed);
-			return;
-		}
-
-		ApplyProceduralIdle(delta);
+		float speed = new Vector2(TargetCharacter.Velocity.X, TargetCharacter.Velocity.Z).Length();
+		if (speed > MoveThreshold) ApplyProceduralMove(delta, speed);
+		else ApplyProceduralIdle(delta);
 	}
 
 	/// <summary>
@@ -140,14 +140,13 @@ public partial class PlayerAnimation : Node
 		Vector3 targetPos = _initialVisualPosition + new Vector3(0.0f, bobY, 0.0f);
 		VisualNode!.Position = VisualNode.Position.Lerp(targetPos, ProceduralSmoothSpeed * delta);
 
-		float tiltFactor = Mathf.Clamp(speed / ReferenceSpeed, 0.0f, 1.0f);
-		float pitch = _initialVisualRotation.X - (LeanAmount * tiltFactor);
+		float tilt = Mathf.Clamp(speed / ReferenceSpeed, 0.0f, 1.0f);
+		float pitch = _initialVisualRotation.X - (LeanAmount * tilt);
 		float roll = _initialVisualRotation.Z + (Mathf.Sin(_bobTimer * 0.5f) * LeanAmount * 0.5f);
-
-		Vector3 targetRot = VisualNode.Rotation;
-		targetRot.X = Mathf.LerpAngle(targetRot.X, pitch, ProceduralSmoothSpeed * delta);
-		targetRot.Z = Mathf.LerpAngle(targetRot.Z, roll, ProceduralSmoothSpeed * delta);
-		VisualNode.Rotation = targetRot;
+		VisualNode.Rotation = new Vector3(
+			Mathf.LerpAngle(VisualNode.Rotation.X, pitch, ProceduralSmoothSpeed * delta),
+			VisualNode.Rotation.Y,
+			Mathf.LerpAngle(VisualNode.Rotation.Z, roll, ProceduralSmoothSpeed * delta));
 	}
 
 	/// <summary>
@@ -159,11 +158,10 @@ public partial class PlayerAnimation : Node
 		float idleBob = Mathf.Sin(_bobTimer) * (BobAmplitude * 0.25f);
 		Vector3 targetPos = _initialVisualPosition + new Vector3(0.0f, idleBob, 0.0f);
 		VisualNode!.Position = VisualNode.Position.Lerp(targetPos, ProceduralSmoothSpeed * delta);
-
-		Vector3 rot = VisualNode.Rotation;
-		rot.X = Mathf.LerpAngle(rot.X, _initialVisualRotation.X, ProceduralSmoothSpeed * delta);
-		rot.Z = Mathf.LerpAngle(rot.Z, _initialVisualRotation.Z, ProceduralSmoothSpeed * delta);
-		VisualNode.Rotation = rot;
+		VisualNode.Rotation = new Vector3(
+			Mathf.LerpAngle(VisualNode.Rotation.X, _initialVisualRotation.X, ProceduralSmoothSpeed * delta),
+			VisualNode.Rotation.Y,
+			Mathf.LerpAngle(VisualNode.Rotation.Z, _initialVisualRotation.Z, ProceduralSmoothSpeed * delta));
 	}
 
 	/// <summary>
@@ -173,9 +171,10 @@ public partial class PlayerAnimation : Node
 	{
 		Vector3 targetPos = _initialVisualPosition + new Vector3(0.0f, BobAmplitude * 0.5f, 0.0f);
 		VisualNode!.Position = VisualNode.Position.Lerp(targetPos, ProceduralSmoothSpeed * delta);
-		Vector3 rot = VisualNode.Rotation;
-		rot.X = Mathf.LerpAngle(rot.X, _initialVisualRotation.X + (LeanAmount * 0.5f), ProceduralSmoothSpeed * delta);
-		VisualNode.Rotation = rot;
+		VisualNode.Rotation = new Vector3(
+			Mathf.LerpAngle(VisualNode.Rotation.X, _initialVisualRotation.X + (LeanAmount * 0.5f), ProceduralSmoothSpeed * delta),
+			VisualNode.Rotation.Y,
+			VisualNode.Rotation.Z);
 	}
 
 	/// <summary>
@@ -185,9 +184,14 @@ public partial class PlayerAnimation : Node
 	{
 		if (VisualNode == null) return;
 		VisualNode.Position = VisualNode.Position.Lerp(_initialVisualPosition, ProceduralSmoothSpeed * delta);
-		Vector3 rot = VisualNode.Rotation;
-		rot.X = Mathf.LerpAngle(rot.X, _initialVisualRotation.X, ProceduralSmoothSpeed * delta);
-		rot.Z = Mathf.LerpAngle(rot.Z, _initialVisualRotation.Z, ProceduralSmoothSpeed * delta);
-		VisualNode.Rotation = rot;
+		VisualNode.Rotation = new Vector3(
+			Mathf.LerpAngle(VisualNode.Rotation.X, _initialVisualRotation.X, ProceduralSmoothSpeed * delta),
+			VisualNode.Rotation.Y,
+			Mathf.LerpAngle(VisualNode.Rotation.Z, _initialVisualRotation.Z, ProceduralSmoothSpeed * delta));
 	}
+
+	/// <summary>
+	/// Kiểm tra trạng thái Chế Độ Camera Tự Do (Free Cam) đang kích hoạt hay không.
+	/// </summary>
+	private static bool IsFreeCamActive() => Game.Core.CameraFollow.Instance?.IsFreeCamActive == true;
 }
