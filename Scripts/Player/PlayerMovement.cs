@@ -28,6 +28,9 @@ public partial class PlayerMovement : CharacterBody3D
 	private Vector2 _inputDirection = Vector2.Zero;
 	private const float MinMoveThreshold = 0.05f;
 
+	/// <summary>
+	/// Thiết lập thông số va chạm sàn và tìm kiếm trực quan nhân vật.
+	/// </summary>
 	public override void _Ready()
 	{
 		FloorSnapLength = 0.35f;
@@ -36,6 +39,9 @@ public partial class PlayerMovement : CharacterBody3D
 		VisualNode ??= (Node3D?)FindChild("Character_Armature") ?? (Node3D?)FindChild("CharacterModel");
 	}
 
+	/// <summary>
+	/// Cập nhật vật lý, tiếp nhận điều khiển và di chuyển nhân vật.
+	/// </summary>
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;

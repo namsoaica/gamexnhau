@@ -1,2 +1,98 @@
-# Normalize EOL for all files that Git considers text files.
+# =====================================================================
+# GIT ATTRIBUTES CONFIGURATION
+# =====================================================================
+
+# Default line endings for all text files (Unix style LF)
 * text=auto eol=lf
+
+# ---------------------------------------------------------------------
+# C# & Visual Studio Solution Files (Windows .NET standard: CRLF)
+# ---------------------------------------------------------------------
+*.cs text diff=csharp eol=crlf
+*.csproj text eol=crlf
+*.sln text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+*.config text eol=crlf
+
+# ---------------------------------------------------------------------
+# Godot Engine Text Formats (LF line endings and merge drivers)
+# ---------------------------------------------------------------------
+*.godot text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.import text eol=lf
+*.cfg text eol=lf
+*.gd text eol=lf
+*.shader text eol=lf
+*.gdshader text eol=lf
+
+# ---------------------------------------------------------------------
+# Documentation, Scripts & Web Formats
+# ---------------------------------------------------------------------
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.xml text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# ---------------------------------------------------------------------
+# 3D Models & Assets (Binary / Git LFS ready)
+# ---------------------------------------------------------------------
+*.blend binary
+*.blend1 binary
+*.blend2 binary
+*.glb binary
+*.gltf binary
+*.fbx binary
+*.obj binary
+*.dae binary
+
+# ---------------------------------------------------------------------
+# Textures & Images (Binary)
+# ---------------------------------------------------------------------
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.bmp binary
+*.webp binary
+*.hdr binary
+*.exr binary
+*.svg text eol=lf
+
+# ---------------------------------------------------------------------
+# Audio & Video (Binary)
+# ---------------------------------------------------------------------
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.flac binary
+*.mp4 binary
+*.webm binary
+
+# ---------------------------------------------------------------------
+# Fonts (Binary)
+# ---------------------------------------------------------------------
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# ---------------------------------------------------------------------
+# Compressed Archives & Compiled Binaries
+# ---------------------------------------------------------------------
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.pck binary
+*.exe binary

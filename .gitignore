@@ -1,3 +1,102 @@
-# Godot 4+ specific ignores
+# =====================================================================
+# GODOT 4.x (.NET / C#) GITIGNORE
+# =====================================================================
+
+# Godot engine cache and internal files
 .godot/
+.mono/
 /android/
+
+# Godot 3.x legacy cache (nếu có)
+.import/
+
+# =====================================================================
+# C# / .NET BUILD & ARTIFACTS
+# =====================================================================
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+Generated_Classes/
+
+# =====================================================================
+# IDEs & CODE EDITORS
+# =====================================================================
+# Visual Studio
+.vs/
+*.opensdf
+*.sdf
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Editor temporary / backup files
+*~
+*.swp
+*.swo
+
+# =====================================================================
+# BLENDER & 3D BACKUPS
+# =====================================================================
+# Blender auto-save and backup files (chỉ giữ file .blend gốc)
+*.blend1
+*.blend2
+*.blend3
+*.blend4
+*.blend5
+*.blend@
+*.blend.tmp*
+
+# =====================================================================
+# EXPORT / PACK BUILDS
+# =====================================================================
+build/
+export/
+*.pck
+*.apk
+*.aab
+*.exe
+*.zip
+*.dmg
+*.app
+export.cfg
+export_presets.cfg
+
+# =====================================================================
+# OPERATING SYSTEM ARTIFACTS
+# =====================================================================
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.directory
+
+# =====================================================================
+# LOGS & CRASH DUMPS
+# =====================================================================
+*.log
+*.dmp
+crash-reports/

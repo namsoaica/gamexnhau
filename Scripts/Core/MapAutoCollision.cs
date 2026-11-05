@@ -10,6 +10,9 @@ public partial class MapAutoCollision : Node
 	[ExportGroup("Cấu hình")]
 	[Export] public bool EnableAutoCollision { get; set; } = true;
 
+	/// <summary>
+	/// Bắt đầu quét cây node cha để tự động sinh va chạm vật lý cho các bề mặt địa hình.
+	/// </summary>
 	public override void _Ready()
 	{
 		if (!EnableAutoCollision)
@@ -51,6 +54,7 @@ public partial class MapAutoCollision : Node
 		}
 
 		meshInstance.CreateTrimeshCollision();
+		GD.Print($"[MapAutoCollision] Đã tạo va chạm cho: {meshInstance.Name}");
 	}
 
 	/// <summary>
@@ -70,7 +74,7 @@ public partial class MapAutoCollision : Node
 	}
 
 	/// <summary>
-	/// Lọc tên các Mesh cần tạo bề mặt va chạm cho nhân vật đi lại.
+	/// Lọc tên các Mesh cần tạo bề mặt va chạm cho nhân vật đi lại hoặc cản trở chuyển động.
 	/// </summary>
 	private bool IsWalkableSurface(string nodeName)
 	{
@@ -82,6 +86,9 @@ public partial class MapAutoCollision : Node
 		       lower.Contains("paver") ||
 		       lower.Contains("fence") ||
 		       lower.Contains("floor") ||
-		       lower.Contains("ground");
+		       lower.Contains("ground") ||
+		       lower.Contains("rock") ||
+		       lower.Contains("mountain") ||
+		       lower.Contains("cliff");
 	}
 }

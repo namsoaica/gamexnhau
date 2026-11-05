@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ci1e6hoc2uacw" path="res://Assets/Models_Exported/map_25d.glb" id="2_mapglb"]
 [ext_resource type="PackedScene" uid="uid://ciy0uaygbkns3" path="res://Scenes/Characters/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://c7kqoh0ntwdus" path="res://Scripts/Core/CameraFollow.cs" id="4_cam"]
+[ext_resource type="PackedScene" uid="uid://sdy3ykn64aus" path="res://Assets/Models_Exported/map_surroundings.glb" id="5_surroundings"]
 
 [sub_resource type="Environment" id="Environment_vibrant"]
 background_mode = 1
@@ -28,6 +29,8 @@ script = ExtResource("1_autocol")
 
 [node name="Map_25D" parent="." unique_id=2032450463 instance=ExtResource("2_mapglb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015144348, 0.0102472305, -0.0016038418)
+
+[node name="Map_Surroundings" parent="." unique_id=2089334411 instance=ExtResource("5_surroundings")]
 
 [node name="Player" parent="." unique_id=2044242254 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, -6)

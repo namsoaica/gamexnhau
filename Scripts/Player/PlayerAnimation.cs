@@ -30,11 +30,17 @@ public partial class PlayerAnimation : Node
 	// 3. VÒNG ĐỜI GODOT
 	// =========================================================================
 
+	/// <summary>
+	/// Khởi tạo và liên kết các tham chiếu đối tượng khi node sẵn sàng.
+	/// </summary>
 	public override void _Ready()
 	{
 		ResolveReferences();
 	}
 
+	/// <summary>
+	/// Kiểm tra và cập nhật trạng thái hoạt ảnh theo từng khung hình.
+	/// </summary>
 	public override void _Process(double delta)
 	{
 		UpdateAnimation();

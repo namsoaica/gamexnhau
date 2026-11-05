@@ -1,5 +1,20 @@
-﻿root = true
+# Top-most EditorConfig file
+root = true
 
+# =====================================================================
+# GLOBAL SETTINGS (TẤT CẢ FILE)
+# =====================================================================
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# =====================================================================
+# C# (.NET 8 / GODOT C#)
+# =====================================================================
 [*.cs]
 indent_style = space
 indent_size = 4
@@ -8,13 +23,68 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-# Bắt buộc xuống dòng mở ngoặc nhọn theo chuẩn C# truyền thống (Allman style)
+# --- Định dạng dấu ngoặc (Allman Style - xuống dòng mở ngoặc) ---
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
 
-# Ép kiểu tường minh khi nhìn vào không rõ kiểu dữ liệu (tránh lạm dụng var)
-csharp_style_var_for_built_in_types = false:suggestion
+# --- Quy tắc 'var' (CODING_STANDARDS.md: Không lạm dụng var) ---
+csharp_style_var_for_built_in_types = false:warning
 csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = false:warning
+
+# --- Quy tắc biểu thức & cú pháp thân thiện người đọc ---
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_operators = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# --- Quy tắc Using ---
+csharp_using_directive_placement = outside_namespace:suggestion
+dotnet_sort_system_directives_first = true
+
+# --- Quy chuẩn đặt tên (Naming Conventions) ---
+# Private field: _camelCase
+dotnet_naming_rule.private_fields_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_with_underscore.style = underscore_camel_case
+dotnet_naming_rule.private_fields_with_underscore.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+# =====================================================================
+# GODOT ENGINE TEXT FILES (.tscn, .tres, .godot)
+# =====================================================================
+[*.{godot,tscn,tres,import}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = false
+
+# =====================================================================
+# DOCUMENTATION, DATA & CONFIG (.md, .json, .yaml, .yml)
+# =====================================================================
+[*.{json,yaml,yml}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+[*.md]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+trim_trailing_whitespace = false
+
+# =====================================================================
+# WINDOWS SCRIPTS
+# =====================================================================
+[*.{bat,cmd,ps1}]
+end_of_line = crlf

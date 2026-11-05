@@ -13,6 +13,9 @@ public partial class CameraFollow : Camera3D
 	[Export] public float SmoothSpeed { get; set; } = 8.0f;
 	[Export] public Vector3 LookAtOffset { get; set; } = new Vector3(0.0f, 1.0f, 0.0f);
 
+	/// <summary>
+	/// Khởi tạo camera và tự động tìm kiếm mục tiêu nhân vật nếu chưa gán.
+	/// </summary>
 	public override void _Ready()
 	{
 		Current = true;
@@ -25,6 +28,9 @@ public partial class CameraFollow : Camera3D
 		}
 	}
 
+	/// <summary>
+	/// Cập nhật vị trí camera mượt mà bám theo mục tiêu trong vòng lặp vật lý.
+	/// </summary>
 	public override void _PhysicsProcess(double delta)
 	{
 		if (Target == null)
