@@ -20,6 +20,7 @@ obj/
 *.userosscache
 *.sln.docstates
 *.userprefs
+*.sln.DotSettings.user
 Generated_Classes/
 
 # =====================================================================
@@ -45,6 +46,11 @@ Generated_Classes/
 *~
 *.swp
 *.swo
+*.lock
+
+# Temporary debug scripts
+test_rot.gd
+test_rot.gd.uid
 
 # =====================================================================
 # BLENDER & 3D BACKUPS
@@ -80,6 +86,7 @@ export_presets.cfg
 Thumbs.db
 ehthumbs.db
 ehthumbs_vista.db
+desktop.ini
 Desktop.ini
 $RECYCLE.BIN/
 

@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://ciy0uaygbkns3" path="res://Scenes/Characters/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://c7kqoh0ntwdus" path="res://Scripts/Core/CameraFollow.cs" id="4_cam"]
 [ext_resource type="PackedScene" uid="uid://sdy3ykn64aus" path="res://Assets/Models_Exported/map_surroundings.glb" id="5_surroundings"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/NPC.tscn" id="5_npc"]
+[ext_resource type="Script" uid="uid://dwpklcl7pp863" path="res://Scripts/Core/VoidKillZone.cs" id="6_void"]
 
 [sub_resource type="Environment" id="Environment_vibrant"]
 background_mode = 1
@@ -12,6 +14,9 @@ background_color = Color(0.72, 0.84, 0.96, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.85, 0.88, 0.95, 1)
 ambient_light_energy = 0.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_void"]
+size = Vector3(400, 10, 400)
 
 [node name="WorldMap" type="Node3D" unique_id=1742541137]
 
@@ -42,3 +47,15 @@ current = true
 size = 17.5
 script = ExtResource("4_cam")
 Target = NodePath("../Player")
+
+[node name="NPC" parent="." unique_id=395481746 instance=ExtResource("5_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.5, -6)
+
+[node name="VoidKillZone" type="Area3D" parent="." unique_id=981247120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15, 0)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("6_void")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VoidKillZone" unique_id=981247121]
+shape = SubResource("BoxShape3D_void")
