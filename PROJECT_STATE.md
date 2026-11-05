@@ -415,3 +415,23 @@
 
 
 
+
+### [2026-11-06] - Viết Lại Toàn Diện Tài Liệu README.md & Đồng Bộ Toàn Bộ Dự Án (Sub-agent producer)
+1. **Tái Thiết Kế & Nâng Cấp Toàn Diện Tài Liệu README.md**:
+   - Cập nhật bộ Badges chuyên nghiệp: Godot 4.7.2 Mono, C# .NET 8.0, Jolt Physics 3D, Blender 5.4, Clean Code Allman, Antigravity Sub-Agents, **131/131 Tests Passed (100% Pass)**.
+   - Trình bày trực quan và chi tiết các tính năng gameplay & môi trường mới nhất:
+     * **Đài Vọng Cảnh Tầng 2 Mở Rộng (6.27 m²)**: Rộng 2.60m x 2.41m (gấp ~7 lần diện tích cũ), móng khối 3D đặc monolithic Z=[2.10, 2.52] dày 0.42m, hệ hàng rào gỗ 3 mặt 9 cột tinh xảo, lối vào thang thông thoáng 1.24m nối thẳng đỉnh thang SM_Staircase_02, 0 gap kín khít.
+     * **Thảm Cỏ Tự Nhiên Không Ô Vuông (Clean Organic Grass)**: Xóa 100% đường kẻ ô vuông / bàn cờ, thay bằng thảm cỏ seamless xanh mướt tự nhiên #529934 liền mạch trên toàn bộ bản đồ và cánh đồng 84x84m.
+     * **Không Gian Bầu Trời & Dãy Núi Thoáng Đãng**: Xóa bỏ 5 chóp núi nón chật chội, chỉ giữ lại 2 ngọn núi xa làm điểm nhấn thanh thoát, loại bỏ phông che trắng SM_Sky_Backdrop_Plane, mở rộng bầu trời ProceduralSky và mây bồng bềnh.
+     * **Cầu Thang Leo Mượt Mà (Stair Ramp Builder)**: Tự động phân tích hình học đỉnh và tạo khối dốc phẳng ConvexPolygonShape3D che phủ bậc thang 90°, kết hợp FloorMaxAngle = 58° và FloorSnapLength = 0.40f.
+     * **Vực Sâu Tự Hồi Sinh (VoidKillZone)**: Tự động cứu sinh khi rơi khỏi đảo, triệt tiêu gia tốc rơi và đưa Player an toàn về điểm xuất phát.
+     * **NPC Tương Tác & Thoại Nổi 3D Billboard**: Nhấn phím E / nút tay cầm để mở lời thoại, nhãn Label3D hiển thị rõ nét trên đầu NPC (NoDepthTest=true, FontSize=36, OutlineSize=8), tự ẩn sau 4s.
+2. **Bảng Điều Khiển Toàn Diện (Controls Matrix)**:
+   - Xây dựng bảng ma trận điều khiển đối chiếu trực quan 1:1 giữa **Bàn phím & Chuột** vs. **Tay cầm Gamepad** (Xbox / PlayStation) cho cả chế độ Isometric và Chế độ Camera Tự Do 6-DOF (Free Cam).
+3. **Bộ Công Cụ Dev Mode HUD Toàn Năng (F1 / ~ / Select)**:
+   - Mô tả chi tiết 3 Tab: Tab Nhân Vật (Player Tweaks), Tab Live Dialogue Editor (soạn thảo, thêm, phát, xoay vòng thoại), Tab Thế Giới & Camera.
+   - Nêu bật **Cơ chế Freeze Player Độc Quyền**: Khi bật Free Cam, nhân vật tự động đứng im hoàn toàn để người chơi/dev tự do bay lượn ngắm cảnh, chuyển động phục hồi trơn tru ngay khi tắt.
+4. **Đồng Bộ Hóa Đa Thư Mục & Kiểm Thử Xác Thực**:
+   - Đồng bộ tự động giữa C:\xnhaugame\README.md và C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\README.md qua HardLink.
+   - Xác nhận biên dịch dotnet build: **0 Warning(s), 0 Error(s)**.
+   - Xác nhận kiểm thử tự động Godot Headless: **131 / 131 Test cases Passed (100% Pass, 0 Fail)**.
