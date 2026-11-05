@@ -25,6 +25,7 @@ public partial class SimpleNpc : Node3D, IInteractable
 
 	private int _dialogueIndex = 0;
 	private SceneTreeTimer? _hideTimer;
+	private bool _isFocused = false;
 
 	public override void _Ready()
 	{
@@ -67,6 +68,7 @@ public partial class SimpleNpc : Node3D, IInteractable
 	/// </summary>
 	public void OnFocusGained()
 	{
+		_isFocused = true;
 		if (FloatingLabel == null)
 		{
 			return;
@@ -81,6 +83,7 @@ public partial class SimpleNpc : Node3D, IInteractable
 	/// </summary>
 	public void OnFocusLost()
 	{
+		_isFocused = false;
 		if (FloatingLabel != null)
 		{
 			FloatingLabel.Visible = false;
@@ -159,13 +162,22 @@ public partial class SimpleNpc : Node3D, IInteractable
 	}
 
 	/// <summary>
-	/// Ẩn nhãn thoại khi hết thời gian chờ.
+	/// Hết thời gian thoại: phục hồi lời nhắc tiếp tục nếu người chơi vẫn ở gần, hoặc ẩn đi.
 	/// </summary>
 	private void OnDialogueTimeout()
 	{
-		if (FloatingLabel != null && IsInsideTree())
+		if (FloatingLabel == null || !IsInsideTree())
 		{
-			FloatingLabel.Visible = false;
+			return;
 		}
+
+		if (_isFocused)
+		{
+			FloatingLabel.Text = $"[{NpcName}]\n(Ấn E để tiếp tục trò chuyện)";
+			FloatingLabel.Visible = true;
+			return;
+		}
+
+		FloatingLabel.Visible = false;
 	}
 }

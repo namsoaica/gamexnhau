@@ -39,9 +39,9 @@
 
 ### C. 3D Models & Assets
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
-- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây).
-- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng `Terrain_Plains_Mesh`, 4 dãy núi bao quanh `Mountain_Mesh_*`, 45 tảng đá `Rock_Mesh_*`, 70 cây thông/phong `Tree_Mesh_*`, thảm hoa cỏ).
-- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend`; File nguồn mới: `map_surroundings.blend`).
+- **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã đồng bộ màu xanh cỏ).
+- **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` kết nối phẳng mượt mà Z=0.000m với đảo trung tâm; chỉ giữ lại DUY NHẤT 1 dãy núi hùng vĩ phía Bắc `Mountain_Mesh_North` làm phông nền background xa, đã loại bỏ các dãy núi South, West, East che tầm nhìn Isometric; dọn sạch vật cản tiền cảnh).
+- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn; File nguồn môi trường: `map_surroundings.blend`).
 
 ---
 
@@ -113,3 +113,57 @@
 3. **Xác Thực Hệ Thống & Kiểm Thử Tự Động**:
    - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
    - Chạy kịch bản kiểm thử Godot Headless `test_suite.gd`: **Passed: 32 / Failed: 0** (100% Pass).
+
+### [2026-11-06] - Khắc Phục Triệt Để Lỗi Vật Lý & Hệ Thống Tương Tác / Hội Thoại
+1. **Khắc phục Lỗi Hội Thoại & Tương Tác**:
+   - `InteractableArea.cs`: Sửa `CollisionLayer = (1 << 2) | (1 << 3)` (Layer 3 NPC & Layer 4 Interactable), `CollisionMask = 0`, khắc phục hoàn toàn lỗi lệch physics layer khiến Player không dò thấy NPC.
+   - `SimpleNpc.cs`: Quản lý cờ `_isFocused`. Khi hết 4 giây ẩn thoại (`OnDialogueTimeout`), nếu người chơi vẫn ở gần NPC thì chuyển nhãn hiển thị về `[Tên NPC]\n(Ấn E để tiếp tục trò chuyện)` thay vì ẩn mất hoàn toàn.
+   - `PlayerInteractor.cs`: Bổ sung kiểm tra `Input.IsActionJustPressed(ActionName)` trong `_PhysicsProcess` để bắt phím E tức thì không bị nuốt, tích hợp cơ chế chống kích hoạt kép theo `Engine.GetProcessFrames()`.
+2. **Khắc phục Lỗi Vật Lý & Chuyển Động**:
+   - `PlayerMovement.cs`: Triệt tiêu lỗi FloorSnap kéo giật nhân vật dính sàn khi nhảy bằng cách đặt `FloorSnapLength = 0.0f` khi nhảy hoặc ở trên không (`!IsOnFloor()`), chỉ phục hồi `DefaultFloorSnap` (0.35m) khi đã tiếp đất ổn định. Thêm `FloorStopOnSlope` và `FloorBlockOnWall` chống trôi dốc.
+   - `MapAutoCollision.cs`: Bổ sung tính năng tự động nhận diện mesh nền gạch (`paver` / `Tier2_Pavers`) và phủ `StandardMaterial3D` màu xanh cỏ tươi mát (`AlbedoColor = (0.35, 0.65, 0.25)`), đồng bộ hóa màu sắc cảnh quan theo yêu cầu.
+3. **Kiểm Thử & Chuẩn Hóa Mã Nguồn**:
+   - Tuân thủ 100% `CODING_STANDARDS.md`: Tất cả hàm < 25 dòng, tất cả file < 200 dòng (`PlayerMovement.cs`: 176 dòng, `PlayerInteractor.cs`: 198 dòng, `SimpleNpc.cs`: 185 dòng, `MapAutoCollision.cs`: 128 dòng, `InteractableArea.cs`: 97 dòng).
+   - Mở rộng kịch bản kiểm thử tự động `test_suite.gd`: Bổ sung các test cases kiểm tra layer tương tác, trải nghiệm hội thoại, vật lý FloorSnap và đổi màu nền gạch.
+   - Chạy Godot Headless: **Passed: 47 / Failed: 0** (100% Pass).
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Cải Tạo Môi Trường Bản Đồ 3D (Sub-agent blender-helper)
+1. **Tinh Gọn Dãy Núi & Mở Rộng Tầm Nhìn Isometric**:
+   - Camera Isometric đặt ở `(-28, 23, 28)` nhìn về phía Player (hướng `+X, -Z`).
+   - Xóa bỏ hoàn toàn 3 dãy núi chắn tầm nhìn và chặn lối đi: `Mountain_Mesh_South`, `Mountain_Mesh_West`, `Mountain_Mesh_East`.
+   - **CHỈ GIỮ LẠI DUY NHẤT 1 DÃY NÚI PHÍA BẮC**: `Mountain_Mesh_North` (trải rộng X: [-39.3, 51.4], Y: [24.0, 47.7], cao 16.5m) làm phông nền background xa hùng vĩ, thoáng đãng, tráng lệ.
+2. **Đồng Bộ Màu Xanh Cỏ Cho Nền Gạch (`SM_Tier2_Pavers`)**:
+   - Tuân thủ nghiêm ngặt quy tắc vùng cấm ghi đè: Đọc `map_25d.blend` vào bộ nhớ RAM qua Blender CLI mà không ghi đè file gốc.
+   - Gán vật liệu xanh cỏ `Mat_Grass_Pavers` kèm UV mapping chiếu phẳng cho `SM_Tier2_Pavers`, hòa quyện tuyệt đối với địa hình cỏ của đảo.
+   - Xuất lại model `Assets/Models_Exported/map_25d.glb` chuẩn Godot (-Z forward, Y up).
+   - Kết hợp cấu hình 2 tầng cùng `MapAutoCollision.cs` (`MaterialOverride`), đảm bảo nền gạch hiển thị màu xanh cỏ đồng nhất trên mọi nền tảng.
+3. **Ổn Định Bản Đồ (Map Stability) & Dọn Sạch Tiền Cảnh**:
+   - Định hình lại bề mặt `Terrain_Plains_Mesh`: Thiết lập vùng đệm quanh đảo trung tâm (`[-4, 16] x [-4, 16]`) phẳng lì tuyệt đối ở độ cao `Z = 0.000m`, kết nối không vết nối và không nhấp nhô với đảo trung tâm.
+   - Thảo nguyên phía Nam, Tây, Đông phẳng phiu êm dịu, không gờ dốc cản trở; chân núi phía Bắc dốc nhẹ từ 0.0m lên 4.2m tiếp giáp êm ái với `Mountain_Mesh_North`.
+   - Dọn sạch 7 cây cối và tảng đá tiền cảnh che khuất đường nhìn từ Camera Isometric đến Player/NPC, di chuyển và snap khít 100% tài sản phụ trợ (cây, đá, hoa cỏ) lên bề mặt mới của cánh đồng.
+4. **Kiểm Thử Toàn Diện**:
+   - Đã re-import tài nguyên trong Godot Editor headless.
+   - Mở rộng `test_suite.gd` với bài kiểm tra xác thực dãy núi duy nhất và các núi che khuất đã bị loại bỏ.
+   - Kết quả kiểm thử Godot Headless: **Passed: 53 / Failed: 0** (100% Pass).
+   - Biên dịch `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+### [2026-11-06] - Rà Soát Toàn Diện Mã Nguồn & Đảm Bảo Chất Lượng (Code Review & QA Audit)
+1. **Kiểm Định Chuẩn Clean Code (`CODING_STANDARDS.md`) Toàn Bộ Scripts C#**:
+   - `Scripts/Core/CameraFollow.cs`: 46 dòng, 2 hàm (11-12 dòng), Guard Clauses, XML tiếng Việt. (Đạt 100%)
+   - `Scripts/Core/IInteractable.cs`: 35 dòng, interface chuẩn mực, Single Responsibility. (Đạt 100%)
+   - `Scripts/Core/InteractableArea.cs`: 98 dòng, 6 hàm (< 18 dòng), tự động tạo collision shape, ủy quyền tương tác. (Đạt 100%)
+   - `Scripts/Core/MapAutoCollision.cs`: 127 dòng, 8 hàm (< 16 dòng), tự động tạo Trimesh Collision & phủ vật liệu xanh cỏ. (Đạt 100%)
+   - `Scripts/Core/VoidKillZone.cs`: 129 dòng, 8 hàm (< 15 dòng), an toàn bộ nhớ trong `_ExitTree()` với `BodyEntered -= OnBodyEntered`. (Đạt 100%)
+   - `Scripts/Player/PlayerMovement.cs`: 175 dòng, 12 hàm (< 13 dòng), FloorSnap chống giật dính sàn, trôi dốc, xoay mặt chống moonwalk. (Đạt 100%)
+   - `Scripts/Core/SimpleNpc.cs`: 183 dòng, 11 hàm (< 16 dòng), an toàn bộ nhớ trong `_ExitTree()` với `_hideTimer.Timeout -= OnDialogueTimeout`. (Đạt 100%)
+   - `Scripts/Player/PlayerInteractor.cs`: 189 dòng, 15 hàm (< 19 dòng), an toàn bộ nhớ trong `_ExitTree()` với `AreaEntered` và `AreaExited`. (Đạt 100%)
+   - `Scripts/Player/PlayerAnimation.cs`: 193 dòng, 13 hàm (< 19 dòng), tự động nhận diện clip hoặc procedural lean/bobbing. (Đạt 100%)
+   - **Đánh giá tổng quát**: 100% file C# < 195 dòng (nằm trong giới hạn 150-200 dòng), 100% hàm <= 19 dòng (dưới mức trần 25 dòng), không lồng if quá 2 cấp, Guard Clauses nhất quán, đầy đủ XML comments tiếng Việt.
+2. **Kiểm Tra An Toàn Bộ Nhớ (Memory Safety)**:
+   - Mọi sự kiện đăng ký (`+=`) trong `VoidKillZone.cs`, `SimpleNpc.cs`, `PlayerInteractor.cs` đều đã có lệnh hủy (`-=`) tương ứng trong `_ExitTree()`. Hoàn toàn không rò rỉ bộ nhớ.
+3. **Kiểm Tra Biên Dịch & Chạy Bộ Kiểm Thử Tự Động**:
+   - Biên dịch `dotnet build "C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Chạy kiểm thử tự động Godot Headless `test_suite.gd`: **53 / 53 Test cases Passed (100% Pass, 0 Fail)**.
+
+

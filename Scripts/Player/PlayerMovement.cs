@@ -7,8 +7,7 @@ namespace Game.Player;
 /// </summary>
 public partial class PlayerMovement : CharacterBody3D
 {
-	[Signal]
-	public delegate void JumpedEventHandler();
+	[Signal] public delegate void JumpedEventHandler();
 
 	[ExportGroup("Thông số Vận Tốc")]
 	[Export] public float MoveSpeed { get; set; } = 6.0f;
@@ -21,10 +20,8 @@ public partial class PlayerMovement : CharacterBody3D
 	[Export] public float CoyoteTime { get; set; } = 0.15f;
 	[Export] public float JumpBufferTime { get; set; } = 0.15f;
 
-	[ExportGroup("Xoay Hướng")]
+	[ExportGroup("Xoay Hướng & Node")]
 	[Export] public float RotationSpeed { get; set; } = 12.0f;
-
-	[ExportGroup("Tham Chiếu Node")]
 	[Export] public Node3D? VisualNode { get; set; }
 	[Export] public Camera3D? ReferenceCamera { get; set; }
 
@@ -36,21 +33,17 @@ public partial class PlayerMovement : CharacterBody3D
 	private const float DefaultFloorSnap = 0.35f;
 	private const float DefaultMaxFloorAngle = 50.0f;
 
-	/// <summary>
-	/// Thiết lập thông số va chạm sàn và tìm kiếm trực quan nhân vật.
-	/// </summary>
 	public override void _Ready()
 	{
 		FloorSnapLength = DefaultFloorSnap;
 		FloorConstantSpeed = true;
+		FloorStopOnSlope = true;
+		FloorBlockOnWall = true;
 		FloorMaxAngle = Mathf.DegToRad(DefaultMaxFloorAngle);
 		if (!IsInGroup("Player")) AddToGroup("Player");
 		VisualNode ??= (Node3D?)FindChild("Character_Armature") ?? (Node3D?)FindChild("CharacterModel");
 	}
 
-	/// <summary>
-	/// Cập nhật vật lý, tiếp nhận điều khiển và di chuyển nhân vật.
-	/// </summary>
 	public override void _PhysicsProcess(double delta)
 	{
 		float dt = (float)delta;
@@ -60,25 +53,21 @@ public partial class PlayerMovement : CharacterBody3D
 		HandleJump();
 		ApplyMovement(dt);
 		ApplyRotation(dt);
+		UpdateFloorSnap();
 		MoveAndSlide();
 	}
 
 	/// <summary>
 	/// Hãm dừng vận tốc ngang ngay lập tức khi vào trạng thái đặc biệt.
 	/// </summary>
-	public void StopHorizontalMovement()
-	{
-		Vector3 currentVelocity = Velocity;
-		currentVelocity.X = 0.0f;
-		currentVelocity.Z = 0.0f;
-		Velocity = currentVelocity;
-	}
+	public void StopHorizontalMovement() => Velocity = new Vector3(0.0f, Velocity.Y, 0.0f);
 
 	/// <summary>
 	/// Dịch chuyển nhân vật đến vị trí chỉ định và triệt tiêu toàn bộ vận tốc rơi.
 	/// </summary>
 	public void TeleportTo(Vector3 position)
 	{
+		FloorSnapLength = 0.0f;
 		Velocity = Vector3.Zero;
 		GlobalPosition = position;
 		ResetPhysicsInterpolation();
@@ -101,37 +90,44 @@ public partial class PlayerMovement : CharacterBody3D
 	}
 
 	/// <summary>
-	/// Áp dụng lực hút trọng trường khi nhân vật đang rơi trên không.
+	/// Áp dụng trọng lực mượt mà, ổn định vận tốc khi tiếp đất trên dốc.
 	/// </summary>
 	private void ApplyGravity(float delta)
 	{
-		if (IsOnFloor()) return;
-		Vector3 currentVelocity = Velocity;
-		currentVelocity.Y -= Gravity * delta;
-		Velocity = currentVelocity;
+		if (IsOnFloor())
+		{
+			if (Velocity.Y < 0.0f) Velocity = new Vector3(Velocity.X, -0.1f, Velocity.Z);
+			return;
+		}
+
+		Velocity = new Vector3(Velocity.X, Velocity.Y - (Gravity * delta), Velocity.Z);
 	}
 
 	/// <summary>
 	/// Đọc vector hướng di chuyển WASD / Phím mũi tên chuẩn hóa.
 	/// </summary>
-	private void ReadInput()
-	{
-		_inputVector = Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
-	}
+	private void ReadInput() => _inputVector = Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
 
 	/// <summary>
-	/// Kích hoạt nhảy khi thỏa mãn cả Jump Buffer và Coyote Time.
+	/// Kích hoạt nhảy khi thỏa mãn Jump Buffer và Coyote Time (tắt snap sàn tức thì).
 	/// </summary>
 	private void HandleJump()
 	{
 		if (_jumpBufferTimer <= 0.0f || _coyoteTimer <= 0.0f) return;
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
+		FloorSnapLength = 0.0f;
 
-		Vector3 currentVelocity = Velocity;
-		currentVelocity.Y = JumpVelocity;
-		Velocity = currentVelocity;
+		Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
 		EmitSignal(SignalName.Jumped);
+	}
+
+	/// <summary>
+	/// Quản lý độ bám sàn: tắt snap khi nhảy và ở trên không để tránh giật dính sàn.
+	/// </summary>
+	private void UpdateFloorSnap()
+	{
+		FloorSnapLength = (!IsOnFloor() || Velocity.Y > 0.0f) ? 0.0f : DefaultFloorSnap;
 	}
 
 	/// <summary>
@@ -140,21 +136,11 @@ public partial class PlayerMovement : CharacterBody3D
 	private Vector3 CalculateTargetVelocity()
 	{
 		Camera3D? cam = ReferenceCamera ?? GetViewport()?.GetCamera3D();
-		if (cam == null)
-		{
-			return new Vector3(_inputVector.X * MoveSpeed, 0.0f, _inputVector.Y * MoveSpeed);
-		}
+		if (cam == null) return new Vector3(_inputVector.X * MoveSpeed, 0.0f, _inputVector.Y * MoveSpeed);
 
-		Vector3 camForward = -cam.GlobalTransform.Basis.Z;
-		camForward.Y = 0.0f;
-		camForward = camForward.Normalized();
-
-		Vector3 camRight = cam.GlobalTransform.Basis.X;
-		camRight.Y = 0.0f;
-		camRight = camRight.Normalized();
-
-		Vector3 moveDirection = (camRight * _inputVector.X) - (camForward * _inputVector.Y);
-		return moveDirection * MoveSpeed;
+		Vector3 camFwd = new Vector3(-cam.GlobalTransform.Basis.Z.X, 0.0f, -cam.GlobalTransform.Basis.Z.Z).Normalized();
+		Vector3 camRight = new Vector3(cam.GlobalTransform.Basis.X.X, 0.0f, cam.GlobalTransform.Basis.X.Z).Normalized();
+		return ((camRight * _inputVector.X) - (camFwd * _inputVector.Y)) * MoveSpeed;
 	}
 
 	/// <summary>

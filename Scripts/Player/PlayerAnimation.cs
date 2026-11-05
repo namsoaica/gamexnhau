@@ -173,7 +173,6 @@ public partial class PlayerAnimation : Node
 	{
 		Vector3 targetPos = _initialVisualPosition + new Vector3(0.0f, BobAmplitude * 0.5f, 0.0f);
 		VisualNode!.Position = VisualNode.Position.Lerp(targetPos, ProceduralSmoothSpeed * delta);
-
 		Vector3 rot = VisualNode.Rotation;
 		rot.X = Mathf.LerpAngle(rot.X, _initialVisualRotation.X + (LeanAmount * 0.5f), ProceduralSmoothSpeed * delta);
 		VisualNode.Rotation = rot;

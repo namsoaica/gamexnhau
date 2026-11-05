@@ -41,6 +41,10 @@ func run_suite():
 	test_player_scripts()
 	test_player_facing_direction()
 	test_procedural_tilt_direction()
+	test_dialogue_and_interaction()
+	test_physics_floorsnap()
+	test_paver_recolor()
+	test_surroundings_mountains()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -163,3 +167,80 @@ func test_procedural_tilt_direction():
 			anim_node._process(0.05)
 		print("Procedural moving rotation X (pitch): ", visual.rotation.x)
 		assert_true(visual.rotation.x < 0.0, "Player leans forward (negative pitch X) when moving")
+
+func test_dialogue_and_interaction():
+	print("\n-- Testing Dialogue & Interaction Bug Fixes --")
+	var npc = test_map.find_child("NPC")
+	assert_true(npc != null, "NPC exists in WorldMap")
+
+	var interact_area = npc.find_child("InteractableArea")
+	assert_true(interact_area != null, "InteractableArea exists under NPC")
+	assert_true(interact_area.collision_layer == ((1 << 2) | (1 << 3)), "InteractableArea has Layer 3 & 4 (12)")
+
+	var player = test_map.find_child("Player")
+	var player_interactor = player.find_child("PlayerInteractor")
+	assert_true(player_interactor != null, "PlayerInteractor exists under Player")
+	assert_true(player_interactor.collision_mask == ((1 << 2) | (1 << 3)), "PlayerInteractor scans Layer 3 & 4 (12)")
+
+	# Test Dialogue timeout refocus
+	npc.OnFocusGained()
+	var label = npc.FloatingLabel
+	assert_true(label != null and label.visible, "FloatingLabel visible on focus gained")
+	assert_true(label.text.contains("Ấn E để nói chuyện"), "Prompt displayed on focus gained")
+
+	npc.Interact(player)
+	assert_true(label.text.contains("Xin chào nhà thám hiểm"), "Dialogue text shown on interact")
+
+	# Simulate timeout while focused
+	npc.call("OnDialogueTimeout")
+	assert_true(label.visible, "FloatingLabel still visible after timeout while focused")
+	assert_true(label.text.contains("Ấn E để tiếp tục trò chuyện"), "Prompt updated to continue dialogue after timeout")
+
+func test_physics_floorsnap():
+	print("\n-- Testing Physics FloorSnap Bug Fixes --")
+	var player = test_map.find_child("Player")
+	
+	# When jumping upwards (Velocity.Y > 0), FloorSnapLength must be 0
+	player.velocity = Vector3(0, 9, 0)
+	player._physics_process(0.016)
+	assert_true(player.floor_snap_length == 0.0, "FloorSnapLength is 0.0 when jumping upwards")
+
+	# When landing on floor with Velocity.Y <= 0, FloorSnapLength restores
+	player.velocity = Vector3(0, 0, 0)
+	# Force on floor by setting position and moving
+	player._physics_process(0.016)
+	if player.is_on_floor():
+		assert_true(player.floor_snap_length > 0.0, "FloorSnapLength restored to DefaultFloorSnap on floor")
+	else:
+		assert_true(player.floor_snap_length == 0.0, "FloorSnapLength is 0.0 when in air")
+
+func test_paver_recolor():
+	print("\n-- Testing Paver Recolor To Grass --")
+	var map_25d = test_map.find_child("Map_25D")
+	assert_true(map_25d != null, "Map_25D exists in WorldMap")
+
+	var paver_mesh = map_25d.find_child("SM_Tier2_Pavers")
+	assert_true(paver_mesh != null, "SM_Tier2_Pavers exists in Map_25D")
+	assert_true(paver_mesh.material_override != null, "Paver mesh has grass MaterialOverride applied")
+
+func test_surroundings_mountains():
+	print("\n-- Testing Surroundings Mountains & Plains --")
+	var map_surr = test_map.find_child("Map_Surroundings")
+	assert_true(map_surr != null, "Map_Surroundings exists in WorldMap")
+
+	var north_mt = map_surr.find_child("Mountain_Mesh_North")
+	assert_true(north_mt != null, "Mountain_Mesh_North exists as single majestic background mountain")
+
+	var south_mt = map_surr.find_child("Mountain_Mesh_South")
+	assert_true(south_mt == null, "Mountain_Mesh_South has been removed")
+
+	var west_mt = map_surr.find_child("Mountain_Mesh_West")
+	assert_true(west_mt == null, "Mountain_Mesh_West has been removed")
+
+	var east_mt = map_surr.find_child("Mountain_Mesh_East")
+	assert_true(east_mt == null, "Mountain_Mesh_East has been removed")
+
+	var plains = map_surr.find_child("Terrain_Plains_Mesh")
+	assert_true(plains != null, "Terrain_Plains_Mesh exists and connects island to surroundings")
+
+

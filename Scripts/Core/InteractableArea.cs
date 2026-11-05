@@ -15,12 +15,14 @@ public partial class InteractableArea : Area3D, IInteractable
 	[Export] public bool IsEnabled { get; set; } = true;
 	[Export] public float InteractionRadius { get; set; } = 3.0f;
 
+	private const uint InteractableLayer = (1 << 2) | (1 << 3); // Layer 3 (NPC) & Layer 4 (Interactable)
+
 	public override void _Ready()
 	{
 		Monitoring = false;
 		Monitorable = true;
-		CollisionLayer = 1 | 2;
-		CollisionMask = 1 | 2;
+		CollisionLayer = InteractableLayer;
+		CollisionMask = 0;
 		EnsureCollisionShape();
 	}
 

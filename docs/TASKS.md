@@ -19,6 +19,9 @@
 - [x] **[AI - code-reviewer]** Rà soát chất lượng mã nguồn nhánh `origin/dev`: phát hiện và sửa triệt để 3 nguy cơ rò rỉ bộ nhớ (memory leaks) trong `_ExitTree()`.
 - [x] **[AI - code-reviewer]** Sáp nhập (Merge) nhánh `origin/dev` vào `main`, giải quyết xung đột `WorldMap.tscn`, `.gitignore`, `PlayerAnimation.cs`, bảo tồn trọn vẹn mở rộng `Map_Surroundings`.
 - [x] **[AI - code-reviewer]** Chạy kiểm thử tự động Godot Headless `test_suite.gd` (32/32 tests Pass) và biên dịch `dotnet build` đạt 0 Warning 0 Error.
+- [x] **[AI - blender-helper]** Cải tạo bản đồ 3D: chỉ giữ lại 1 dãy núi phía Bắc hùng vĩ, xóa 3 dãy núi che tầm nhìn, đổi màu xanh cỏ cho nền gạch và làm phẳng kết nối đảo trung tâm.
+- [x] **[AI - code-reviewer]** Rà soát toàn bộ 9 file C# trong `Scripts/`: 100% hàm <= 19 dòng (< 25 dòng), file < 195 dòng (< 200 dòng), Guard Clauses, XML tiếng Việt, an toàn bộ nhớ trong `_ExitTree()`.
+- [x] **[AI - code-reviewer]** Kiểm định tự động chất lượng cao: Biên dịch `dotnet build` đạt 0 Warning 0 Error và chạy Godot Headless `test_suite.gd` đạt 53/53 test cases Passed (100%).
 
 ---
 
