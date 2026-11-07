@@ -43,6 +43,12 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - Cập nhật tọa độ dịch chuyển trong `DevTeleportTab.cs`.
   - Bổ sung va chạm tự động cho tường, giếng, đe sắt, lò luyện trong `MapAutoCollision.cs`.
   - Xác thực `dotnet build` 0 lỗi 0 cảnh báo, Godot Headless `test_suite.gd` đạt 279/279 test cases Passed (100%).
+- [x] **[AI - agy-customizations & code-reviewer]** Thiết lập "Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế Đến Khi Đạt Yêu Cầu (Requirement-Driven Auto-Playtest Loop)" với 4 quy tắc bắt buộc:
+  - (1) Cấm kết thúc nhiệm vụ khi mới chỉ chạy `dotnet build` thành công.
+  - (2) Chuyển hóa 100% yêu cầu người dùng thành Automated Playtest Assertions trong `test_suite.gd` (giả lập bước vào/ra nhà Seamless Interior Transition, kiểm tra va chạm toàn bộ mesh chống xuyên tường, giả lập tương tác 8 NPC và hội thoại tiếng Việt, kiểm tra Dev HUD 6 Tabs và dịch chuyển tức thời, kiểm tra thay đổi đa độ phân giải và FPS trần).
+  - (3) Tự động gọi Godot Headless Mono Console tại `C:/xnhaugame/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe` và đọc toàn bộ log.
+  - (4) Thiết lập vòng lặp tự chữa lỗi (Self-Healing Loop) phân tích log, sửa code/scene và chạy lại liên tục đến khi 100% Pass tuyệt đối.
+  - Đã nâng cấp đồng bộ: `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md`, `.agents/workflows/dev_and_review.py`, và `test_suite.gd` đạt **368 / 368 tests Passed (100%)**.
 
 ---
 

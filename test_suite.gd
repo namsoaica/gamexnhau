@@ -657,37 +657,109 @@ func test_player_combat_system():
 	dummy.queue_free()
 
 func test_village_map_and_gameplay():
-	print("\n-- Testing Village Map & 4 Gameplay Subsystems in WorldMap --")
+	print("\n-- Requirement-Driven Playtest: Village Map & 4 Gameplay Subsystems in WorldMap --")
 	var vlg = test_map
 	assert_true(vlg != null, "WorldMap instance exists for village verification")
 	if vlg == null:
 		return
 
-	# 1. Test Seamless Interior Zones
+	var player = vlg.find_child("Player", true, false)
+	assert_true(player != null, "Player exists in WorldMap for playtest simulation")
+	var cam = vlg.find_child("IsometricCamera", true, false)
+	assert_true(cam != null, "IsometricCamera exists in WorldMap")
+
+	# 1. Automated Playtest: Seamless Interior Zones Entry & Exit Simulation
 	var zones = ["InteriorZone_Smith", "InteriorZone_Alchemist", "InteriorZone_Chef", "InteriorZone_House"]
 	for zn in zones:
 		var z_node = vlg.find_child(zn, true, false)
 		assert_true(z_node != null, "Interior zone '" + zn + "' exists in WorldMap")
-		if z_node != null:
-			var light = z_node.get("InteriorLight")
-			assert_true(light != null, zn + " has InteriorLight configured")
-			var zoom = z_node.get("InteriorCameraZoom")
-			assert_true(zoom != null and zoom > 5.0, zn + " has InteriorCameraZoom > 5.0")
+		if z_node == null:
+			continue
 
-	# 2. Test 8 NPCs in WorldMap
+		var light = z_node.get("InteriorLight")
+		assert_true(light != null, zn + " has InteriorLight configured")
+		var target_zoom = z_node.get("InteriorCameraZoom")
+		assert_true(target_zoom != null and target_zoom > 5.0, zn + " has InteriorCameraZoom > 5.0")
+
+		# Simulating Player Entering the Building (Seamless Transition Trigger)
+		z_node.emit_signal("body_entered", player)
+		if light != null:
+			assert_true(light.visible == true, zn + " interior light turns ON when player enters")
+		if cam != null and target_zoom != null:
+			assert_true(is_equal_approx(cam.TargetZoomSize, target_zoom), zn + " camera zoomed to interior target size " + str(target_zoom))
+
+		# Simulating Player Exiting the Building
+		z_node.emit_signal("body_exited", player)
+		if light != null:
+			assert_true(light.visible == false, zn + " interior light turns OFF when player exits")
+		if cam != null:
+			assert_true(is_equal_approx(cam.TargetZoomSize, 17.5), zn + " camera zoom restored to default 17.5 upon exit")
+
+	# 2. Automated Playtest: Mesh Collision Validation (No Wall/Floor Clipping)
+	var vlg_mesh = vlg.find_child("VillageMesh", true, false)
+	assert_true(vlg_mesh != null, "VillageMesh model instance exists in WorldMap")
+	if vlg_mesh != null:
+		var critical_meshes = [
+			"Floor_Smith", "Wall_North_Smith", "Floor_Alchemist", "Wall_North_Alchemist",
+			"Floor_Chef", "Wall_North_Chef", "Floor_House", "Wall_North_House",
+			"Well_Stone", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base"
+		]
+		for mesh_name in critical_meshes:
+			var m_node = vlg_mesh.find_child(mesh_name, true, false)
+			assert_true(m_node != null, "Critical structure mesh '" + mesh_name + "' exists in VillageMesh")
+			if m_node != null:
+				var has_col = false
+				for child in m_node.get_children():
+					if child is StaticBody3D:
+						for grand in child.get_children():
+							if grand is CollisionShape3D:
+								has_col = true
+								break
+				assert_true(has_col, mesh_name + " has valid CollisionShape3D (anti-wall-clipping verified)")
+
+	# 3. Automated Playtest: 8 NPCs Behavior & Interactive Dialogue Simulation
+	var dialog = vlg.find_child("NpcInteractionDialog", true, false)
+	assert_true(dialog != null, "NpcInteractionDialog exists in WorldMap")
+
 	var npcs = [
-		"Npc_Blacksmith", "Npc_Alchemist", "Npc_Chef", "Npc_Farmer",
-		"Npc_Fisherman", "Npc_Miner", "Npc_Lumberjack", "Npc_Guard"
+		{"name": "Npc_Blacksmith", "prof": 0, "title": "Thợ Rèn"},
+		{"name": "Npc_Alchemist", "prof": 1, "title": "Nhà Giả Kim"},
+		{"name": "Npc_Chef", "prof": 2, "title": "Đầu Bếp"},
+		{"name": "Npc_Farmer", "prof": 3, "title": "Nông Dân"},
+		{"name": "Npc_Fisherman", "prof": 4, "title": "Ngư Dân"},
+		{"name": "Npc_Miner", "prof": 5, "title": "Thợ Mỏ"},
+		{"name": "Npc_Lumberjack", "prof": 6, "title": "Tiều Phu"},
+		{"name": "Npc_Guard", "prof": 7, "title": "Lính Canh"}
 	]
-	for npc_name in npcs:
-		var npc_node = vlg.find_child(npc_name, true, false)
-		assert_true(npc_node != null, "NPC '" + npc_name + "' exists in WorldMap")
+	for npc_data in npcs:
+		var npc_node = vlg.find_child(npc_data["name"], true, false)
+		assert_true(npc_node != null, "NPC '" + npc_data["name"] + "' exists in WorldMap")
 		if npc_node != null:
-			assert_true(npc_node.is_in_group("VillageNPC"), npc_name + " is in group VillageNPC")
-			assert_true(npc_node.get("Profession") != null, npc_name + " has Profession assigned")
-			assert_true(npc_node.CanInteract(), npc_name + " CanInteract returns true initially")
+			assert_true(npc_node.is_in_group("VillageNPC"), npc_data["name"] + " is in group VillageNPC")
+			assert_true(int(npc_node.get("Profession")) == npc_data["prof"], npc_data["name"] + " has exact Profession " + str(npc_data["prof"]))
+			assert_true(npc_node.CanInteract(), npc_data["name"] + " CanInteract returns true initially")
 
-	# 3. Test Dev Overlay 6 Tabs
+			# Simulating NPC Interaction Trigger
+			npc_node.Interact(player)
+			assert_true(int(npc_node.CurrentState) == 3, npc_data["name"] + " entered State 3 (Interacting)")
+			if dialog != null:
+				var panel = dialog.get("DialogPanel")
+				if panel != null:
+					assert_true(panel.visible == true, "NpcInteractionDialog panel is visible during interaction with " + npc_data["name"])
+				var prof_lbl = dialog.get("ProfessionLabel")
+				if prof_lbl != null:
+					assert_true(npc_data["title"] in prof_lbl.text, "Dialogue displays correct Vietnamese profession title: " + npc_data["title"])
+				var actions = dialog.get("ActionsContainer")
+				if actions != null:
+					assert_true(actions.get_child_count() >= 2, "Dialogue generated at least 2 special actions for " + npc_data["name"])
+				
+				# Simulating Closing the Dialogue
+				dialog.CloseDialog()
+				if panel != null:
+					assert_true(panel.visible == false, "Dialogue panel closed properly for " + npc_data["name"])
+			npc_node.FinishInteraction()
+
+	# 4. Automated Playtest: Dev Overlay 6 Tabs & Teleportation Simulation
 	var dev = vlg.find_child("DevOverlay", true, false)
 	assert_true(dev != null, "DevOverlay exists in WorldMap")
 	if dev != null:
@@ -702,24 +774,33 @@ func test_village_map_and_gameplay():
 		var gfx_tab = dev.find_child("DevGraphicsTab", true, false)
 		assert_true(gfx_tab != null, "DevGraphicsTab exists in DevOverlay")
 
-	# 4. Test Display Settings Manager
+		# Teleportation Playtest to Village Blacksmith
+		if player != null:
+			var target_smith = Vector3(-11.0, 0.5, 21.0)
+			player.TeleportTo(target_smith)
+			assert_true(player.global_position.distance_to(target_smith) < 1.0, "Player teleported successfully to Blacksmith coordinates")
+			# Teleport back to spawn
+			player.TeleportTo(Vector3(6.0, 2.5, -6.0))
+
+	# 5. Automated Playtest: DisplaySettingsManager (Multi-Resolution & FPS Scaling)
 	var disp_mgr = vlg.find_child("DisplaySettingsManager", true, false)
 	assert_true(disp_mgr != null, "DisplaySettingsManager node exists in WorldMap")
 	if disp_mgr != null:
-		var max_fps = disp_mgr.get("CurrentMaxFps")
-		assert_true(max_fps != null, "DisplaySettingsManager has CurrentMaxFps")
+		# Test Resolution Switching
+		disp_mgr.SetResolution(Vector2i(1280, 720))
+		assert_true(disp_mgr.CurrentResolution == Vector2i(1280, 720), "DisplaySettingsManager resolution set to 720p")
+		disp_mgr.SetResolution(Vector2i(1920, 1080))
+		assert_true(disp_mgr.CurrentResolution == Vector2i(1920, 1080), "DisplaySettingsManager resolution restored to 1080p")
 
-	# 5. Test NPC Interaction Dialog
-	var dialog = vlg.find_child("NpcInteractionDialog", true, false)
-	assert_true(dialog != null, "NpcInteractionDialog exists in WorldMap")
-
-	# 6. Test CameraFollow Interior Focus
-	var cam = vlg.find_child("IsometricCamera", true, false)
-	assert_true(cam != null, "IsometricCamera exists in WorldMap")
-	if cam != null:
-		cam.SetInteriorFocus(Vector3(10, 2, 10), 12.0)
-		assert_true(is_equal_approx(cam.TargetZoomSize, 12.0), "Camera TargetZoomSize changed to 12.0 on interior focus")
-		cam.ResetInteriorFocus()
+		# Test Target FPS and VSync
+		disp_mgr.SetMaxFps(144)
+		assert_true(disp_mgr.CurrentMaxFps == 144, "DisplaySettingsManager max FPS set to 144")
+		disp_mgr.SetMaxFps(60)
+		assert_true(disp_mgr.CurrentMaxFps == 60, "DisplaySettingsManager max FPS set to 60")
+		disp_mgr.SetVSync(DisplayServer.VSYNC_ENABLED)
+		assert_true(disp_mgr.CurrentVSync == DisplayServer.VSYNC_ENABLED, "DisplaySettingsManager VSync enabled")
+		disp_mgr.SaveSettings()
+		assert_true(FileAccess.file_exists("user://settings.cfg"), "Settings saved successfully to user://settings.cfg")
 
 
 

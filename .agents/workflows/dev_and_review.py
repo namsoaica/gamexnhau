@@ -41,7 +41,8 @@ reviewer = agent(
         "3. Nếu có hàm >= 25 dòng hoặc file >= 200 dòng -> Tách nhỏ và refactor ngay.\n"
         "4. Kiểm tra an toàn bộ nhớ: hủy sự kiện -= trong _ExitTree().\n"
         "5. Chạy 'dotnet build' kiểm tra 0 lỗi 0 cảnh báo.\n"
-        "6. Cập nhật kết quả vào docs/SESSION_HISTORY.md và gọi finish() trả về tóm tắt dưới 5 dòng."
+        "6. Thực thi Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế (Requirement-Driven Auto-Playtest Loop): Chạy test_suite.gd trên Godot Headless tại C:/xnhaugame/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe. Nếu có [FAIL] hoặc lỗi runtime -> Thực hiện Self-Healing Loop tự sửa và chạy lại đến khi 100% PASS.\n"
+        "7. Cập nhật kết quả vào docs/PROJECT_STATE.md, docs/SESSION_HISTORY.md và gọi finish() trả về tóm tắt dưới 5 dòng."
     ),
     role="Code Reviewer",
     type_name="self",
