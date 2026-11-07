@@ -554,3 +554,40 @@
    - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
    - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
 
+
+
+### [2026-11-07] - Cấu Hình Toàn Diện Workspace Antigravity CLI Theo Chuẩn Local Scope (Lead Orchestrator)
+1. **Thực thi nguyên tắc Strict Local Scope**:
+   - Toàn bộ cấu hình, rules, skills, workflows và tài nguyên chỉ hoạt động trong phạm vi cục bộ của repository `gamexnhau`.
+   - Tuyệt đối không can thiệp, không tạo và không sửa đổi bất kỳ file nào thuộc phạm vi toàn cục (`~/.gemini/`).
+2. **Nâng cấp và Chuẩn hóa Toàn bộ 5 Kỹ Năng Chính + Kỹ Năng Phụ Trợ**:
+   - `.agents/skills/csharp-coder/SKILL.md`: Chuẩn hóa vai trò Clean C# Gameplay Programmer, chuyển đổi toàn bộ đường dẫn thành tương đối (`Dự án Trò chơi Mới.csproj`, `Scripts/`), bổ sung mô tả kích hoạt tự nhiên song ngữ (Anh - Việt), ràng buộc Clean Code (< 25 dòng/hàm, < 200 dòng/file, Guard Clauses, hủy `-=` trong `_ExitTree()`).
+   - `.agents/skills/code-reviewer/SKILL.md`: Chuẩn hóa vai trò Clean Code Reviewer & QA, quy trình rà soát tự động 5 bước, kiểm định an toàn bộ nhớ và lệnh `dotnet build` 0 lỗi 0 cảnh báo.
+   - `.agents/skills/producer/SKILL.md`: Chuẩn hóa vai trò Project Producer & Task Coordinator, phân chia nhiệm vụ mạch lạc `[HUMAN]` vs `[AI]`, đồng bộ hóa tài liệu giữa `docs/` và root.
+   - `.agents/skills/blender-helper/SKILL.md`: Chuẩn hóa vai trò Blender Technical Assistant, cơ chế tự động tìm `blender.exe` linh hoạt (PATH hoặc `C:\Program Files\Blender Foundation\Blender 5.2`), quy tắc bất khả xâm phạm bảo vệ `.blend` gốc và cấm nhúng texture trùng vào `.glb`.
+   - `.agents/skills/texture-architect/SKILL.md`: Hoàn thiện kỹ năng kiến trúc Texture/Material, cây quyết định 3 bước tối ưu hóa VRAM, quy chuẩn ảnh lũy thừa 2 và quản lý danh mục `Assets/Textures/TEXTURE_CATALOG.md`.
+   - `.agents/skills/checkpoint/SKILL.md`: Chuẩn hóa vai trò Context & History Manager, tự động quét thay đổi và đóng gói bối cảnh dự án.
+3. **Nâng cấp Danh Mục Tài Nguyên Dùng Chung `Assets/Textures/TEXTURE_CATALOG.md`**:
+   - Bổ sung cột Định dạng (Format: PNG RGBA8, StandardMaterial3D .tres), Mục đích sử dụng chi tiết và Hướng dẫn tái sử dụng cụ thể cho từng danh mục: Palettes, Grayscale Masks, Tileable Seamless Textures và Shared Materials.
+   - Thiết lập nguyên tắc bắt buộc: `@texture-architect` và `@blender-helper` phải tra cứu catalog trước khi thao tác và cập nhật ngay khi tài nguyên thay đổi.
+4. **Đồng Bộ Hóa Quy Tắc Workspace `AGENTS.md` & `GEMINI.md`**:
+   - Đồng bộ hóa 100% nội dung giữa `AGENTS.md` và `GEMINI.md`, xác lập rõ ràng sơ đồ luồng điều phối tự nhiên theo từng nhóm nhiệm vụ.
+5. **Kiểm Định Chất Lượng Toàn Diện**:
+   - Biên dịch C#: `dotnet build "Dự án Trò chơi Mới.csproj"` $\rightarrow$ **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Kiểm thử Godot Headless: Chạy `test_suite.gd` trên Godot 4.7.2 Mono $\rightarrow$ **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
+
+
+### [2026-11-08] - Triển Khai Hệ Thống Tấn Công Cơ Bản (PlayerCombat & IDamageable) (Sub-agent csharp-coder)
+1. **Thiết kế kiến trúc chiến đấu chuẩn Clean Code**:
+   - `Scripts/Core/IDamageable.cs` (29 dòng): Giao diện chuẩn cho các thực thể nhận sát thương (`CurrentHealth`, `MaxHealth`, `IsAlive`, `TakeDamage()`).
+   - `Scripts/Core/DummyTarget.cs` (56 dòng): Thực thể bia tập đánh triển khai `IDamageable` với hiệu ứng co giãn trúng đòn (`Tween`), trừ máu và tự động hồi máu phục hồi sau thời gian chờ.
+   - `Scripts/Player/PlayerCombat.cs` (168 dòng): Điều phối đòn đánh, cấu hình phím tấn công (Chuột trái / Phím J / Nút X Gamepad), kích hoạt `AttackArea` hình cầu phía trước nhân vật, liên kết chặt chẽ với `PlayerAnimation`.
+   - `Scripts/Player/PlayerAnimation.cs`: Refactor gọn gàng (144 dòng < 200 dòng), đồng bộ cờ `IsAttacking` để ưu tiên phát animation `Attack` (51 channel tracks) từ `character_25d.glb` và triệt tiêu lean/bobbing thủ tục trong lúc vung kiếm.
+2. **An toàn bộ nhớ & Scene Setup**:
+   - `AttackArea` được cấu hình trực tiếp trong `Scenes/Characters/Player.tscn` với `SphereShape3D` bán kính 0.9m.
+   - Toàn bộ sự kiện `BodyEntered` và `AreaEntered` đều được hủy kết nối `-=` an toàn trong `PlayerCombat._ExitTree()`.
+3. **Mở rộng bộ kiểm thử tự động `test_suite.gd`**:
+   - Thêm `test_player_combat_system()`: Kiểm tra toàn diện thuộc tính combat mặc định, kích hoạt đòn đánh, trạng thái hitbox, khả năng gây 25 sát thương chuẩn lên `DummyTarget` và hoàn tất đòn đánh.
+4. **Biên dịch & Xác thực chất lượng**:
+   - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - Godot Headless `test_suite.gd`: **223 / 223 Test cases Passed (100% Pass, 0 Fail)**.

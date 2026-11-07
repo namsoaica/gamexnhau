@@ -61,11 +61,12 @@ func run_suite():
 	test_character_shared_materials()
 	test_map_shared_materials_applied()
 	test_blender_exported_models_and_textures()
+	test_player_combat_system()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
 	print("\n-- Testing Input Actions & Gamepad Bindings --")
-	var actions = ["move_left", "move_right", "move_forward", "move_backward", "jump", "interact"]
+	var actions = ["move_left", "move_right", "move_forward", "move_backward", "jump", "interact", "attack"]
 	for act in actions:
 		assert_true(InputMap.has_action(act), "Action '" + act + "' exists in InputMap")
 	
@@ -608,6 +609,52 @@ func test_blender_exported_models_and_textures():
 	for tex_path in textures:
 		var tex = ResourceLoader.load(tex_path)
 		assert_true(tex != null and tex is Texture2D, "Texture exists and is Texture2D: " + tex_path)
+
+func test_player_combat_system():
+	print("\n-- Testing Player Combat System (PlayerCombat & IDamageable) --")
+	var player = test_map.find_child("Player")
+	assert_true(player != null, "Player node exists in scene")
+
+	var combat = player.find_child("PlayerCombat")
+	assert_true(combat != null, "PlayerCombat node exists under Player")
+	assert_true(is_equal_approx(combat.get("AttackDamage"), 25.0), "Default AttackDamage is 25.0")
+	assert_true(is_equal_approx(combat.get("AttackCooldown"), 0.45), "Default AttackCooldown is 0.45s")
+	assert_true(is_equal_approx(combat.get("AttackDuration"), 0.35), "Default AttackDuration is 0.35s")
+	assert_true(combat.get("AttackAnimName") == "Attack", "AttackAnimName is 'Attack'")
+
+	var attack_area = player.find_child("AttackArea", true, false)
+	assert_true(attack_area != null, "AttackArea exists under Player")
+	assert_true(attack_area.monitoring == false, "AttackArea monitoring is disabled initially")
+
+	var anim = player.find_child("PlayerAnimation", true, false)
+	assert_true(anim != null, "PlayerAnimation exists")
+
+	# Test executing attack
+	assert_true(combat.CanAttack(), "CanAttack returns true initially")
+	combat.ExecuteAttack()
+	assert_true(combat.IsAttacking, "IsAttacking is true after ExecuteAttack")
+	assert_true(attack_area.monitoring == true, "AttackArea monitoring enabled during attack")
+	assert_true(anim.IsAttacking == true, "PlayerAnimation.IsAttacking is true during attack")
+
+	# Test Damage to a DummyTarget
+	var dummy_script = load("res://Scripts/Core/DummyTarget.cs")
+	var dummy = dummy_script.new()
+	test_map.add_child(dummy)
+	dummy.global_position = player.global_position + Vector3(0, 0, 1.0)
+	var initial_hp = dummy.CurrentHealth
+	assert_true(dummy.IsAlive, "Dummy is initially alive with 100 HP")
+
+	combat.CheckHitTarget(dummy)
+	assert_true(dummy.CurrentHealth < initial_hp, "Dummy took damage from attack")
+	assert_true(is_equal_approx(dummy.CurrentHealth, initial_hp - 25.0), "Dummy took exactly 25 damage")
+
+	# Test Finishing attack
+	combat.FinishAttack()
+	assert_true(combat.IsAttacking == false, "IsAttacking is false after FinishAttack")
+	assert_true(attack_area.monitoring == false, "AttackArea monitoring disabled after attack")
+	assert_true(anim.IsAttacking == false, "PlayerAnimation.IsAttacking is false after FinishAttack")
+	dummy.queue_free()
+
 
 
 
