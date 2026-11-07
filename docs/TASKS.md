@@ -66,6 +66,13 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (2) Khởi tạo đồng bộ `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/Village/VillageMap.tscn` chứa toàn bộ cấu trúc hợp nhất từ `WorldMap.tscn`, triệt tiêu hoàn toàn khối trắng chắn màn hình khi người dùng mở tab scene trong Godot Editor.
   - (3) Cập nhật `DefaultSpawnPosition` trong `VoidKillZone.cs` thành `(3.8, 0.5, 4.0)`, biên dịch `dotnet build` đạt 0 lỗi 0 cảnh báo.
   - (4) Thực thi Visual Playtest Loop chụp 4 ảnh màn hình mới, soi mắt thần kiểm tra trực quan thành công, 372/372 test cases Passed (100%).
+- [x] **[AI - agy-customizations, texture-architect & blender-helper]** Thiết lập 4 quy tắc kỹ thuật bắt buộc xóa bỏ hoàn toàn bọc Texture mù theo `modelyeucau` và Quy chuẩn Dựng Nhân Vật 3D & Animation (Character & Rigging Pipeline):
+  - (1) **Trích xuất bảng màu & họa tiết thật từ ảnh mẫu** (Pixel Color & Pattern Sampling): Bắt buộc viết script Python (`PIL`/`numpy`) quét trực tiếp file ảnh trong `modelyeucau/` để lấy mẫu mã màu Hex/RGB thật của từng phân khu và sinh Texture `.png` có vân bề mặt (vân gỗ, thớ đá, gân lá, gạch lát, bạt sọc).
+  - (2) **Bắt buộc trải UV tự động trong Blender & Godot** (Mandatory UV Unwrapping & Triplanar): Chạy lệnh `bpy.ops.uv.cube_project(cube_size=1.0)` hoặc `bpy.ops.uv.smart_project()` cho mọi Mesh tạo ra; bật `uv1_triplanar = true` cho bề mặt địa hình/kiến trúc lớn trong Godot.
+  - (3) **Kiểm tra bọc Texture lên khối 3D thực tế**: Bắt buộc xuất ảnh bọc thử 3D `docs/test_screenshots/_texture_3d_check.png` trước khi đưa vào game.
+  - (4) **Đối chiếu song song với ảnh gốc** (Side-by-Side Visual Diff): Mắt thần mở song song ảnh gốc trong `modelyeucau/` và ảnh chụp màn hình trong game để so sánh màu sắc, hoa văn, triệt tiêu mọi vật thể bị trơn màu phẳng hoặc mất material.
+  - (5) **Quy Chuẩn Dựng Nhân Vật 3D & Animation (Character & Rigging Pipeline)**: Dựng tách bộ phận cơ thể (`Head`, `Torso`, `Arm_L/R`, `Leg_L/R`, `Weapon_Slot`), căn chỉnh tâm xoay (Pivot/Origin) đúng khớp vai/háng/cổ, bo tròn `bmesh`, lấy mẫu màu trang phục/mặt từ ảnh mẫu, tạo sẵn 4 Actions animation cơ bản (`Idle`, `Walk`, `Run`, `Attack`/`Work`), và render `_char_preview.png` đối chiếu tỷ lệ 1.8m trước khi đưa vào Godot.
+  - Đã cập nhật đồng bộ toàn diện: `.agents/skills/texture-architect/SKILL.md`, `.agents/skills/blender-helper/SKILL.md`, `AGENTS.md`, và `GEMINI.md`.
 
 ---
 

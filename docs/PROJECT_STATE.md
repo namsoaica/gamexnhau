@@ -673,3 +673,17 @@
    - Đọc ảnh kiểm tra trực quan `read_file`:
      * `docs/test_screenshots/1_map_overview.png`: Hiển thị rõ ràng giao lộ 2 map, đường đất kết nối Đảo Đá với Cổng Làng, vườn rau, NPC, không có vật thể che chắn tầm nhìn.
      * `docs/test_screenshots/2_interior_view.png`, `3_npc_ui.png`, `4_devtools_ui.png`: 100% đạt chuẩn chất lượng cao.
+
+
+### [2026-11-08] - Thiết Lập 4 Quy Tắc Kỹ Thuật Chống Bọc Texture Mù & Character Rigging Pipeline (Sub-agent texture-architect & blender-helper)
+1. **Nâng Cấp `.agents/skills/texture-architect/SKILL.md`**:
+   - Quy tắc 1: Trích xuất bảng màu & họa tiết thật từ ảnh mẫu (`Pixel Color & Pattern Sampling`) bằng script Python (`PIL`/`numpy`) quét trực tiếp file trong `modelyeucau/` để lấy mã Hex/RGB thật và sinh Texture `.png` có vân bề mặt (vân gỗ, thớ đá, gân lá, gạch lát, bạt sọc).
+   - Quy tắc 2: Bắt buộc trải UV tự động (`bpy.ops.uv.cube_project` / `smart_project`) cho mọi Mesh trong Blender và kích hoạt `uv1_triplanar = true` / `uv1_scale` trong Godot `.tres`.
+   - Quy tắc 3: Kiểm tra bọc Texture lên khối 3D thực tế (`docs/test_screenshots/_texture_3d_check.png`) trước khi đưa vào game.
+   - Quy tắc 4: Đối chiếu song song với ảnh gốc (`Side-by-Side Visual Diff`) giữa ảnh `modelyeucau/` và ảnh chụp màn hình game để triệt tiêu mọi vật thể bị trơn màu phẳng hoặc mất material.
+2. **Nâng Cấp `.agents/skills/blender-helper/SKILL.md`**:
+   - Tích hợp 4 quy tắc bọc texture & UV unwrapping cho quy trình Blender.
+   - Bổ sung **Quy Chuẩn Dựng Nhân Vật 3D & Animation (Character & Rigging Pipeline)**: Dựng tách bộ phận (`Head`, `Torso`, `Arm_L/R`, `Leg_L/R`, `Weapon_Slot`), căn chỉnh tâm xoay (Pivot/Origin) đúng khớp vai/háng/cổ hoặc tạo hệ xương Armature chuẩn, bo tròn `bmesh`, lấy mẫu màu trang phục/mặt từ ảnh mẫu, tạo sẵn 4 Actions animation cơ bản (`Idle`, `Walk`, `Run`, `Attack`/`Work`), và render ảnh `_char_preview.png` đối chiếu tỷ lệ 1.8m trước khi đưa vào Godot.
+3. **Đồng Bộ Hóa Toàn Diện**:
+   - Cập nhật đồng bộ vào `AGENTS.md` và `GEMINI.md`.
+   - Xác thực `dotnet build` 0 lỗi 0 cảnh báo.
