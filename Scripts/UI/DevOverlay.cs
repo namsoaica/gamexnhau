@@ -5,7 +5,7 @@ using Game.Core;
 namespace Game.UI;
 
 /// <summary>
-/// Bảng điều khiển Chế Độ Dev (Debug Overlay HUD) hỗ trợ Bàn phím & Tay cầm Gamepad.
+/// Bảng điều khiển Chế Độ Dev (Debug Overlay HUD) mở rộng hỗ trợ Bàn phím & Tay cầm Gamepad.
 /// </summary>
 public partial class DevOverlay : CanvasLayer
 {
@@ -21,6 +21,9 @@ public partial class DevOverlay : CanvasLayer
 	[Export] public DevPlayerTab? PlayerTab { get; set; }
 	[Export] public DevNpcTab? NpcTab { get; set; }
 	[Export] public DevWorldTab? WorldTab { get; set; }
+	[Export] public DevTeleportTab? TeleportTab { get; set; }
+	[Export] public DevNpcSystemTab? NpcSystemTab { get; set; }
+	[Export] public DevGraphicsTab? GraphicsTab { get; set; }
 
 	private PlayerMovement? _player;
 	private SimpleNpc? _npc;
@@ -54,14 +57,8 @@ public partial class DevOverlay : CanvasLayer
 		WorldTab?.UpdateRealtimeStats();
 	}
 
-	/// <summary>
-	/// Bật / tắt bảng HUD Dev Mode và mở khóa chuột khi kích hoạt.
-	/// </summary>
 	public void ToggleDevMode() => SetDevModeVisible(MainPanel == null || !MainPanel.Visible);
 
-	/// <summary>
-	/// Đặt trạng thái ẩn hiện của bảng Dev.
-	/// </summary>
 	public void SetDevModeVisible(bool isVisible)
 	{
 		if (MainPanel != null) MainPanel.Visible = isVisible;
@@ -70,22 +67,18 @@ public partial class DevOverlay : CanvasLayer
 
 	private bool HandleToggleInput(InputEvent @event)
 	{
-		if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+		if (@event is InputEventKey key && key.Pressed && !key.Echo)
 		{
-			if (keyEvent.Keycode == ToggleKeyPrimary ||
-			    keyEvent.Keycode == ToggleKeySecondary ||
-			    keyEvent.Keycode == ToggleKeyTertiary)
+			if (key.Keycode == ToggleKeyPrimary || key.Keycode == ToggleKeySecondary || key.Keycode == ToggleKeyTertiary)
 			{
 				ToggleDevMode();
 				return true;
 			}
 		}
 
-		if (@event is InputEventJoypadButton joyBtn && joyBtn.Pressed)
+		if (@event is InputEventJoypadButton joy && joy.Pressed)
 		{
-			if (joyBtn.ButtonIndex == JoyButton.Back ||
-			    joyBtn.ButtonIndex == JoyButton.Start ||
-			    joyBtn.ButtonIndex == JoyButton.RightStick)
+			if (joy.ButtonIndex == JoyButton.Back || joy.ButtonIndex == JoyButton.Start || joy.ButtonIndex == JoyButton.RightStick)
 			{
 				ToggleDevMode();
 				return true;
@@ -97,23 +90,20 @@ public partial class DevOverlay : CanvasLayer
 
 	private bool HandleTabNavigationInput(InputEvent @event)
 	{
-		if (Tabs == null || @event is not InputEventJoypadButton joyBtn || !joyBtn.Pressed) return false;
+		if (Tabs == null || @event is not InputEventJoypadButton joy || !joy.Pressed) return false;
+		int count = Tabs.GetTabCount();
+		if (count <= 1) return false;
 
-		int tabCount = Tabs.GetTabCount();
-		if (tabCount <= 1) return false;
-
-		if (joyBtn.ButtonIndex == JoyButton.LeftShoulder)
+		if (joy.ButtonIndex == JoyButton.LeftShoulder)
 		{
-			Tabs.CurrentTab = (Tabs.CurrentTab - 1 + tabCount) % tabCount;
+			Tabs.CurrentTab = (Tabs.CurrentTab - 1 + count) % count;
 			return true;
 		}
-
-		if (joyBtn.ButtonIndex == JoyButton.RightShoulder)
+		if (joy.ButtonIndex == JoyButton.RightShoulder)
 		{
-			Tabs.CurrentTab = (Tabs.CurrentTab + 1) % tabCount;
+			Tabs.CurrentTab = (Tabs.CurrentTab + 1) % count;
 			return true;
 		}
-
 		return false;
 	}
 
@@ -127,18 +117,24 @@ public partial class DevOverlay : CanvasLayer
 
 	private void InitializeTabs()
 	{
-		if (Tabs != null)
-		{
-			Tabs.SetTabTitle(0, "🎮 Nhân Vật");
-			Tabs.SetTabTitle(1, "💬 Hội Thoại");
-			Tabs.SetTabTitle(2, "📷 Môi Trường");
-		}
-
+		SetTabTitles();
 		PlayerTab?.Setup(_player);
 		NpcTab?.Setup(_npc);
 		WorldTab?.Setup(_camera, _player);
+		TeleportTab?.Setup(_player);
+		NpcSystemTab?.Setup(_player);
 
 		if (CloseBtn != null) CloseBtn.Pressed += () => SetDevModeVisible(false);
+	}
+
+	private void SetTabTitles()
+	{
+		if (Tabs == null) return;
+		string[] titles = { "🎮 Player", "💬 Thoại", "📷 Camera", "🚀 Teleport", "👥 Dân Làng", "⚙️ Đồ Họa" };
+		for (int i = 0; i < titles.Length && i < Tabs.GetTabCount(); i++)
+		{
+			Tabs.SetTabTitle(i, titles[i]);
+		}
 	}
 
 	private void FindControlsIfNull()
@@ -149,5 +145,8 @@ public partial class DevOverlay : CanvasLayer
 		PlayerTab ??= GetNodeOrNull<DevPlayerTab>("DevPanel/VBox/Tabs/DevPlayerTab");
 		NpcTab ??= GetNodeOrNull<DevNpcTab>("DevPanel/VBox/Tabs/DevNpcTab");
 		WorldTab ??= GetNodeOrNull<DevWorldTab>("DevPanel/VBox/Tabs/DevWorldTab");
+		TeleportTab ??= GetNodeOrNull<DevTeleportTab>("DevPanel/VBox/Tabs/DevTeleportTab");
+		NpcSystemTab ??= GetNodeOrNull<DevNpcSystemTab>("DevPanel/VBox/Tabs/DevNpcSystemTab");
+		GraphicsTab ??= GetNodeOrNull<DevGraphicsTab>("DevPanel/VBox/Tabs/DevGraphicsTab");
 	}
 }

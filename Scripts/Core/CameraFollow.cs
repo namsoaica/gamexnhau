@@ -3,7 +3,7 @@ using Godot;
 namespace Game.Core;
 
 /// <summary>
-/// Camera điều khiển góc nhìn Isometric bám theo nhân vật và hỗ trợ Chế Độ Tự Do (Free Cam).
+/// Camera điều khiển góc nhìn Isometric bám theo nhân vật, hỗ trợ Free Cam và Interior Focus.
 /// </summary>
 public partial class CameraFollow : Camera3D
 {
@@ -34,6 +34,8 @@ public partial class CameraFollow : Camera3D
 
 	private readonly FreeCameraController _freeCam = new();
 	private float _targetZoomSize;
+	private float _preInteriorZoom;
+	private Vector3? _interiorCenter;
 	private ProjectionType _savedProjection = ProjectionType.Orthogonal;
 
 	public override void _Ready()
@@ -41,6 +43,7 @@ public partial class CameraFollow : Camera3D
 		Instance = this;
 		Current = true;
 		_targetZoomSize = Size;
+		_preInteriorZoom = Size;
 		_savedProjection = Projection;
 		LocatePlayerTarget();
 		SnapToTarget();
@@ -73,7 +76,6 @@ public partial class CameraFollow : Camera3D
 			_freeCam.Update(this, dt);
 			return;
 		}
-
 		UpdateIsometricZoom(dt);
 	}
 
@@ -82,10 +84,34 @@ public partial class CameraFollow : Camera3D
 		if (IsFreeCamActive || Target == null) return;
 
 		float dt = (float)delta;
-		Vector3 targetPos = Target.GlobalPosition + Offset;
+		Vector3 focalPoint = _interiorCenter ?? Target.GlobalPosition;
+		Vector3 targetPos = focalPoint + Offset;
 		GlobalPosition = GlobalPosition.Lerp(targetPos, SmoothSpeed * dt);
-		LookAt(Target.GlobalPosition + LookAtOffset, Vector3.Up);
+		LookAt(focalPoint + LookAtOffset, Vector3.Up);
 	}
+
+	/// <summary>
+	/// Kích hoạt hoặc hủy chế độ tâm ngắm nội thất nhà.
+	/// </summary>
+	public void SetInteriorFocus(Vector3? roomCenter, float? interiorZoom)
+	{
+		_interiorCenter = roomCenter;
+		if (roomCenter.HasValue)
+		{
+			if (interiorZoom.HasValue)
+			{
+				_preInteriorZoom = _targetZoomSize;
+				TargetZoomSize = interiorZoom.Value;
+			}
+		}
+		else
+		{
+			TargetZoomSize = _preInteriorZoom;
+		}
+	}
+
+	public void SetInteriorFocus(Vector3 roomCenter, float interiorZoom) => SetInteriorFocus((Vector3?)roomCenter, (float?)interiorZoom);
+	public void ResetInteriorFocus() => SetInteriorFocus(null, null);
 
 	/// <summary>
 	/// Bật hoặc tắt Chế Độ Camera Tự Do (Free Cam).
@@ -127,8 +153,9 @@ public partial class CameraFollow : Camera3D
 	private void SnapToTarget()
 	{
 		if (Target == null) return;
-		GlobalPosition = Target.GlobalPosition + Offset;
-		LookAt(Target.GlobalPosition + LookAtOffset, Vector3.Up);
+		Vector3 focal = _interiorCenter ?? Target.GlobalPosition;
+		GlobalPosition = focal + Offset;
+		LookAt(focal + LookAtOffset, Vector3.Up);
 	}
 
 	private void UpdateIsometricZoom(float dt)
@@ -142,22 +169,13 @@ public partial class CameraFollow : Camera3D
 
 	private void HandleIsometricZoomInput(MouseButton buttonIndex)
 	{
-		if (buttonIndex == MouseButton.WheelUp)
-		{
-			TargetZoomSize -= ZoomSpeed;
-		}
-		else if (buttonIndex == MouseButton.WheelDown)
-		{
-			TargetZoomSize += ZoomSpeed;
-		}
+		if (buttonIndex == MouseButton.WheelUp) TargetZoomSize -= ZoomSpeed;
+		else if (buttonIndex == MouseButton.WheelDown) TargetZoomSize += ZoomSpeed;
 	}
 
 	private void HandleGamepadZoom(float dt)
 	{
 		float rightY = Input.GetJoyAxis(0, JoyAxis.RightY);
-		if (Mathf.Abs(rightY) > 0.25f)
-		{
-			TargetZoomSize += rightY * ZoomSpeed * 4.0f * dt;
-		}
+		if (Mathf.Abs(rightY) > 0.25f) TargetZoomSize += rightY * ZoomSpeed * 4.0f * dt;
 	}
 }

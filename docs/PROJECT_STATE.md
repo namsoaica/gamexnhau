@@ -26,11 +26,18 @@
 | `Scripts/Core/InteractableArea.cs` | `uid://b45c22501e5v` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
 | `Scripts/Core/SimpleNpc.cs` | `uid://cqj18q3f63k1` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
-| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), cung cấp `SetFreeCamActive()` và `ResetToPlayer()`, an toàn bộ nhớ trong `_ExitTree()`. |
-| `Scripts/Core/FreeCameraController.cs` | (C# Script) | Bộ điều khiển Camera Tự Do (6-DOF Fly Cam) độc lập, hỗ trợ bàn phím WASD / Space / Ctrl / EQ, xoay góc nhìn chuột phải + Mouse Motion hoặc Right Stick cần phải, nâng/hạ độ cao bằng cò L2/R2 hoặc LB/RB, cuộn chuột điều chỉnh tốc độ bay (5.0 - 50.0). |
-| `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động tải và tái sử dụng bộ vật liệu dùng chung `res://Assets/Materials_Shared/` (`M_Grass.tres`, `M_Dirt.tres`, `M_Rock.tres`, `M_Wood_Fence.tres`, `M_Rock_Mountain_Purple.tres`), tự động gán vật liệu chuẩn cho nền gạch, cánh đồng, lối mòn đất, hàng rào gỗ, vách núi tím viễn cảnh và đá tảng; loại bỏ các tấm phông nền trắng `sky_backdrop`/`sky_plane` để lộ bầu trời xanh ProceduralSky; tự động tạo `Trimesh Collision` kèm `BackfaceCollision = true` cho địa hình và điều phối tạo Ramp cho cầu thang qua `StairRampBuilder`. Tuân thủ Clean Code 168 dòng, mỗi hàm < 15 dòng, dọn dẹp biến trong `_ExitTree()`. |
-| `Scripts/Core/StairRampBuilder.cs` | (C# Script) | Tự động phân tích hình học đỉnh và hướng dốc của mesh cầu thang (`stair`/`staircase`), tạo khối dốc nghiêng phẳng `ConvexPolygonShape3D` che phủ bậc thang giúp nhân vật bước lên êm ru không vướng góc 90°. |
-| `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode): Bật/tắt linh hoạt bằng phím `F1`/`~`/`F3` hoặc tay cầm Gamepad (`Back`/`Select`, `Start`, `RightStick`), chuyển đổi các tab bằng nút vai `LB`/`RB`, mở khóa chuột, điều phối các tab con. |
+| `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), hỗ trợ chuyển đổi tâm nhìn và zoom cho chuyển đổi nội thất (`SetInteriorFocus`, `ResetInteriorFocus`), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), an toàn bộ nhớ trong `_ExitTree()`. |
+| `Scripts/Core/InteriorZone.cs` | (C# Script) | Vùng chuyển đổi nội thất liền mạch (Seamless Interior Transition): Tự động ẩn mái nhà, tường trước và collider khi Player bước vào trong nhà, bật đèn ấm nội thất `OmniLight3D`, kích hoạt zoom gần và tâm ngắm của camera nội thất. |
+| `Scripts/Core/DisplaySettingsManager.cs` | (C# Script) | Singleton quản lý cấu hình hiển thị, độ phân giải đa màn hình (720p đến 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), Target FPS (30, 60, 120, 144, Unlimited), VSync, lưu trữ bền vững tại `user://settings.cfg`. |
+| `Scripts/NPC/NpcProfession.cs` | (C# Script) | Enum định nghĩa 8 nghề nghiệp dân làng (`Blacksmith`, `Alchemist`, `Chef`, `Farmer`, `Fisherman`, `Miner`, `Lumberjack`, `Guard`) kèm các hàm mở rộng tiêu đề tiếng Việt và câu chào mặc định. |
+| `Scripts/NPC/NpcState.cs` | (C# Script) | Enum định nghĩa 4 trạng thái AI State Machine (`Idle`, `Working`, `Patrolling`, `Interacting`). |
+| `Scripts/NPC/NpcSpecialActionManager.cs` | (C# Script) | Quản lý danh mục tùy chọn tương tác đặc biệt cho 8 nghề nghiệp (cường hóa vũ khí, mua potion hồi máu/tăng tốc, thưởng thức bánh mì, đổi khoáng sản...). |
+| `Scripts/NPC/NpcBehavior.cs` | (C# Script) | Bộ điều khiển AI State Machine và tương tác chuyên biệt cho dân làng, kế thừa `CharacterBody3D`, implement `IInteractable`, procedural working animation, tuần tra waypoints, xoay mặt nhìn Player khi tương tác. |
+| `Scripts/UI/NpcInteractionDialog.cs` | (C# Script) | Giao diện Popup Dialog cho 8 dân làng: Hiển thị avatar/nghề nghiệp, lời chào, danh sách các nút hành động đặc biệt sinh động, mở khóa chuột và đóng sạch sẽ. |
+| `Scripts/UI/DevTeleportTab.cs` | (C# Script) | Tab dịch chuyển tức thời (Teleport) tới 8 phân khu làng và 4 phòng nội thất trên bản đồ. |
+| `Scripts/UI/DevNpcSystemTab.cs` | (C# Script) | Tab giám sát và điều khiển trạng thái 8 NPC trong làng: xem tọa độ/state, dịch chuyển đến cạnh NPC, triệu hồi NPC tới Player, ép đổi state AI. |
+| `Scripts/UI/DevGraphicsTab.cs` | (C# Script) | Tab tinh chỉnh cấu hình đồ họa, độ phân giải, FPS và VSync trực tiếp trên Dev HUD kèm nút lưu cấu hình. |
+| `Scripts/UI/DevOverlay.cs` | (C# Script) | Bảng điều khiển HUD Chế Độ Dev (Dev Mode) mở rộng 6 tab: Bật/tắt bằng phím `F1`/`~`/`F3` hoặc Gamepad, điều phối các tab con. |
 | `Scripts/UI/DevPlayerTab.cs` | (C# Script) | Tab tinh chỉnh nhân vật: Sliders `MoveSpeed`, `JumpVelocity`, `Gravity`, Checkbox `InfiniteJump` (nhảy vô hạn/bất tử), Nút `TeleportTo` về điểm xuất phát. |
 | `Scripts/UI/DevNpcTab.cs` | (C# Script) | Tab Live Dialogue Editor: Hiển thị tên NPC, danh sách thoại trong `ItemList`, ô nhập `LineEdit`, nút thêm thoại mới, phát thoại ngay, xoay vòng thoại, xóa câu thoại. |
 | `Scripts/UI/DevWorldTab.cs` | (C# Script) | Tab Môi trường & Camera: Slider Zoom Isometric, CheckBox kích hoạt `[🎥 Free Cam]`, Slider tốc độ bay Free Cam (5.0 - 50.0), Nút `[🔄 Quay về góc nhìn Player]`, hiển thị nhãn trạng thái camera thời gian thực, FPS, Player Pos, và nút Reload màn chơi. An toàn bộ nhớ trong `_ExitTree()`. |
@@ -40,7 +47,10 @@
 | :--- | :--- | :--- |
 | `Scenes/Characters/Player.tscn` | `uid://ciy0uaygbkns3` | `CharacterBody3D` (PlayerMovement) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `CharacterModel` (`character_25d.glb`) -> `PlayerAnimation` -> `PlayerInteractor` (Area3D). |
 | `Scenes/Characters/NPC.tscn` | (PackedScene) | `Node3D` (SimpleNpc) -> `CharacterModel` (`character_25d.glb`) -> `InteractableArea` (Area3D). |
-| `Scenes/UI/DevOverlay.tscn` | `uid://b8d2y01devhud` | `CanvasLayer` (DevOverlay, layer 100) -> `PanelContainer` (StyleBoxFlat bán trong suốt bo góc) -> `VBoxContainer` -> HeaderBar -> `TabContainer` (`DevPlayerTab`, `DevNpcTab`, `DevWorldTab`). |
+| `Scenes/UI/DevOverlay.tscn` | `uid://b8d2y01devhud` | `CanvasLayer` (DevOverlay, layer 100) -> `PanelContainer` (StyleBoxFlat bán trong suốt bo góc) -> `VBoxContainer` -> HeaderBar -> `TabContainer` (`DevPlayerTab`, `DevNpcTab`, `DevWorldTab`, `DevTeleportTab`, `DevNpcSystemTab`, `DevGraphicsTab`). |
+| `Scenes/Characters/VillageNpc.tscn` | `uid://b2v8npcbehav1` | `CharacterBody3D` (NpcBehavior) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `VisualModel` (`character_25d.glb`) -> `InteractableArea` -> `OverheadLabel` (Label3D billboard). |
+| `Scenes/UI/NpcInteractionDialog.tscn` | `uid://c3q8npcdialog1` | `CanvasLayer` (NpcInteractionDialog, layer 90) -> `PanelContainer` -> VBox (Header Tên/Nghề -> MessageLabel -> Scroll/ActionsList -> CloseButton). |
+| `Scenes/Levels/VillageMap.tscn` | `uid://vllgmap77scene1` | `VillageMap` (Node3D) -> `DisplaySettingsManager` -> `WorldEnvironment` -> `DirectionalLight3D` -> `VillageMesh` (`village_map.glb`) -> `Player` -> `IsometricCamera` -> 4 `InteriorZone_*` (Smith, Alchemist, Chef, House) -> 8 `VillageNpc` -> `VoidKillZone` -> `DevOverlay` -> `NpcInteractionDialog`. |
 | `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | `WorldMap` (Node3D) -> `WorldEnvironment` -> `DirectionalLight3D` -> `MapAutoCollision` -> `Map_25D` (`map_25d.glb`) -> `Map_Surroundings` (`map_surroundings.glb`) -> `Player` -> `IsometricCamera` (CameraFollow) -> `NPC` -> `VoidKillZone` (Area3D) -> `DevOverlay` (CanvasLayer). |
 | `Scenes/Levels/TestLevel.tscn` | `uid://c66126flaj42w` | Level kiểm thử mặt sàn phẳng ban đầu. |
 
@@ -48,7 +58,8 @@
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
 - **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; đã liên kết bộ texture seamless mới: `tex_grass_seamless.png` (`Mat_Grass`), `tex_dirt_seamless.png` (`Mat_Cliff_Dirt`, `Mat_Dirt_Path`), `tex_wood_seamless.png` (`Mat_Wood`), `tex_rock_seamless.png` (`Mat_Stone`, `Mat_Cliff_Rock`); toàn bộ texture được pack trực tiếp vào file blend an toàn `map_25d_fixed.blend` và xuất sang `.glb` chuẩn Godot `export_yup=True`, `export_materials='EXPORT'`).
 - **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` liên kết texture chuẩn `tex_grass_seamless.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; toàn bộ 45 tảng đá `Rock_Mesh_*` được gán vật liệu `Mat_Stone` liên kết texture `tex_rock_seamless.png`; toàn bộ texture được pack trực tiếp vào `map_surroundings.blend` và xuất sang `.glb` chuẩn Godot; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
-- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn tuyệt đối; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`).
+- **Village Map Model**: `Assets/Models/village_map.glb` (Kích thước 884 KB, gồm 428 object, 117 mesh va chạm `-col`, địa hình 48m x 48m, 6 phân khu: Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Cổng Làng & Vườn Rau; nội thất 4 phòng; tách riêng các bộ phận mái `Roof_*` và tường trước `Wall_Front_*` cho cơ chế Seamless Interior Transition).
+- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn tuyệt đối; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`; File nguồn làng: `village_map.blend`, script sinh tự động: `build_village_map.py`).
 
 ### D. Hệ Thống Texture & Vật Liệu Dùng Chung (`Assets/Textures/` & `Assets/Materials_Shared/`)
 - **Tra cứu bắt buộc trước khi tạo Model / Scene**: `Assets/Textures/TEXTURE_CATALOG.md`.
@@ -74,8 +85,22 @@
   * `M_Grass_Dry.tres`: Cỏ khô vàng úa mùa thu.
   * `M_Dirt_RedClay.tres`: Đất đỏ bazan / mỏ đất sét.
   * `M_Metal_DarkIron.tres`: Sắt đen rèn thô.
+  * `M_Roof_Tiles_Red.tres`: Mái ngói đỏ cam nhà rèn & nhà dân.
+  * `M_Roof_Tiles_Teal.tres`: Mái ngói xanh ngọc teal nhà giả kim.
+  * `M_Canopy_Striped.tres`: Mái bạt sọc đỏ trắng sạp chợ.
+  * `M_Mystic_Cyan.tres`: Dung dịch & khói ma thuật cyan phát sáng emission.
+  * `M_Lava_Fire.tres`: Lửa lò rèn & lò luyện nung phát sáng emission vàng cam.
   * `M_Character_Body.tres`: Chuẩn vật liệu thân nhân vật Player / NPC Box (`character_box_texture.png`, Roughness = 0.60).
   * `M_Character_Face.tres`: Chuẩn vật liệu khuôn mặt nhân vật Player (`character_face.png`, Roughness = 0.60).
+
+### E. Quy Trình Sketch-to-3D Pipeline (`modelyeucau/` -> Blender -> Godot)
+- **Thư mục ảnh phác họa**: `modelyeucau/` (chứa các concept, sketch như `modelyeucau/charater1/`, `modelyeucau/map/`, `modelyeucau/map2/`).
+- **Quy trình chuẩn hóa 4 bước**:
+  1. **Nguồn ảnh**: Xác định đường dẫn file trong `modelyeucau/`.
+  2. **Phân tích thị giác**: Bắt buộc dùng công cụ đọc file (`read_file`) đọc ảnh phác họa, giải mã bố cục 2D (tọa độ lưới X, Z), tỷ lệ kích thước AABB và bảng màu chủ đạo trước khi sinh mã.
+  3. **Phối hợp Texture**: Đối chiếu `Assets/Textures/TEXTURE_CATALOG.md`, gán Material Slot chuẩn kết nối với `.tres` dùng chung hoặc masks đổi màu.
+  4. **Dựng 3D & Xuất Godot Scene**: Soạn script Python (`bpy`), gọi Blender CLI tại `C:/xnhaugame/blender-5.4.0-alpha+main.4f97ee24309d-windows.amd64-release/blender.exe --background --python ...` để sinh Mesh đúng tọa độ, tạo va chạm (Collision `-col`/`-colonly`), xuất `.glb` vào `Assets/Models/`, sau đó tạo và liên kết vào Scene `.tscn` của Godot 4.
+  5. **Bản đồ Làng đã hoàn thành**: Đã hiện thực hóa `modelyeucau/map2/1.jpg` thành `Assets/Models/village_map.glb` (884 KB, 428 mesh, 117 colliders, 6 phân khu ngoại thất và nội thất 4 phòng kèm cơ chế tách mái `Roof_*` và tường trước `Wall_Front_*`).
 
 
 ---
@@ -577,17 +602,26 @@
    - Kiểm thử Godot Headless: Chạy `test_suite.gd` trên Godot 4.7.2 Mono $\rightarrow$ **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
 
 
-### [2026-11-08] - Triển Khai Hệ Thống Tấn Công Cơ Bản (PlayerCombat & IDamageable) (Sub-agent csharp-coder)
-1. **Thiết kế kiến trúc chiến đấu chuẩn Clean Code**:
-   - `Scripts/Core/IDamageable.cs` (29 dòng): Giao diện chuẩn cho các thực thể nhận sát thương (`CurrentHealth`, `MaxHealth`, `IsAlive`, `TakeDamage()`).
-   - `Scripts/Core/DummyTarget.cs` (56 dòng): Thực thể bia tập đánh triển khai `IDamageable` với hiệu ứng co giãn trúng đòn (`Tween`), trừ máu và tự động hồi máu phục hồi sau thời gian chờ.
-   - `Scripts/Player/PlayerCombat.cs` (168 dòng): Điều phối đòn đánh, cấu hình phím tấn công (Chuột trái / Phím J / Nút X Gamepad), kích hoạt `AttackArea` hình cầu phía trước nhân vật, liên kết chặt chẽ với `PlayerAnimation`.
-   - `Scripts/Player/PlayerAnimation.cs`: Refactor gọn gàng (144 dòng < 200 dòng), đồng bộ cờ `IsAttacking` để ưu tiên phát animation `Attack` (51 channel tracks) từ `character_25d.glb` và triệt tiêu lean/bobbing thủ tục trong lúc vung kiếm.
-2. **An toàn bộ nhớ & Scene Setup**:
-   - `AttackArea` được cấu hình trực tiếp trong `Scenes/Characters/Player.tscn` với `SphereShape3D` bán kính 0.9m.
-   - Toàn bộ sự kiện `BodyEntered` và `AreaEntered` đều được hủy kết nối `-=` an toàn trong `PlayerCombat._ExitTree()`.
-3. **Mở rộng bộ kiểm thử tự động `test_suite.gd`**:
-   - Thêm `test_player_combat_system()`: Kiểm tra toàn diện thuộc tính combat mặc định, kích hoạt đòn đánh, trạng thái hitbox, khả năng gây 25 sát thương chuẩn lên `DummyTarget` và hoàn tất đòn đánh.
-4. **Biên dịch & Xác thực chất lượng**:
-   - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
-   - Godot Headless `test_suite.gd`: **223 / 223 Test cases Passed (100% Pass, 0 Fail)**.
+### [2026-11-08] - Lập Trình Trọn Gói 4 Phân Hệ Gameplay Bản Đồ Làng Mới (Village Map) (Sub-agent csharp-coder & code-reviewer)
+1. **Phân Hệ 1: Cơ Chế Chuyển Đổi Nội Thất Liền Mạch (Seamless Interior Transition)**:
+   - `Scripts/Core/InteriorZone.cs` (133 dòng): Quản lý vùng nội thất Area3D cho 4 ngôi nhà (Nhà Rèn, Nhà Giả Kim, Quán Ăn, Nhà Dân), tự động ẩn/hiện mái nhà (`Roof_*`) và tường trước (`Wall_Front_*`), ngắt/bật collider va chạm, điều khiển đèn ấm nội thất `OmniLight3D`.
+   - `Scripts/Core/CameraFollow.cs` (181 dòng): Bổ sung phương thức `SetInteriorFocus(Vector3? roomCenter, float? interiorZoom)` cùng overload cho GDScript/C#, lerp tâm ngắm và mức zoom phù hợp với không gian bên trong nhà mà không làm gián đoạn gameplay.
+2. **Phân Hệ 2: Hệ Thống Hành Vi NPC (NPC Behavior System) & Tương Tác Đặc Biệt 8 Dân Làng**:
+   - `Scripts/NPC/NpcProfession.cs` (54 dòng): Enum 8 nghề nghiệp (`Blacksmith`, `Alchemist`, `Chef`, `Farmer`, `Fisherman`, `Miner`, `Lumberjack`, `Guard`) kèm danh xưng tiếng Việt và câu chào cá nhân hóa.
+   - `Scripts/NPC/NpcState.cs` (12 dòng): Enum 4 trạng thái AI State Machine (`Idle`, `Working`, `Patrolling`, `Interacting`).
+   - `Scripts/NPC/NpcSpecialActionManager.cs` (101 dòng): Cung cấp bộ 2-3 tùy chọn tương tác đặc biệt cho từng nghề (cường hóa vũ khí, sửa trang bị, mua potion máu/tốc, thưởng thức bánh mì, đổi khoáng sản...).
+   - `Scripts/NPC/NpcBehavior.cs` (179 dòng): Bộ não AI State Machine kế thừa `CharacterBody3D`, implement `IInteractable`, chuyển động nhấp nhô công việc thủ tục (procedural working motion), tuần tra các Waypoints, tự động xoay người đối thoại với Player khi ấn E.
+   - `Scripts/UI/NpcInteractionDialog.cs` (139 dòng) & `Scenes/UI/NpcInteractionDialog.tscn`: Giao diện Popup Dialog chuẩn UX, hiển thị avatar, nghề nghiệp, danh sách nút hành động sinh động, giải phóng chuột và đóng sạch sẽ.
+   - `Scenes/Characters/VillageNpc.tscn`: Scene NPC dân làng hoàn chỉnh gắn `NpcBehavior`, `CollisionShape3D`, `VisualModel` và `OverheadLabel` billboard 3D.
+3. **Phân Hệ 3: Cài Đặt Hiển Thị & Khung Hình (DisplaySettingsManager)**:
+   - `Scripts/Core/DisplaySettingsManager.cs` (118 dòng): Singleton quản lý cấu hình hiển thị đa độ phân giải (720p, 900p, 1080p, 1440p, 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), Target FPS (30, 60, 120, 144, Unlimited), VSync, lưu và đọc bền vững từ `user://settings.cfg`.
+4. **Phân Hệ 4: Nâng Cấp Bảng Điều Khiển Dev Mode (Dev Overlay HUD)**:
+   - `Scripts/UI/DevTeleportTab.cs` (71 dòng): Tab dịch chuyển nhanh tới 8 phân khu làng và 4 phòng nội thất.
+   - `Scripts/UI/DevNpcSystemTab.cs` (144 dòng): Tab giám sát 8 NPC (xem state/tọa độ, dịch chuyển tới NPC, triệu hồi NPC tới Player, ép đổi trạng thái AI).
+   - `Scripts/UI/DevGraphicsTab.cs` (174 dòng): Tab tinh chỉnh độ phân giải, FPS, VSync và lưu cấu hình ngay trong game.
+   - `Scripts/UI/DevOverlay.cs` (152 dòng) & `Scenes/UI/DevOverlay.tscn`: Nâng cấp giao diện 6 tab hoàn chỉnh.
+5. **Phân Hệ 5: Tích Hợp Scene & Kiểm Định Chất Lượng Toàn Diện**:
+   - `Scenes/Levels/VillageMap.tscn`: Scene bản đồ làng mở rộng hoàn chỉnh gồm mô hình `village_map.glb`, ánh sáng mặt trời ấm áp, ACES Tonemap, 4 `InteriorZone`, 8 NPC dân làng, Player, `IsometricCamera`, `VoidKillZone`, `DevOverlay` và `NpcInteractionDialog`.
+   - **Đạt chuẩn Clean Code**: 100% file C# < 200 dòng, 100% method < 25 dòng, Guard Clauses, hủy `-=` trong `_ExitTree()`.
+   - **Biên dịch C#**: `dotnet build` $\rightarrow$ **Build succeeded. 0 Warning(s), 0 Error(s)**.
+   - **Xác thực tự động Godot Headless**: `test_suite.gd` $\rightarrow$ **279 / 279 Test cases Passed (100% Pass, 0 Fail)**.

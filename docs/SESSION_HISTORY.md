@@ -346,6 +346,18 @@
   - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
   - Godot Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
 
+## Phiên làm việc: 2026-11-08 (Sáng - Tích Hợp Quy Trình Sketch-to-3D Pipeline Vào blender-helper & Workspace Rules)
+- **Cập nhật kỹ năng `.agents/skills/blender-helper/SKILL.md`**:
+  - Tích hợp quy trình 4 bước chuẩn "Đọc Ảnh Phác Họa Tạo Model 3D (Sketch-to-3D Pipeline)".
+  - Quy định thư mục ảnh người dùng tại `modelyeucau/`.
+  - Bắt buộc phân tích thị giác bằng công cụ đọc file (`read_file`) để giải mã bố cục 2D (tọa độ X, Z), màu sắc, tỷ lệ kích thước trước khi viết code.
+  - Phối hợp `@texture-architect` tra cứu `Assets/Textures/TEXTURE_CATALOG.md` để tái sử dụng hoặc tạo vật liệu phù hợp.
+  - Tự động hóa qua Blender CLI (`C:/xnhaugame/blender-5.4.0-alpha+main.4f97ee24309d-windows.amd64-release/blender.exe --background --python ...`): dựng Mesh 3D, sinh Collision va chạm tự động, xuất file `.glb` vào `Assets/Models/` và gắn vào Scene `.tscn` của Godot 4.
+- **Cập nhật quy tắc dự án `AGENTS.md` và `GEMINI.md`**:
+  - Bổ sung sơ đồ Mermaid và quy chuẩn chi tiết cho quy trình Sketch-to-3D vào Mục 2.
+  - Cập nhật vai trò kỹ năng `@blender-helper` trong Mục 1 và Mục 5.
+- **Tạo thư mục chuẩn**: Khởi tạo thư mục đích `Assets/Models/` để tiếp nhận các model xuất từ Blender.
+
 
 
 
@@ -385,3 +397,27 @@
 - **Kiểm định chất lượng & Test Suite**:
   - `dotnet build "Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
   - Chạy `test_suite.gd`: **223 / 223 Test cases Passed (100% Pass, 0 Fail)**.
+
+## Phiên làm việc: 2026-11-08 (Sáng - Lập Trình Trọn Gói 4 Phân Hệ Gameplay Bản Đồ Làng Mới)
+- **Phân hệ 1: Chuyển Đổi Nội Thất Liền Mạch (Seamless Interior Transition)**:
+  - Tạo `Scripts/Core/InteriorZone.cs` (133 dòng): Điều khiển ẩn/hiện mái nhà (`Roof_*`) và tường trước (`Wall_Front_*`), ngắt bật collider, bật đèn ấm nội thất `OmniLight3D`, kích hoạt zoom cận cảnh camera.
+  - Nâng cấp `Scripts/Core/CameraFollow.cs` (181 dòng): Bổ sung `SetInteriorFocus` và `ResetInteriorFocus` lerp mượt mà không gián đoạn gameplay.
+- **Phân hệ 2: Hệ Thống AI NPC & Tương Tác Chuyên Biệt 8 Dân Làng**:
+  - Tạo `Scripts/NPC/NpcProfession.cs` (54 dòng), `Scripts/NPC/NpcState.cs` (12 dòng).
+  - Tạo `Scripts/NPC/NpcSpecialActionManager.cs` (101 dòng): Cung cấp bộ tùy chọn đặc biệt cho 8 nghề (Thợ Rèn, Giả Kim, Đầu Bếp, Nông Dân, Ngư Dân, Thợ Mỏ, Tiều Phu, Lính Canh).
+  - Tạo `Scripts/NPC/NpcBehavior.cs` (179 dòng): AI State Machine (Idle, Working, Patrolling, Interacting), chuyển động nhấp nhô thủ tục (procedural working), tuần tra waypoint, xoay mặt nhìn Player khi tương tác.
+  - Tạo `Scripts/UI/NpcInteractionDialog.cs` (139 dòng) & `Scenes/UI/NpcInteractionDialog.tscn`: Giao diện Popup Dialog chuyên nghiệp, tự động sinh nút bấm theo nghề, mở khóa chuột và đóng sạch sẽ.
+  - Tạo `Scenes/Characters/VillageNpc.tscn`: Scene mẫu dân làng gồm `CharacterBody3D`, `CollisionShape3D`, `VisualModel`, `InteractableArea`, `OverheadLabel` billboard.
+- **Phân hệ 3: Cài Đặt Hiển Thị & Khung Hình (DisplaySettingsManager)**:
+  - Tạo `Scripts/Core/DisplaySettingsManager.cs` (118 dòng): Singleton quản lý độ phân giải (720p đến 4K), chế độ màn hình (Windowed, Borderless, Fullscreen), Target FPS (30 - Unlimited), VSync, lưu bền vững vào `user://settings.cfg`.
+- **Phân hệ 4: Mở Rộng Bảng Điều Khiển Dev Mode HUD (6 Tab Toàn Năng)**:
+  - Tạo `Scripts/UI/DevTeleportTab.cs` (71 dòng): Dịch chuyển nhanh tới 8 phân khu và 4 nội thất phòng.
+  - Tạo `Scripts/UI/DevNpcSystemTab.cs` (144 dòng): Giám sát 8 NPC, triệu hồi NPC, dịch chuyển đến NPC, ép đổi trạng thái AI.
+  - Tạo `Scripts/UI/DevGraphicsTab.cs` (174 dòng): Tinh chỉnh đồ họa, độ phân giải, FPS, VSync ngay trong HUD kèm nút lưu.
+  - Cập nhật `Scripts/UI/DevOverlay.cs` (152 dòng) và `Scenes/UI/DevOverlay.tscn`: Đồng bộ 6 tabs mượt mà với chuột và Gamepad (LB/RB).
+- **Phân hệ 5: Scene Bản Đồ Làng Hoàn Chỉnh & Kiểm Thử Toàn Diện**:
+  - Tạo `Scenes/Levels/VillageMap.tscn`: Tích hợp toàn diện `village_map.glb`, `Player`, `IsometricCamera`, 4 `InteriorZone`, 8 NPC dân làng, `DisplaySettingsManager`, `VoidKillZone`, `DevOverlay`, `NpcInteractionDialog`.
+  - Khắc phục lỗi disconnect trong `DevNpcTab.cs` khi `_npc == null`.
+  - **Chuẩn Clean Code**: 100% file C# < 200 dòng, method < 25 dòng, Guard Clauses, hủy `-=` trong `_ExitTree()`.
+  - **Biên dịch C#**: `dotnet build` $\rightarrow$ **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - **Godot Headless verification**: `test_suite.gd` $\rightarrow$ **279 / 279 Test cases Passed (100% Pass, 0 Fail)**.

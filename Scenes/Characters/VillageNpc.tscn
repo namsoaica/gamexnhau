@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://b2v8npcbehav1"]
+
+[ext_resource type="Script" path="res://Scripts/NPC/NpcBehavior.cs" id="1_behav"]
+[ext_resource type="PackedScene" uid="uid://8mty0la5evqd" path="res://Assets/Models_Exported/character_25d.glb" id="2_model"]
+[ext_resource type="Script" path="res://Scripts/Core/InteractableArea.cs" id="3_area"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_npc"]
+radius = 0.4
+height = 1.8
+
+[node name="VillageNpc" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_behav")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_npc")
+
+[node name="VisualModel" parent="." instance=ExtResource("2_model")]
+
+[node name="InteractableArea" type="Area3D" parent="."]
+script = ExtResource("3_area")
+PromptText = "Trò chuyện (E)"
+InteractionRadius = 3.0
+
+[node name="OverheadLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+billboard = 1
+no_depth_test = true
+outline_render_priority = 1
+text = "[Nghề Nghiệp]
+Tên NPC"
+font_size = 36
+outline_size = 8
+outline_color = Color(0, 0, 0, 0.8)

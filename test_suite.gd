@@ -62,6 +62,7 @@ func run_suite():
 	test_map_shared_materials_applied()
 	test_blender_exported_models_and_textures()
 	test_player_combat_system()
+	test_village_map_and_gameplay()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -654,6 +655,77 @@ func test_player_combat_system():
 	assert_true(attack_area.monitoring == false, "AttackArea monitoring disabled after attack")
 	assert_true(anim.IsAttacking == false, "PlayerAnimation.IsAttacking is false after FinishAttack")
 	dummy.queue_free()
+
+func test_village_map_and_gameplay():
+	print("\n-- Testing Village Map & 4 Gameplay Subsystems --")
+	var vlg_res = load("res://Scenes/Levels/VillageMap.tscn")
+	assert_true(vlg_res != null, "VillageMap.tscn loaded successfully")
+	if vlg_res == null:
+		return
+		
+	var vlg = vlg_res.instantiate()
+	test_map.add_child(vlg)
+
+	# 1. Test Seamless Interior Zones
+	var zones = ["InteriorZone_Smith", "InteriorZone_Alchemist", "InteriorZone_Chef", "InteriorZone_House"]
+	for zn in zones:
+		var z_node = vlg.find_child(zn, true, false)
+		assert_true(z_node != null, "Interior zone '" + zn + "' exists")
+		if z_node != null:
+			var light = z_node.get("InteriorLight")
+			assert_true(light != null, zn + " has InteriorLight configured")
+			var zoom = z_node.get("InteriorCameraZoom")
+			assert_true(zoom != null and zoom > 5.0, zn + " has InteriorCameraZoom > 5.0")
+
+	# 2. Test 8 NPCs
+	var npcs = [
+		"Npc_Blacksmith", "Npc_Alchemist", "Npc_Chef", "Npc_Farmer",
+		"Npc_Fisherman", "Npc_Miner", "Npc_Lumberjack", "Npc_Guard"
+	]
+	for npc_name in npcs:
+		var npc_node = vlg.find_child(npc_name, true, false)
+		assert_true(npc_node != null, "NPC '" + npc_name + "' exists in VillageMap")
+		if npc_node != null:
+			assert_true(npc_node.is_in_group("VillageNPC"), npc_name + " is in group VillageNPC")
+			assert_true(npc_node.get("Profession") != null, npc_name + " has Profession assigned")
+			assert_true(npc_node.CanInteract(), npc_name + " CanInteract returns true initially")
+
+	# 3. Test Dev Overlay 6 Tabs
+	var dev = vlg.find_child("DevOverlay", true, false)
+	assert_true(dev != null, "DevOverlay exists in VillageMap")
+	if dev != null:
+		var tabs = dev.find_child("Tabs", true, false)
+		assert_true(tabs != null, "Tabs container exists in DevOverlay")
+		if tabs != null:
+			assert_true(tabs.get_tab_count() >= 6, "DevOverlay has at least 6 tabs (found: " + str(tabs.get_tab_count()) + ")")
+		var tp_tab = dev.find_child("DevTeleportTab", true, false)
+		assert_true(tp_tab != null, "DevTeleportTab exists in DevOverlay")
+		var npc_tab = dev.find_child("DevNpcSystemTab", true, false)
+		assert_true(npc_tab != null, "DevNpcSystemTab exists in DevOverlay")
+		var gfx_tab = dev.find_child("DevGraphicsTab", true, false)
+		assert_true(gfx_tab != null, "DevGraphicsTab exists in DevOverlay")
+
+	# 4. Test Display Settings Manager
+	var disp_mgr = vlg.find_child("DisplaySettingsManager", true, false)
+	assert_true(disp_mgr != null, "DisplaySettingsManager node exists in VillageMap")
+	if disp_mgr != null:
+		var max_fps = disp_mgr.get("CurrentMaxFps")
+		assert_true(max_fps != null, "DisplaySettingsManager has CurrentMaxFps")
+
+	# 5. Test NPC Interaction Dialog
+	var dialog = vlg.find_child("NpcInteractionDialog", true, false)
+	assert_true(dialog != null, "NpcInteractionDialog exists in VillageMap")
+
+	# 6. Test CameraFollow Interior Focus
+	var cam = vlg.find_child("IsometricCamera", true, false)
+	assert_true(cam != null, "IsometricCamera exists in VillageMap")
+	if cam != null:
+		cam.SetInteriorFocus(Vector3(10, 2, 10), 12.0)
+		assert_true(is_equal_approx(cam.TargetZoomSize, 12.0), "Camera TargetZoomSize changed to 12.0 on interior focus")
+		cam.ResetInteriorFocus()
+
+	vlg.queue_free()
+
 
 
 

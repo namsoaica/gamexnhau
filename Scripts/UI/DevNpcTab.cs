@@ -18,6 +18,7 @@ public partial class DevNpcTab : VBoxContainer
 	[Export] public Button? DeleteDialogueBtn { get; set; }
 
 	private SimpleNpc? _npc;
+	private bool _isEventsConnected;
 
 	public override void _ExitTree()
 	{
@@ -80,10 +81,12 @@ public partial class DevNpcTab : VBoxContainer
 	/// </summary>
 	private void ConnectEvents()
 	{
+		if (_isEventsConnected) return;
 		if (AddDialogueBtn != null) AddDialogueBtn.Pressed += OnAddDialoguePressed;
 		if (SpeakNowBtn != null) SpeakNowBtn.Pressed += OnSpeakNowPressed;
 		if (CycleDialogueBtn != null) CycleDialogueBtn.Pressed += OnCycleDialoguePressed;
 		if (DeleteDialogueBtn != null) DeleteDialogueBtn.Pressed += OnDeleteDialoguePressed;
+		_isEventsConnected = true;
 	}
 
 	/// <summary>
@@ -91,10 +94,12 @@ public partial class DevNpcTab : VBoxContainer
 	/// </summary>
 	private void DisconnectEvents()
 	{
+		if (!_isEventsConnected) return;
 		if (AddDialogueBtn != null) AddDialogueBtn.Pressed -= OnAddDialoguePressed;
 		if (SpeakNowBtn != null) SpeakNowBtn.Pressed -= OnSpeakNowPressed;
 		if (CycleDialogueBtn != null) CycleDialogueBtn.Pressed -= OnCycleDialoguePressed;
 		if (DeleteDialogueBtn != null) DeleteDialogueBtn.Pressed -= OnDeleteDialoguePressed;
+		_isEventsConnected = false;
 	}
 
 	/// <summary>

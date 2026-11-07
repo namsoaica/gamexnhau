@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://6q8pf6plns63" path="res://Assets/Textures/Grayscale_Masks/mask_rock_detail.png" id="1_mask_rock"]
+
+[resource]
+albedo_color = Color(0.18, 0.55, 0.52, 1)
+albedo_texture = ExtResource("1_mask_rock")
+roughness = 0.8
+uv1_scale = Vector3(3, 3, 3)

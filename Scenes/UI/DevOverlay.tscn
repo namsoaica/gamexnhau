@@ -4,6 +4,9 @@
 [ext_resource type="Script" path="res://Scripts/UI/DevPlayerTab.cs" id="2_player_tab"]
 [ext_resource type="Script" path="res://Scripts/UI/DevNpcTab.cs" id="3_npc_tab"]
 [ext_resource type="Script" path="res://Scripts/UI/DevWorldTab.cs" id="4_world_tab"]
+[ext_resource type="Script" path="res://Scripts/UI/DevTeleportTab.cs" id="5_teleport_tab"]
+[ext_resource type="Script" path="res://Scripts/UI/DevNpcSystemTab.cs" id="6_npc_sys_tab"]
+[ext_resource type="Script" path="res://Scripts/UI/DevGraphicsTab.cs" id="7_graphics_tab"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 16.0
@@ -104,8 +107,8 @@ text = "Lực nhảy:"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-min_value = 5.0
-max_value = 25.0
+min_value = 4.0
+max_value = 20.0
 step = 0.5
 value = 9.0
 
@@ -130,25 +133,28 @@ size_flags_vertical = 4
 min_value = 5.0
 max_value = 40.0
 step = 1.0
-value = 20.0
+value = 18.0
 
 [node name="GravityVal" type="Label" parent="DevPanel/VBox/Tabs/DevPlayerTab/GravityRow"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-text = "20.0"
+text = "18.0"
 horizontal_alignment = 2
 
-[node name="Sep" type="HSeparator" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+[node name="HSeparator_p1" type="HSeparator" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
 layout_mode = 2
 
 [node name="InfiniteJumpCheck" type="CheckBox" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
 layout_mode = 2
-text = "✨ Nhảy Vô Hạn / Bất Tử (Infinite Jump)"
+text = "🪽 Nhảy Vô Hạn (Infinite Jump)"
 
-[node name="RespawnBtn" type="Button" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+[node name="HSeparator_p2" type="HSeparator" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
+layout_mode = 2
+
+[node name="ResetPosBtn" type="Button" parent="DevPanel/VBox/Tabs/DevPlayerTab"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-text = "🔄 Về Điểm Xuất Phát (Teleport Spawn)"
+text = "📍 Dịch Chuyển Về Điểm Xuất Phát"
 
 [node name="DevNpcTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
 visible = false
@@ -156,46 +162,50 @@ layout_mode = 2
 theme_override_constants/separation = 8
 script = ExtResource("3_npc_tab")
 
-[node name="NpcNameLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+[node name="NpcHeaderRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
-text = "NPC: Dân Làng"
 
-[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+[node name="TargetLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab/NpcHeaderRow"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "Danh sách câu thoại hiện có:"
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+text = "NPC Mục Tiêu: NPC Mẫu"
+
+[node name="ListLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+layout_mode = 2
+text = "Danh Sách Câu Thoại (Live Editor):"
 
 [node name="DialogueList" type="ItemList" parent="DevPanel/VBox/Tabs/DevNpcTab"]
 custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
-size_flags_vertical = 3
+select_mode = 1
 
-[node name="DialogueInput" type="LineEdit" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+[node name="NewRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
 layout_mode = 2
+
+[node name="NewLineEdit" type="LineEdit" parent="DevPanel/VBox/Tabs/DevNpcTab/NewRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Nhập câu thoại mới tại đây..."
-clear_button_enabled = true
 
-[node name="ActionsRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
+[node name="AddBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/NewRow"]
+layout_mode = 2
+text = "➕ Thêm"
+
+[node name="ActionsRow1" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
 layout_mode = 2
 
-[node name="AddBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "➕ Thêm Thoại"
-
-[node name="SpeakNowBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow"]
+[node name="SpeakBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow1"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "🗣️ Nói Ngay"
+text = "💬 Phát Thoại Ngay"
+
+[node name="NextLineBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⏭️ Đổi Câu Tiếp"
 
 [node name="ActionsRow2" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcTab"]
 layout_mode = 2
-
-[node name="CycleBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "🔄 Xoay Vòng"
 
 [node name="DeleteBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcTab/ActionsRow2"]
 layout_mode = 2
@@ -295,3 +305,142 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "🔄 Tải Lại Màn Chơi (Reload)"
+
+[node name="DevTeleportTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("5_teleport_tab")
+
+[node name="Scroll" type="ScrollContainer" parent="DevPanel/VBox/Tabs/DevTeleportTab"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Grid" type="GridContainer" parent="DevPanel/VBox/Tabs/DevTeleportTab/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="DevNpcSystemTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+script = ExtResource("6_npc_sys_tab")
+
+[node name="DropdownRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcSystemTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/DropdownRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Dân Làng:"
+
+[node name="NpcDropdown" type="OptionButton" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/DropdownRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StateLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcSystemTab"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+text = "Trạng thái: Idle"
+
+[node name="Actions" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcSystemTab"]
+layout_mode = 2
+
+[node name="TeleportToNpcBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🏃 Đến Cạnh NPC"
+
+[node name="SummonNpcBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🧲 Triệu Hồi NPC"
+
+[node name="ForceLabel" type="Label" parent="DevPanel/VBox/Tabs/DevNpcSystemTab"]
+layout_mode = 2
+text = "Ép Trạng Thái AI:"
+
+[node name="ForceStateRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevNpcSystemTab"]
+layout_mode = 2
+
+[node name="ForceIdleBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/ForceStateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "💤 Idle"
+
+[node name="ForceWorkBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/ForceStateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⚒️ Working"
+
+[node name="ForcePatrolBtn" type="Button" parent="DevPanel/VBox/Tabs/DevNpcSystemTab/ForceStateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🚶 Patrol"
+
+[node name="DevGraphicsTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+script = ExtResource("7_graphics_tab")
+
+[node name="ResRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevGraphicsTab/ResRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Độ Phân Giải:"
+
+[node name="ResOption" type="OptionButton" parent="DevPanel/VBox/Tabs/DevGraphicsTab/ResRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ModeRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevGraphicsTab/ModeRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Chế Độ Cửa Sổ:"
+
+[node name="ModeOption" type="OptionButton" parent="DevPanel/VBox/Tabs/DevGraphicsTab/ModeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FpsRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevGraphicsTab/FpsRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Giới Hạn FPS:"
+
+[node name="FpsOption" type="OptionButton" parent="DevPanel/VBox/Tabs/DevGraphicsTab/FpsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VsyncRow" type="HBoxContainer" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DevPanel/VBox/Tabs/DevGraphicsTab/VsyncRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "VSync (Đồng Bộ):"
+
+[node name="VsyncOption" type="OptionButton" parent="DevPanel/VBox/Tabs/DevGraphicsTab/VsyncRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SaveBtn" type="Button" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "💾 Lưu Cấu Hình Hiển Thị"
+
+[node name="StatusLabel" type="Label" parent="DevPanel/VBox/Tabs/DevGraphicsTab"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.4, 1)
+text = "Sẵn sàng"
