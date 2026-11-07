@@ -76,10 +76,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0023872852, 0.0102472305, -
 [node name="VillageMesh" parent="." instance=ExtResource("8_vlgmesh")]
 
 [node name="Player" parent="." unique_id=2044242254 instance=ExtResource("3_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, -6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0.5, 4.0)
 
 [node name="IsometricCamera" type="Camera3D" parent="." unique_id=86864845 node_paths=PackedStringArray("Target")]
-transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, -22, 24.35, 22)
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, -24.2, 23.5, 32.0)
 projection = 1
 current = true
 size = 17.5

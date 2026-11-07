@@ -13,7 +13,7 @@ public partial class VoidKillZone : Area3D
 
 	[ExportGroup("Cấu hình Hồi sinh")]
 	[Export] public Node3D? SpawnTarget { get; set; }
-	[Export] public Vector3 DefaultSpawnPosition { get; set; } = new Vector3(6.0f, 2.5f, -6.0f);
+	[Export] public Vector3 DefaultSpawnPosition { get; set; } = new Vector3(3.8f, 0.5f, 4.0f);
 	[Export] public bool AutoRecordInitialPosition { get; set; } = true;
 
 	[ExportGroup("Kích Thước Vùng Va Chạm")]

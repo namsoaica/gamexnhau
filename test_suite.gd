@@ -41,17 +41,17 @@ func _process(delta: float) -> bool:
 			phase_frame = 0
 			return false
 
-	# Phase 1: 1_map_overview.png (Ngoài trời toàn cảnh làng)
+	# Phase 1: 1_map_overview.png (Giao lộ 2 Map liền kề: Đảo Đá & Làng)
 	elif test_phase == 1:
 		if phase_frame == 1:
 			var player = test_map.find_child("Player", true, false)
 			if player:
-				player.TeleportTo(Vector3(0.0, 0.5, 12.0))
+				player.TeleportTo(Vector3(3.8, 0.5, 4.0))
 			var cam = test_map.find_child("IsometricCamera", true, false)
 			if cam:
 				cam.ResetToPlayer()
 		elif phase_frame >= 15:
-			capture_screenshot("res://docs/test_screenshots/1_map_overview.png", "1_map_overview.png (Ngoài trời toàn cảnh)")
+			capture_screenshot("res://docs/test_screenshots/1_map_overview.png", "1_map_overview.png (Giao lộ 2 Map liền kề)")
 			# Prepare for Phase 2: Interior view of Blacksmith
 			var player = test_map.find_child("Player", true, false)
 			var smith_zone = test_map.find_child("InteriorZone_Smith", true, false)

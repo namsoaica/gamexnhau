@@ -61,6 +61,11 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (3) Phát hiện và loại bỏ triệt để 65 đạo cụ xung quanh (`Map_Surroundings`) mọc xuyên vào làng/nhà dân qua `MaterialCatalogHelper.cs` và `MapAutoCollision.cs`; cấu hình `InteriorZone` ẩn tường South/West cho góc nhìn diorama thông thoáng; điều chỉnh vị trí cây cối bao quanh.
   - (4) Đạt chuẩn 100% cả về logic lẫn hình ảnh: **372 / 372 Test cases PASSED (100% Pass, 0 Error)** và 4/4 ảnh chụp màn hình đạt chuẩn thẩm mỹ cao.
   - Đã cập nhật đồng bộ: `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md`, `.agents/workflows/dev_and_review.py`, `test_suite.gd`, và `WorldMap.tscn`.
+- [x] **[AI - csharp-coder & producer]** Giải quyết triệt để 2 vấn đề hiển thị trực quan và đồng bộ Scene Editor:
+  - (1) Cập nhật vị trí spawn Player trong `WorldMap.tscn` tại giao lộ đắc địa `(3.8, 0.5, 4.0)` ngay chân bậc thang Đảo Đá (`SM_Staircase_01`) và trên con đường mòn đất `Path_Connector_Island` nối thẳng Cổng Làng (`Z=8.5`). Khi vào game (F5), thấy ngay bậc thang đảo đá phía sau và toàn cảnh làng, cổng làng, vườn rau, 8 NPC phía trước trong 1 góc nhìn thông thoáng duy nhất.
+  - (2) Khởi tạo đồng bộ `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/Village/VillageMap.tscn` chứa toàn bộ cấu trúc hợp nhất từ `WorldMap.tscn`, triệt tiêu hoàn toàn khối trắng chắn màn hình khi người dùng mở tab scene trong Godot Editor.
+  - (3) Cập nhật `DefaultSpawnPosition` trong `VoidKillZone.cs` thành `(3.8, 0.5, 4.0)`, biên dịch `dotnet build` đạt 0 lỗi 0 cảnh báo.
+  - (4) Thực thi Visual Playtest Loop chụp 4 ảnh màn hình mới, soi mắt thần kiểm tra trực quan thành công, 372/372 test cases Passed (100%).
 
 ---
 

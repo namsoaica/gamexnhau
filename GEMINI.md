@@ -9,11 +9,11 @@ Tập tin này là quy tắc cốt lõi (Workspace Rules) của dự án. Mọi 
 - Luồng chat chính đóng vai trò **Tổng Điều Phối Viên (Lead Orchestrator)**:
   1. **Nạp bối cảnh tự động**: Luôn đọc trạng thái dự án từ `docs/PROJECT_STATE.md` và `docs/TASKS.md` ngay từ đầu mỗi phiên.
   2. **Kích hoạt tự động dây chuyền kỹ năng**: Khi người dùng nhập bất kỳ yêu cầu nào (ngay cả khi **KHÔNG** gõ `@tên-skill`), Orchestrator tự động phân tích và kích hoạt dây chuyền phù hợp trong 5 kỹ năng chính:
-     - `@csharp-coder`: Viết/sửa code C# gameplay Godot 4 (.NET 8), tuân thủ Clean Code (`CODING_STANDARDS.md`), chạy `dotnet build`.
-     - `@code-reviewer`: Rà soát Clean Code (<25 dòng/<200 dòng, -= `_ExitTree`), thực thi **Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế (Requirement-Driven Auto-Playtest Loop)** qua `test_suite.gd` trên Godot Headless đến khi 100% Pass.
-     - `@producer`: Quản lý tiến độ, ghi chép `TASKS.md`, `PROJECT_STATE.md`, phân chia việc giữa Human và AI.
-     - `@blender-helper`: Hỗ trợ kỹ thuật 3D, quy trình Sketch-to-3D từ ảnh `modelyeucau/`, script xuất model `.glb` chuẩn Godot kèm collision, không ghi đè `.blend` gốc.
-     - `@texture-architect`: Quản lý và tối ưu Texture/Material, tra cứu `TEXTURE_CATALOG.md`, ưu tiên tái sử dụng `.tres` hoặc Grayscale Masks, chống phình dung lượng.
+     - `@csharp-coder`: Viết/sửa code C# gameplay Godot 4 (.NET 8), tuân thủ Clean Code (`CODING_STANDARDS.md`), tính toán AABB chống đè hình, đăng ký Input trong `project.godot`, dùng UI Containers, chạy `dotnet build`.
+     - `@code-reviewer`: Rà soát Clean Code (<25 dòng/<200 dòng, -= `_ExitTree`), thực thi **Cơ Chế Kiểm Thử Thị Giác Thực Tế (Visual Playtest & Screenshot Inspection Loop)** qua `test_suite.gd` trên Godot Windowed (không dùng `--headless`), tự soi 4 ảnh chụp màn hình đến khi 100% Pass và thẩm mỹ hoàn hảo.
+     - `@producer`: Quản lý tiến độ, ghi chép `TASKS.md`, `PROJECT_STATE.md`, quét kiểm tra tệp tin thực tế trên ổ cứng trước khi ghi tài liệu, phân chia việc giữa Human và AI.
+     - `@blender-helper`: Hỗ trợ kỹ thuật 3D, tuân thủ Human Reference Scale (Người 1.8m, Cửa 2.3-2.6m, Tường 3.5-4.5m), quy trình Sketch-to-3D từ ảnh `modelyeucau/`, script xuất model `.glb` chuẩn Godot kèm collision, không ghi đè `.blend` gốc.
+     - `@texture-architect`: Quản lý và tối ưu Texture/Material, tra cứu `TEXTURE_CATALOG.md`, xuất ảnh lát thử 2x2 `_tile_preview.png` tự soi Seamless trước khi đăng ký, chống phình dung lượng.
      - `@checkpoint`: Đóng gói trạng thái, ghi `SESSION_HISTORY.md` trước khi reset token.
   3. **Cách ly tiến trình qua Sub-agent**: Khởi tạo Sub-agent độc lập qua công cụ `invoke_subagent` (với `TypeName="csharp-coder"`, `"code-reviewer"`, `"producer"`, `"blender-helper"`, `"texture-architect"` hoặc `"self"`) hoặc chạy workflow qua `run_workflow` / workflow scripts trong `.agents/workflows/`.
   4. **Giải phóng 100% token nháp**: Mọi tác vụ đọc file lớn, sinh mã, kiểm thử diễn ra trong tiến trình con. Khi hoàn tất, Sub-agent lưu trạng thái và đóng tiến trình con, trả về báo cáo ngắn gọn giúp luồng chat chính luôn nhẹ, sạch và cực kỳ thông minh.
@@ -27,8 +27,8 @@ Tập tin này là quy tắc cốt lõi (Workspace Rules) của dự án. Mọi 
 flowchart LR
     User["Yêu cầu người dùng"] --> Producer["@producer<br>Cập nhật TASKS.md"]
     Producer --> Coder["@csharp-coder<br>Viết Clean C# & dotnet build"]
-    Coder --> Reviewer["@code-reviewer<br>Playtest Loop (test_suite.gd Headless)"]
-    Reviewer --> SelfHeal{"100% PASS<br>& 0 Error?"}
+    Coder --> Reviewer["@code-reviewer<br>Visual Playtest (Windowed) & Soi Ảnh"]
+    Reviewer --> SelfHeal{"100% PASS<br>& 4 Ảnh Đạt Chuẩn?"}
     SelfHeal -- "Chưa đạt" --> Coder
     SelfHeal -- "Đạt 100%" --> State["Cập nhật PROJECT_STATE.md & Đóng tiến trình con"]
     State --> Report["Báo cáo súc tích cho User"]
@@ -78,8 +78,33 @@ flowchart TD
 
 ---
 
-## 3. Quy Chuẩn Kỹ Thuật Bắt Buộc Với Mọi Sub-agent
-Mỗi khi khởi tạo Sub-agent, prompt giao việc BẮT BUỘC phải kèm các yêu cầu sau:
+## 3. Quy Chuẩn Kỹ Thuật & Bộ 4 Quy Tắc Xóa Bỏ Điểm Mù (Zero-Blindspot Protocol)
+
+Mọi Sub-agent khi thực thi nhiệm vụ BẮT BUỘC tuân thủ tuyệt đối các quy tắc xóa bỏ điểm mù sau:
+
+1. **Chữa mù cho `@texture-architect` (Mắt Thần Lát Thử 2x2)**:
+   - Mỗi khi sinh texture mới bằng script Python, **CẤM ĐƯA THẲNG VÀO GAME NGAY**.
+   - Bắt buộc phải xuất ra ảnh lát thử 2x2 (`Assets/Textures/_tile_preview.png`) ghép từ 4 ô texture gốc.
+   - Bắt buộc dùng công cụ đọc ảnh (`read_file`) mở `_tile_preview.png` lên tự kiểm tra bằng mắt xem: Mép nối có liền mạch Seamless 100% không, có bị lộ đường viền chữ thập hay vệt cắt không, họa tiết có tự nhiên không và độ tương phản có chuẩn không trước khi đăng ký vào `Assets/Textures/TEXTURE_CATALOG.md`.
+
+2. **Chữa mù không gian, va chạm, phím bấm và UI cho `@csharp-coder`**:
+   - **Chống đè hình bằng AABB (Anti-Overlap Check)**: Khi đặt các vật thể (nhà cửa, cây cối, NPC) vào Scene `.tscn`, cấm đoán mò tọa độ mà bắt buộc phải tính toán khung bao AABB thực tế của Mesh để đảm bảo khoảng cách giữa các công trình/vật thể không giao cắt hay chèn lấn nhau.
+   - **Khớp Collider 100% với AABB**: Kích thước và tâm của `CollisionShape3D` dạng `BoxShape3D` phải khớp chuẩn xác 100% với AABB của Mesh (`Size = aabb.Size`, `Position = aabb.Position + aabb.Size / 2.0f`).
+   - **Đăng ký Input Action**: Khi dùng bất kỳ Input Action nào trong C# (`Input.IsActionPressed`, `Input.GetVector`...), bắt buộc phải kiểm tra và đăng ký phím đó trong file `project.godot` trước.
+   - **Thiết kế UI Co Giãn Tự Động**: Cấm gán chết tọa độ pixel cứng; bắt buộc dùng hệ thống Container (`VBoxContainer`, `HBoxContainer`, `PanelContainer`, `MarginContainer`) và Anchor của Godot để tự động co giãn đẹp mắt ở mọi độ phân giải từ 720p đến 4K.
+
+3. **Chữa mù tỷ lệ kích thước cho `@blender-helper` (Human Reference Scale)**:
+   - Mọi script dựng hình Blender bắt buộc phải tuân thủ "Bảng Tỷ Lệ Chuẩn So Với Nhân Vật (Human Reference Scale)" với quy ước:
+     * **Nhân vật cao chuẩn**: 1.80m (Player Capsule $R=0.4m, H=1.8m$).
+     * **Cửa ra vào (Doors)**: Cao tối thiểu 2.30m - 2.60m, rộng 1.20m - 1.50m (đảm bảo nhân vật 1.8m đi qua hoàn toàn không cụng đầu hay vướng vai).
+     * **Tường nhà (Walls)**: Cao 3.50m - 4.50m (trần cao thoáng đãng, không bí bách).
+     * **Nội thất (Furniture)**: Bàn ăn cao 0.8-0.9m, Ghế ngồi cao 0.45-0.5m, Giường dài 2.2m x rộng 1.4m x cao 0.55m, Tủ đồ cao 2.2-2.6m, Lò rèn cao 1.2-1.5m, Đe sắt cao 0.85m.
+     * **Cây cối (Trees)**: Cây nhỏ cao 4.0-5.5m, Cây lớn cao 6.5-9.0m.
+   - Đảm bảo khi đưa vào Godot, nhân vật đi qua cửa và vào trong nhà (Seamless Interior Transition) hoàn toàn khớp kích thước thực tế.
+
+4. **Chữa mù đồng bộ tài liệu cho `@producer` (Xác Thực Ổ Cứng Thực Tế)**:
+   - Trước khi ghi `PROJECT_STATE.md` và `SESSION_HISTORY.md` cuối mỗi nhiệm vụ, bắt buộc phải quét kiểm tra danh sách file thực tế trong `Scripts/`, `Scenes/`, `Assets/` và `Models/` trên ổ cứng (dùng công cụ filesystem thực tế) để đảm bảo không bao giờ ghi sai tên file hay đường dẫn ảo.
+
 - **Đường dẫn thư mục Godot**: `C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới` (hoặc junction tại `C:\xnhaugame`)
 - **File dự án .csproj**: `C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj`
 - **Clean Code Standards**: Tuân thủ tuyệt đối `docs/CODING_STANDARDS.md`:

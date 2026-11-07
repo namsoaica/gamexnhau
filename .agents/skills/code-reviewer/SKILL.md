@@ -39,6 +39,15 @@ Kỹ năng này chịu trách nhiệm tối cao về chất lượng mã nguồn
    - Nạp vật liệu dùng chung từ `res://Assets/Materials_Shared/*.tres` theo danh mục `Assets/Textures/TEXTURE_CATALOG.md`.
 5. **Chú thích XML**:
    - Đảm bảo có chú thích XML `/// <summary>` bằng tiếng Việt trên các Class, Signal và Phương thức quan trọng.
+6. **Kiểm tra AABB Va Chạm & Chống Đè Hình (Anti-Overlap Check)**:
+   - Rà soát kích thước `CollisionShape3D` dạng `BoxShape3D` phải khớp chính xác 100% với khung bao AABB của Mesh.
+   - Kiểm tra khoảng cách giữa các công trình/vật thể trong Scene `.tscn` không được giao cắt hay chèn lấn nhau.
+7. **Kiểm tra Đăng Ký Input Action**:
+   - Mọi chuỗi Action được gọi trong C# (`Input.IsActionPressed`, `Input.GetVector`...) bắt buộc phải được khai báo và gán phím trong `project.godot`.
+8. **Kiểm tra Giao Diện Co Giãn Tự Động (Responsive UI)**:
+   - Rà soát các Scene UI / DevTool / Dialog đảm bảo sử dụng hệ thống Container (`VBoxContainer`, `HBoxContainer`, `PanelContainer`, `MarginContainer`) và Anchors, cấm gán chết tọa độ pixel cứng.
+9. **Kiểm tra Tỷ Lệ Nhân Trắc Học (Human Reference Scale)**:
+   - Đối chiếu kích thước mô hình 3D: Cửa ra vào phải $\ge 2.3m - 2.6m$, tường nhà $\ge 3.5m - 4.5m$ so với nhân vật chuẩn 1.8m.
 
 ---
 

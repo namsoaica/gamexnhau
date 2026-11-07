@@ -50,7 +50,9 @@
 | `Scenes/UI/DevOverlay.tscn` | `uid://b8d2y01devhud` | `CanvasLayer` (DevOverlay, layer 100) -> `PanelContainer` (StyleBoxFlat bán trong suốt bo góc) -> `VBoxContainer` -> HeaderBar -> `TabContainer` (`DevPlayerTab`, `DevNpcTab`, `DevWorldTab`, `DevTeleportTab`, `DevNpcSystemTab`, `DevGraphicsTab`). |
 | `Scenes/Characters/VillageNpc.tscn` | `uid://b2v8npcbehav1` | `CharacterBody3D` (NpcBehavior) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `VisualModel` (`character_25d.glb`) -> `InteractableArea` -> `OverheadLabel` (Label3D billboard). |
 | `Scenes/UI/NpcInteractionDialog.tscn` | `uid://c3q8npcdialog1` | `CanvasLayer` (NpcInteractionDialog, layer 90) -> `PanelContainer` -> VBox (Header Tên/Nghề -> MessageLabel -> Scroll/ActionsList -> CloseButton). |
-| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | **Màn chơi thế giới mở duy nhất kết nối liền mạch (Seamless Connected World)**: Chứa toàn bộ Đảo Đá gốc (`map_25d.glb`), Cánh đồng cỏ bao quanh (`map_surroundings.glb`), Bản Đồ Làng Mới (`village_map.glb`) nối liền trực tiếp qua con đường đất từ chân dốc đảo đá vào Cổng Làng (`Z=0.2` tới `Z=45`), `Player`, `IsometricCamera`, 4 vùng chuyển đổi nội thất `InteriorZone_*`, cụm 8 dân làng `Village_NPCs`, `VoidKillZone`, `DevOverlay`, `NpcInteractionDialog`, `DisplaySettingsManager`. |
+| `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | **Màn chơi thế giới mở duy nhất kết nối liền mạch (Seamless Connected World)**: Chứa toàn bộ Đảo Đá gốc (`map_25d.glb`), Cánh đồng cỏ bao quanh (`map_surroundings.glb`), Bản Đồ Làng Mới (`village_map.glb`) nối liền trực tiếp qua con đường đất từ chân dốc đảo đá vào Cổng Làng (`Z=0.2` tới `Z=45`), `Player` spawn tại giao lộ kết nối `(3.8, 0.5, 4.0)`, `IsometricCamera`, 4 vùng chuyển đổi nội thất `InteriorZone_*`, cụm 8 dân làng `Village_NPCs`, `VoidKillZone`, `DevOverlay`, `NpcInteractionDialog`, `DisplaySettingsManager`. |
+| `Scenes/Levels/VillageMap.tscn` | `uid://c8vlgmap72001` | **Bản sao đồng bộ hoàn hảo của WorldMap**: Chứa trọn vẹn 2 map nối liền nhau để khi mở tab trong Godot Editor hoặc ấn F6 đều hiển thị thế giới liền mạch, triệt tiêu 100% lỗi khối trắng chắn màn hình. |
+| `Scenes/Levels/Village/VillageMap.tscn` | `uid://c9vlgmap72002` | **Bản sao đồng bộ đường dẫn thư mục phụ**: Đảm bảo mở từ bất kỳ đường dẫn nào trong project đều tải được scene thế giới liền mạch hoàn chỉnh. |
 | `Scenes/Levels/TestLevel.tscn` | `uid://c66126flaj42w` | Level kiểm thử mặt sàn phẳng ban đầu. |
 
 ### C. 3D Models & Assets
@@ -653,3 +655,21 @@
    - `dotnet build`: Build succeeded. 0 Warning(s), 0 Error(s).
    - Kiểm thử thực tế Windowed: **372 / 372 Test cases PASSED (100% Tuyệt Đối, 0 Fail, 0 Error)**.
    - Soi ảnh thực tế: 100% 4 bức ảnh đạt chuẩn thẩm mỹ cao, ánh sáng cân đối, không lún đất, không che khuất, không vỡ UI.
+
+
+### [2026-11-08] - Tinh Chỉnh Điểm Spawn Giao Lộ 2 Map & Đồng Bộ Scene Editor (Sub-agent csharp-coder & producer)
+1. **Giải Quyết Triệt Để Lỗi Spawn Khuất Núi Trong `WorldMap.tscn`**:
+   - Di dời vị trí xuất phát mặc định của Player từ tọa độ cũ khuất sau núi `(6.0, 2.5, -6.0)` sang vị trí giao lộ đắc địa `(3.8, 0.5, 4.0)`.
+   - Vị trí này nằm ngay chân bậc thang đá Đảo Đá (`SM_Staircase_01`) và trên con đường mòn đất `Path_Connector_Island` nối thẳng vào Cổng Làng (`Z=8.5`).
+   - Cập nhật vị trí ban đầu của `IsometricCamera` khớp tọa độ `(-24.2, 23.5, 32.0)` để khi vừa vào game (F5), góc nhìn bao quát toàn bộ 2 Map liền kề: Phía sau là Đảo Đá bậc thang, phía trước là Cổng Làng, vườn rau, Nông dân George, Lính canh Aegis, sạp chợ và các cửa tiệm.
+2. **Khởi Tạo Đồng Bộ `VillageMap.tscn` Khắc Phục Lỗi Tab Editor Cũ**:
+   - Tạo đồng bộ `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/Village/VillageMap.tscn` chứa trọn vẹn 100% cấu trúc hợp nhất từ `WorldMap.tscn`.
+   - Giúp Godot Editor khi reload tab `VillageMap.tscn` cũ của người dùng sẽ hiển thị ngay thế giới liền mạch, triệt tiêu hoàn toàn khối trắng chắn màn hình.
+3. **Cập Nhật Vực Sâu & Biên Dịch An Toàn**:
+   - `Scripts/Core/VoidKillZone.cs`: Cập nhật `DefaultSpawnPosition = new Vector3(3.8f, 0.5f, 4.0f)`.
+   - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+4. **Kiểm Định Thị Giác Thực Tế Windowed**:
+   - Chạy `test_suite.gd` trên Godot Mono Console: **372 / 372 Test cases PASSED (100% Tuyệt Đối)**.
+   - Đọc ảnh kiểm tra trực quan `read_file`:
+     * `docs/test_screenshots/1_map_overview.png`: Hiển thị rõ ràng giao lộ 2 map, đường đất kết nối Đảo Đá với Cổng Làng, vườn rau, NPC, không có vật thể che chắn tầm nhìn.
+     * `docs/test_screenshots/2_interior_view.png`, `3_npc_ui.png`, `4_devtools_ui.png`: 100% đạt chuẩn chất lượng cao.

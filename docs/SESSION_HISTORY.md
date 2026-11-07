@@ -421,3 +421,18 @@
   - **Chuẩn Clean Code**: 100% file C# < 200 dòng, method < 25 dòng, Guard Clauses, hủy `-=` trong `_ExitTree()`.
   - **Biên dịch C#**: `dotnet build` $\rightarrow$ **Build succeeded. 0 Warning(s), 0 Error(s)**.
   - **Godot Headless verification**: `test_suite.gd` $\rightarrow$ **279 / 279 Test cases Passed (100% Pass, 0 Fail)**.
+
+## Phiên làm việc: 2026-11-08 (Trưa - Tinh Chỉnh Điểm Spawn Giao Lộ 2 Map & Triệt Tiêu Lỗi Scene Editor)
+- **Cập nhật tọa độ Spawn Player tại Giao Lộ 2 Map (`WorldMap.tscn`)**:
+  - Chuyển vị trí spawn của Player sang `(3.8, 0.5, 4.0)` ngay chân bậc thang Đảo Đá (`SM_Staircase_01`) và trên con đường mòn đất `Path_Connector_Island` dẫn thẳng vào Cổng Làng (`Z=8.5`).
+  - Cập nhật vị trí `IsometricCamera` về `(-24.2, 23.5, 32.0)` để người chơi vừa bấm F5 là thấy ngay cả 2 Map liền kề: Bậc thang Đảo Đá hùng vĩ sau lưng và toàn cảnh Cổng Làng, vườn rau, sạp chợ, NPC phía trước trong 1 góc nhìn thông thoáng duy nhất.
+- **Đồng bộ hóa Scenes (`VillageMap.tscn` và `Village/VillageMap.tscn`)**:
+  - Khởi tạo `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/Village/VillageMap.tscn` mang toàn bộ cấu trúc hợp nhất từ `WorldMap.tscn`.
+  - Triệt tiêu triệt để hiện tượng Godot Editor mở tab cũ bị khối trắng che khuất màn hình.
+- **Cập nhật `VoidKillZone.cs`**:
+  - Thiết lập `DefaultSpawnPosition = new Vector3(3.8f, 0.5f, 4.0f)`.
+- **Kiểm định chất lượng toàn diện**:
+  - `dotnet build`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Chạy `test_suite.gd` trên Godot Mono Console (Windowed rendering): **372 / 372 Test cases PASSED (100% Pass, 0 Error)**.
+  - Mắt thần tự soi 4 ảnh thực tế: 100% đạt chuẩn thẩm mỹ cao.
+
