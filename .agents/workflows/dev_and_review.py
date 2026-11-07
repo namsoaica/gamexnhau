@@ -1,7 +1,7 @@
 """
-Workflow: Lập trình C# và Rà soát Clean Code tự động (Hierarchical 3-Tier Gate)
+Workflow: Lập trình C# và Giám Sát C# Riêng (Strict Single Responsibility)
 Thực thi tuần tự:
-- Thợ C# (@csharp-coder) lập trình
+- Thợ C# (@csharp-coder) lập trình (chỉ sửa .cs, .tscn, project.godot)
 - Giám sát C# (@csharp-inspector) chạy tools/supervisor_gate.py duyệt/ép sửa tại chỗ
 - Giám sát tổng quản (@chief-supervisor) kiểm định thực tế Windowed Playtest & Vision 4 ảnh
 """
@@ -11,24 +11,22 @@ task_description = args.get("task", "Thực hiện nhiệm vụ lập trình gam
 # -------------------------------------------------------------
 # PHASE 1: C# CODE IMPLEMENTATION
 # -------------------------------------------------------------
-phase("Tầng 1: Lập trình C# Gameplay")
+phase("Tầng 1: Thợ C# Gameplay (@csharp-coder)")
 coder = agent(
     prompt=(
         f"Bạn là Sub-agent csharp-coder.\n"
         f"Nhiệm vụ: {task_description}\n"
-        f"Quy trình bắt buộc:\n"
-        f"1. Đọc docs/PROJECT_STATE.md, docs/TASKS.md và docs/CODING_STANDARDS.md.\n"
-        f"2. Nếu cần gán vật liệu/texture cho mesh, tra cứu Assets/Textures/TEXTURE_CATALOG.md và nạp từ Assets/Materials_Shared/.\n"
-        f"3. Viết code C# theo Clean Code: mỗi hàm < 25 dòng, mỗi file < 200 dòng, Guard Clauses, XML tiếng Việt, hủy -= trong _ExitTree().\n"
-        f"4. Chạy 'dotnet build' đảm bảo 0 lỗi 0 cảnh báo.\n"
-        f"5. Bàn giao cho @csharp-inspector nghiệm thu."
+        f"Ranh giới file nghiêm ngặt: CHỈ ĐƯỢC viết/sửa file .cs trong Scripts/, .tscn trong Scenes/ và project.godot. Cấm chạm vào script Blender hay Texture.\n"
+        f"Viết code C# theo Clean Code: mỗi hàm < 25 dòng, mỗi file < 200 dòng, Guard Clauses, XML tiếng Việt, hủy -= trong _ExitTree().\n"
+        f"Chạy 'dotnet build' đảm bảo 0 lỗi 0 cảnh báo.\n"
+        f"Bàn giao cho @csharp-inspector nghiệm thu."
     ),
-    role="C# Programmer",
+    role="csharp-coder",
     type_name="self",
     schema={"type": "string"}
 )
 coder_result = await coder(task_description, {"type": "string"})
-log(f"[Coder]: {coder_result}")
+log(f"[csharp-coder]: {coder_result}")
 
 # -------------------------------------------------------------
 # PHASE 2: 1-ON-1 C# INSPECTION GATEKEEPER
@@ -43,12 +41,12 @@ inspector = agent(
         "3. Nếu vi phạm bất kỳ tiêu chí nào -> Bắt @csharp-coder sửa lại tại chỗ.\n"
         "4. Chỉ khi exit code là 0 mới ký duyệt PASS và bàn giao lên @chief-supervisor."
     ),
-    role="C# Inspector Gatekeeper",
+    role="csharp-inspector",
     type_name="self",
     schema={"type": "string"}
 )
 inspect_result = await inspector("Rà soát các file code vừa tạo/sửa", {"type": "string"})
-log(f"[C# Inspector]: {inspect_result}")
+log(f"[csharp-inspector]: {inspect_result}")
 
 # -------------------------------------------------------------
 # PHASE 3: CHIEF SUPERVISOR PLAYTEST & WHOLE-GAME QA
@@ -63,13 +61,13 @@ chief = agent(
         "3. Kiểm tra Timestamp 4 ảnh mới hơn code.\n"
         "4. Dùng công cụ đọc ảnh Vision soi từng bức ảnh (kiểm tra ánh sáng, che khuất góc nhìn, lún đất, vỡ UI).\n"
         "5. Nếu phát hiện lỗi thị giác -> Thực hiện Reverse Loop trả về cặp Coder-Inspector sửa tiếp đến khi hoàn hảo.\n"
-        "6. Cập nhật kết quả vào docs/PROJECT_STATE.md, docs/TASKS.md, docs/SESSION_HISTORY.md và kết thúc."
+        "6. Bàn giao kết quả cho @producer đồng bộ tài liệu."
     ),
-    role="Chief Supervisor",
+    role="chief-supervisor",
     type_name="self",
     schema={"type": "string"}
 )
 chief_result = await chief("Thực hiện kiểm định tích hợp và nghiệm thu thị giác toàn game", {"type": "string"})
-log(f"[Chief Supervisor]: {chief_result}")
+log(f"[chief-supervisor]: {chief_result}")
 
 print(f"=== KẾT QUẢ WORKFLOW ===\n{coder_result}\n\n[Đánh giá Gatekeeper]:\n{inspect_result}\n\n[Chief Supervisor]:\n{chief_result}")

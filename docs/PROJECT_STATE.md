@@ -754,3 +754,23 @@
    - Tạo mới `.agents/workflows/hierarchical_supervision.py`.
    - Nâng cấp `.agents/workflows/dev_and_review.py` và `.agents/workflows/asset_and_material_pipeline.py`.
    - Cập nhật toàn diện `AGENTS.md` và `GEMINI.md` theo mô hình Tháp Giám Sát Phân Cấp 3 Tầng.
+
+
+### [2026-11-08] - Ban Hành Luật Cô Lập Đơn Nhiệm & Quy Tắc Cấm Gộp Giám Sát (Strict 1-Skill-Per-Subagent & File-Boundary Isolation)
+1. **Cấm Đặt Tên Chung Chung & Cấm Kiêm Nhiệm**:
+   - Nghiêm cấm đặt tên Sub-agent dạng "System Lead", "Lead Integrator", "QA Tester" để gom việc.
+   - Mỗi Sub-agent bắt buộc gắn 1-1 với 1 kỹ năng cụ thể trong `.agents/skills/`, tên Role phải mang đúng định danh kỹ năng.
+2. **Cô Lập Ranh Giới File Tuyệt Đối (File-Type Boundary)**:
+   - `@texture-architect`: Chỉ tạo/sửa `.png`, `.tres`, `Assets/Textures/TEXTURE_CATALOG.md`.
+   - `@blender-helper`: Chỉ viết script Python `bpy` trong `tools/` / `Assets/Blender_Source/` và xuất `.glb` vào `Assets/Models/`. Cấm sửa `.cs` hoặc `.tscn`.
+   - `@csharp-coder`: Chỉ viết/sửa `.cs`, `.tscn` và `project.godot`. Cấm viết script Blender hay vẽ Texture.
+3. **Dây Chuyền Nối Tiếp 4 Ca Tách Biệt**:
+   - Ca 1: `@texture-architect` + `@texture-inspector` -> Đóng tiến trình.
+   - Ca 2: `@blender-helper` + `@blender-inspector` -> Đóng tiến trình.
+   - Ca 3: `@csharp-coder` + `@csharp-inspector` -> Đóng tiến trình.
+   - Ca 4: `@chief-supervisor` + `@producer` -> Nghiệm thu toàn game và đồng bộ tài liệu.
+4. **Cấm Gộp Giám Sát (Strict 1-to-1 Inspector Pairing)**:
+   - Mỗi Thợ bắt buộc phải có Giám sát chuyên ngành riêng biệt tương ứng có ID tiến trình độc lập.
+5. **Cập Nhật Công Cụ & Quy Tắc**:
+   - `tools/supervisor_gate.py`: Thêm kiểm tra tự động luật phân vai đơn nhiệm trong nhật ký phiên làm việc.
+   - Cập nhật toàn diện `AGENTS.md`, `GEMINI.md`, workflows và các file `SKILL.md`.

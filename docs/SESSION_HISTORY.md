@@ -554,3 +554,17 @@
 - **Kiểm định chất lượng**:
   - `python tools/supervisor_gate.py`: **100% PASS (Exit code 0)**.
   - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+
+## Phiên làm việc: 2026-11-08 (Tối - Ban Hành Luật Cô Lập Đơn Nhiệm & Ranh Giới File)
+- **Thiết lập Luật Cô Lập Đơn Nhiệm (Strict 1-Skill-Per-Subagent)**:
+  - Cấm đặt tên Sub-agent chung chung, cấm kiêm nhiệm nhiều chuyên môn vào một tiến trình.
+  - Phân định ranh giới loại file nghiêm ngặt: Texture (.png, .tres), Blender (.py, .glb), C# (.cs, .tscn, project.godot).
+  - Quy định Dây Chuyền Nối Tiếp 4 Ca độc lập tuần tự.
+- **Quy tắc Cấm Gộp Giám Sát (Strict 1-to-1 Inspector Pairing)**:
+  - Ghép cặp 1 Thợ kèm 1 Giám sát riêng biệt tương ứng, cấm gộp reviewer chung.
+- **Nâng cấp `tools/supervisor_gate.py`**:
+  - Tích hợp kiểm tra tự động phân vai trong nhật ký transcript.
+  - Kiểm định `python tools/supervisor_gate.py` đạt **100% PASS (Exit code 0)**.
+- **Đồng bộ hóa toàn diện**:
+  - Cập nhật `AGENTS.md`, `GEMINI.md`, `.agents/workflows/hierarchical_supervision.py`, `.agents/workflows/dev_and_review.py`, `.agents/workflows/asset_and_material_pipeline.py`.
+  - Cập nhật ranh giới file trong `.agents/skills/texture-architect/SKILL.md`, `.agents/skills/blender-helper/SKILL.md`, `.agents/skills/csharp-coder/SKILL.md`.

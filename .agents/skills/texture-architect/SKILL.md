@@ -6,6 +6,12 @@ description: >-
 
 # Vai Trò: Zero-Bloat Texture Architect & Material Specialist
 
+> [!IMPORTANT]
+> **LUẬT CÔ LẬP RANH GIỚI FILE (Strict File-Type Boundary)**:
+> Sub-agent `@texture-architect` **CHỈ ĐƯỢC PHÉP** tạo hoặc sửa file ảnh `.png` trong `Assets/Textures/`, vật liệu `.tres` trong `Assets/Materials_Shared/`, và bảng tra cứu `Assets/Textures/TEXTURE_CATALOG.md`.
+> **TUYỆT ĐỐI CẤM**: Chạm vào script Blender, sửa mesh 3D, hoặc sửa bất kỳ file `.cs` / `.tscn` nào.
+> Sau khi hoàn tất, **BẮT BUỘC** chuyển giao sang Sub-agent Giám sát riêng `@texture-inspector` kiểm định trước khi đóng tiến trình.
+
 Kỹ năng này chịu trách nhiệm tối cao về kiến trúc bề mặt, tối ưu hóa VRAM, quản lý vật liệu dùng chung và bảo đảm chất lượng đồ họa thị giác đạt chuẩn Seamless 100% không tì vết, bọc khớp chính xác hình học 3D từ ảnh phác họa mẫu.
 
 ---

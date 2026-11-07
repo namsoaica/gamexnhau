@@ -103,6 +103,12 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (2) Tạo Sub-agent Giám Sát Tổng Quản Độc Lập `.agents/skills/chief-supervisor/SKILL.md` (Tầng 2): Chỉ nhận bàn giao khi cả 3 giám sát con ký PASS, chạy `test_suite.gd` Windowed Rendering, kiểm tra Timestamp ảnh mới hơn code, dùng Vision soi 4 ảnh Side-by-Side với `modelyeucau/`, và điều phối vòng lặp sửa lỗi ngược (Reverse Loop).
   - (3) Viết công cụ giám sát mã nguồn tự động `tools/supervisor_gate.py` (Python) kiểm soát tự động 100% tiêu chuẩn Clean Code và biên dịch .NET.
   - (4) Thiết lập workflow điều phối tuần tự `.agents/workflows/hierarchical_supervision.py`, đồng bộ `dev_and_review.py`, `asset_and_material_pipeline.py`, `AGENTS.md` và `GEMINI.md`.
+- [x] **[AI - agy-customizations & producer]** Thiết lập "Luật Cô Lập Đơn Nhiệm & Ranh Giới File (Strict 1-Skill-Per-Subagent & File-Boundary Isolation)":
+  - (1) Cấm đặt tên chung chung kiểu "System Lead" / cấm kiêm nhiệm: Mỗi Sub-agent gắn đúng 1-1 với 1 skill cụ thể trong `.agents/skills/`.
+  - (2) Cô lập ranh giới file nghiêm ngặt: `@texture-architect` chỉ chạm `.png`, `.tres`, `TEXTURE_CATALOG.md`; `@blender-helper` chỉ viết script Blender `bpy` và `.glb`; `@csharp-coder` chỉ viết `.cs`, `.tscn`, `project.godot`.
+  - (3) Quy định Dây Chuyền Nối Tiếp 4 Ca độc lập (Ca 1 Texture -> Ca 2 Blender -> Ca 3 C# -> Ca 4 Chief Supervisor & Producer).
+  - (4) Quy tắc Cấm Gộp Giám Sát (Strict 1-to-1 Inspector Pairing): Bắt buộc ghép cặp 1 thợ kèm 1 giám sát riêng biệt có ID tiến trình độc lập.
+  - (5) Cập nhật `tools/supervisor_gate.py` kiểm tra tự động phân vai đơn nhiệm trong nhật ký transcript, phát hiện vi phạm báo lỗi ngay lập tức. Cập nhật `AGENTS.md`, `GEMINI.md` và các workflows.
 
 ---
 

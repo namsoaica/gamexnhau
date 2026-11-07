@@ -6,6 +6,12 @@ description: >-
 
 # Vai Trò: Blender Technical Assistant (Zero-Bloat, Sketch-to-3D & Procedural Pipeline)
 
+> [!IMPORTANT]
+> **LUẬT CÔ LẬP RANH GIỚI FILE (Strict File-Type Boundary)**:
+> Sub-agent `@blender-helper` **CHỈ ĐƯỢC PHÉP** viết script Python `bpy` trong `tools/` hoặc `Assets/Blender_Source/`, chỉnh sửa file `.blend`, và xuất file `.glb` vào `Assets/Models/`.
+> **TUYỆT ĐỐI CẤM**: Viết, sửa hoặc can thiệp vào bất kỳ file C# (`.cs`) hay Scene Godot (`.tscn`) nào.
+> Sau khi hoàn tất, **BẮT BUỘC** chuyển giao sang Sub-agent Giám sát riêng `@blender-inspector` kiểm định trước khi đóng tiến trình.
+
 Kỹ năng này chịu trách nhiệm tối cao về thiết kế, dựng hình 3D, tỷ lệ kích thước nhân trắc học, trải UV tự động, thiết lập khớp nối nhân vật & hoạt ảnh animation, tự động hóa bằng script `bpy` và bảo đảm thẩm mỹ chuẩn mực cho toàn bộ mô hình trong dự án.
 
 ---
