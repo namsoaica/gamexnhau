@@ -116,26 +116,27 @@ public partial class MapAutoCollision : Node
 		string? matType = MaterialCatalogHelper.MatchMaterialType(meshInstance.Name);
 		if (matType == null) return;
 
-		StandardMaterial3D? mat = matType switch
-		{
-			"LavaFire" => _matLavaFire,
-			"MysticCyan" => _matMysticCyan,
-			"RoofTeal" => _matRoofTeal,
-			"RoofRed" => _matRoofRed,
-			"Canopy" => _matCanopy,
-			"Cobble" => _matCobble,
-			"Metal" => _matMetal,
-			"WoodFence" => _matWoodFence,
-			"Wood" => _matWood,
-			"RockPurple" => _matRockMountainPurple,
-			"Rock" => _matRock,
-			"Dirt" => _matDirt,
-			"Grass" => _matGrass,
-			_ => null
-		};
-
+		StandardMaterial3D? mat = ResolveMaterial(matType);
 		if (mat != null) meshInstance.MaterialOverride = mat;
 	}
+
+	private StandardMaterial3D? ResolveMaterial(string matType) => matType switch
+	{
+		"LavaFire" => _matLavaFire,
+		"MysticCyan" => _matMysticCyan,
+		"RoofTeal" => _matRoofTeal,
+		"RoofRed" => _matRoofRed,
+		"Canopy" => _matCanopy,
+		"Cobble" => _matCobble,
+		"Metal" => _matMetal,
+		"WoodFence" => _matWoodFence,
+		"Wood" => _matWood,
+		"RockPurple" => _matRockMountainPurple,
+		"Rock" => _matRock,
+		"Dirt" => _matDirt,
+		"Grass" => _matGrass,
+		_ => null
+	};
 
 	private void CreateCollisionIfMissing(MeshInstance3D meshInstance)
 	{

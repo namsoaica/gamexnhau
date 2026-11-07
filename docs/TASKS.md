@@ -95,6 +95,15 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (4) **Đạt chuẩn Clean Code**: 100% hàm < 25 dòng, file < 200 dòng, Guard Clauses, hủy `-=` trong `_ExitTree()`, `dotnet build` 0 lỗi 0 cảnh báo.
   - (5) **Windowed Visual Playtest & Nghiệm thu thị giác**: Chạy `test_suite.gd` trên Godot Mono Console đạt **463 / 463 Passed (100% Pass, 0 Fail)**; chụp và tự soi 4 ảnh màn hình chất lượng cao tại `docs/test_screenshots/`.
 
+- [x] **[AI - agy-customizations & producer]** Nâng cấp toàn bộ hệ thống sang mô hình "Tháp Giám Sát Phân Cấp 3 Tầng (Hierarchical 3-Tier Supervision Pyramid)":
+  - (1) Tạo 3 Sub-agent Giám Sát Chuyên Biệt 1-kèm-1 trong `.agents/skills/`:
+    * `.agents/skills/texture-inspector/SKILL.md`: Giám sát riêng kèm chặt `@texture-architect`, kiểm tra trích xuất màu thật từ `modelyeucau/`, soi ảnh lát thử 2x2 Seamless `_tile_preview.png`, ảnh bọc 3D `_texture_3d_check.png` và danh mục `TEXTURE_CATALOG.md`.
+    * `.agents/skills/blender-inspector/SKILL.md`: Giám sát riêng kèm chặt `@blender-helper`, soi ảnh `_preview_render.png` đối chiếu `modelyeucau/`, kiểm tra lưới `bmesh` + Bevel + Solidify + Shade Auto Smooth, trải UV bắt buộc và tỷ lệ Human Reference Scale.
+    * `.agents/skills/csharp-inspector/SKILL.md`: Giám sát riêng kèm chặt `@csharp-coder`, chạy công cụ tự động `tools/supervisor_gate.py` (hàm < 25 dòng, file < 200 dòng, an toàn bộ nhớ -= `_ExitTree`, Input Action, `dotnet build` 0 lỗi) và kiểm tra AABB va chạm trong `.tscn`.
+  - (2) Tạo Sub-agent Giám Sát Tổng Quản Độc Lập `.agents/skills/chief-supervisor/SKILL.md` (Tầng 2): Chỉ nhận bàn giao khi cả 3 giám sát con ký PASS, chạy `test_suite.gd` Windowed Rendering, kiểm tra Timestamp ảnh mới hơn code, dùng Vision soi 4 ảnh Side-by-Side với `modelyeucau/`, và điều phối vòng lặp sửa lỗi ngược (Reverse Loop).
+  - (3) Viết công cụ giám sát mã nguồn tự động `tools/supervisor_gate.py` (Python) kiểm soát tự động 100% tiêu chuẩn Clean Code và biên dịch .NET.
+  - (4) Thiết lập workflow điều phối tuần tự `.agents/workflows/hierarchical_supervision.py`, đồng bộ `dev_and_review.py`, `asset_and_material_pipeline.py`, `AGENTS.md` và `GEMINI.md`.
+
 ---
 
 ## 🎯 Việc Cần Làm Tiếp Theo (Backlog / Next Steps)

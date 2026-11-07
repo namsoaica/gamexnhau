@@ -738,3 +738,19 @@
      * `3_npc_ui.png`: Hộp thoại tương tác NPC hiển thị Avatar HD của Vulcan và các tùy chọn hành động.
      * `4_devtools_ui.png`: Menu Cài Đặt Game và Dev Overlay hiển thị các tùy chọn phân giải, FPS, VSync.
 
+
+
+### [2026-11-08] - Nâng Cấp Toàn Bộ Hệ Thống Sang Mô Hình Tháp Giám Sát Phân Cấp 3 Tầng (Hierarchical 3-Tier Supervision Pyramid)
+1. **Thiết Lập 3 Sub-agent Giám Sát Chuyên Biệt 1-Kèm-1 (Tầng 1)**:
+   - Tạo `.agents/skills/texture-inspector/SKILL.md`: Giám sát riêng kèm chặt `@texture-architect`, kiểm tra quét mã màu thật từ `modelyeucau/`, soi ảnh lát thử 2x2 Seamless `_tile_preview.png`, ảnh bọc 3D `_texture_3d_check.png` và danh mục `TEXTURE_CATALOG.md`.
+   - Tạo `.agents/skills/blender-inspector/SKILL.md`: Giám sát riêng kèm chặt `@blender-helper`, soi ảnh `_preview_render.png` đối chiếu `modelyeucau/`, kiểm tra lưới `bmesh` + Bevel + Solidify + Shade Auto Smooth, trải UV bắt buộc và tỷ lệ Human Reference Scale (Người 1.8m, Cửa 2.3-2.6m, Tường 3.5-4.5m).
+   - Tạo `.agents/skills/csharp-inspector/SKILL.md`: Giám sát riêng kèm chặt `@csharp-coder`, chạy công cụ tự động `tools/supervisor_gate.py` (hàm < 25 dòng, file < 200 dòng, an toàn bộ nhớ -= `_ExitTree`, Input Action, `dotnet build` 0 lỗi) và kiểm tra AABB va chạm trong `.tscn`.
+2. **Thiết Lập Sub-agent Giám Sát Tổng Quản Độc Lập (Tầng 2)**:
+   - Tạo `.agents/skills/chief-supervisor/SKILL.md`: Đứng trên 3 giám sát con, chỉ nhận bàn giao khi cả 3 giám sát con ký PASS, chạy `test_suite.gd` Windowed Rendering (CẤM `--headless`), kiểm tra Timestamp ảnh mới hơn code, dùng Vision soi 4 ảnh Side-by-Side với `modelyeucau/`, và điều phối vòng lặp sửa lỗi ngược (Reverse Loop).
+3. **Phát Triển Bộ Công Cụ Tự Động Gatekeeper**:
+   - Viết `tools/supervisor_gate.py` (Python) tự động phân tích tĩnh Clean Code C#, kiểm tra sự kiện `+=` có `-=` trong `_ExitTree()`, kiểm tra đăng ký Input Action trong `project.godot` và chạy `dotnet build`.
+   - Refactor `MapAutoCollision.cs`, `StairRampBuilder.cs`, `DevGraphicsTab.cs`, `SettingsMenu.cs` (tách `SettingsMenuBinder.cs`) đảm bảo 100% C# codebase tuân thủ Clean Code (<25 dòng/hàm, <200 dòng/file).
+4. **Cập Nhật Workflow & Quy Tắc Cốt Lõi**:
+   - Tạo mới `.agents/workflows/hierarchical_supervision.py`.
+   - Nâng cấp `.agents/workflows/dev_and_review.py` và `.agents/workflows/asset_and_material_pipeline.py`.
+   - Cập nhật toàn diện `AGENTS.md` và `GEMINI.md` theo mô hình Tháp Giám Sát Phân Cấp 3 Tầng.

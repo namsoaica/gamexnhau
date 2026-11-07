@@ -27,48 +27,61 @@ public partial class DevGraphicsTab : VBoxContainer
 
 	private void PopulateAllOptions()
 	{
-		if (ResolutionOption != null)
-		{
-			ResolutionOption.Clear();
-			for (int i = 0; i < DisplaySettingsManager.AvailableResolutions.Length; i++)
-			{
-				Vector2I r = DisplaySettingsManager.AvailableResolutions[i];
-				ResolutionOption.AddItem($"{r.X} x {r.Y}", i);
-			}
-		}
+		PopulateResolutions();
+		PopulateWindowModes();
+		PopulateFpsLimits();
+		PopulateVsyncModes();
+	}
 
-		if (WindowModeOption != null)
-		{
-			WindowModeOption.Clear();
-			WindowModeOption.AddItem("Cửa sổ (Windowed)", 0);
-			WindowModeOption.AddItem("Không viền (Borderless)", 1);
-			WindowModeOption.AddItem("Toàn màn hình (Fullscreen)", 2);
-		}
+	private void PopulateResolutions()
+	{
+		if (ResolutionOption == null) return;
+		ResolutionOption.Clear();
+		for (int i = 0; i < DisplaySettingsManager.AvailableResolutions.Length; i++)
+			ResolutionOption.AddItem($"{DisplaySettingsManager.AvailableResolutions[i].X} x {DisplaySettingsManager.AvailableResolutions[i].Y}", i);
+	}
 
-		if (FpsOption != null)
-		{
-			FpsOption.Clear();
-			for (int i = 0; i < DisplaySettingsManager.AvailableFpsLimits.Length; i++)
-			{
-				int f = DisplaySettingsManager.AvailableFpsLimits[i];
-				FpsOption.AddItem(f == 0 ? "Không giới hạn" : $"{f} FPS", i);
-			}
-		}
+	private void PopulateWindowModes()
+	{
+		if (WindowModeOption == null) return;
+		WindowModeOption.Clear();
+		WindowModeOption.AddItem("Cửa sổ (Windowed)", 0);
+		WindowModeOption.AddItem("Không viền (Borderless)", 1);
+		WindowModeOption.AddItem("Toàn màn hình (Fullscreen)", 2);
+	}
 
-		if (VsyncOption != null)
+	private void PopulateFpsLimits()
+	{
+		if (FpsOption == null) return;
+		FpsOption.Clear();
+		for (int i = 0; i < DisplaySettingsManager.AvailableFpsLimits.Length; i++)
 		{
-			VsyncOption.Clear();
-			VsyncOption.AddItem("Tắt VSync", 0);
-			VsyncOption.AddItem("Bật VSync", 1);
-			VsyncOption.AddItem("Thích ứng (Adaptive)", 2);
+			int f = DisplaySettingsManager.AvailableFpsLimits[i];
+			FpsOption.AddItem(f == 0 ? "Không giới hạn" : $"{f} FPS", i);
 		}
+	}
+
+	private void PopulateVsyncModes()
+	{
+		if (VsyncOption == null) return;
+		VsyncOption.Clear();
+		VsyncOption.AddItem("Tắt VSync", 0);
+		VsyncOption.AddItem("Bật VSync", 1);
+		VsyncOption.AddItem("Thích ứng (Adaptive)", 2);
 	}
 
 	private void SyncFromCurrentSettings()
 	{
 		DisplaySettingsManager? mgr = DisplaySettingsManager.Instance;
 		if (mgr == null) return;
+		SyncResolutionSelection(mgr);
+		SyncWindowModeSelection(mgr);
+		SyncFpsSelection(mgr);
+		SyncVsyncSelection(mgr);
+	}
 
+	private void SyncResolutionSelection(DisplaySettingsManager mgr)
+	{
 		for (int i = 0; i < DisplaySettingsManager.AvailableResolutions.Length; i++)
 		{
 			if (DisplaySettingsManager.AvailableResolutions[i] == mgr.CurrentResolution)
@@ -77,10 +90,16 @@ public partial class DevGraphicsTab : VBoxContainer
 				break;
 			}
 		}
+	}
 
+	private void SyncWindowModeSelection(DisplaySettingsManager mgr)
+	{
 		int modeIdx = mgr.CurrentWindowMode == DisplayServer.WindowMode.ExclusiveFullscreen ? 2 : (mgr.CurrentWindowMode == DisplayServer.WindowMode.Fullscreen ? 1 : 0);
 		WindowModeOption?.Select(modeIdx);
+	}
 
+	private void SyncFpsSelection(DisplaySettingsManager mgr)
+	{
 		for (int i = 0; i < DisplaySettingsManager.AvailableFpsLimits.Length; i++)
 		{
 			if (DisplaySettingsManager.AvailableFpsLimits[i] == mgr.CurrentMaxFps)
@@ -89,7 +108,10 @@ public partial class DevGraphicsTab : VBoxContainer
 				break;
 			}
 		}
+	}
 
+	private void SyncVsyncSelection(DisplaySettingsManager mgr)
+	{
 		int vsyncIdx = mgr.CurrentVSync == DisplayServer.VSyncMode.Adaptive ? 2 : (mgr.CurrentVSync == DisplayServer.VSyncMode.Enabled ? 1 : 0);
 		VsyncOption?.Select(vsyncIdx);
 	}

@@ -28,7 +28,7 @@ public partial class SettingsMenu : CanvasLayer
 	{
 		Instance = this;
 		LocateControls();
-		PopulateOptions();
+		SettingsMenuBinder.PopulateOptions(ResolutionOption, WindowModeOption, FpsOption, VsyncOption);
 		SyncFromSettings();
 		BindEvents();
 		SetMenuOpen(false);
@@ -69,11 +69,7 @@ public partial class SettingsMenu : CanvasLayer
 		DisplaySettingsManager? mgr = DisplaySettingsManager.Instance;
 		if (mgr == null) return;
 
-		ApplySelectedResolution(mgr);
-		ApplySelectedWindowMode(mgr);
-		ApplySelectedFps(mgr);
-		ApplySelectedVsync(mgr);
-
+		SettingsMenuBinder.ApplyToSettings(ResolutionOption, WindowModeOption, FpsOption, VsyncOption, mgr);
 		mgr.SaveSettings();
 		if (StatusLabel != null) StatusLabel.Text = "Đã lưu cài đặt thành công!";
 	}
@@ -91,134 +87,11 @@ public partial class SettingsMenu : CanvasLayer
 		StatusLabel ??= GetNodeOrNull<Label>("MainPanel/Margin/VBox/StatusLabel");
 	}
 
-	private void PopulateOptions()
-	{
-		PopulateResolutions();
-		PopulateWindowModes();
-		PopulateFpsLimits();
-		PopulateVsyncModes();
-	}
-
-	private void PopulateResolutions()
-	{
-		if (ResolutionOption == null) return;
-		ResolutionOption.Clear();
-		for (int i = 0; i < DisplaySettingsManager.AvailableResolutions.Length; i++)
-		{
-			Vector2I r = DisplaySettingsManager.AvailableResolutions[i];
-			ResolutionOption.AddItem($"{r.X} x {r.Y}", i);
-		}
-	}
-
-	private void PopulateWindowModes()
-	{
-		if (WindowModeOption == null) return;
-		WindowModeOption.Clear();
-		WindowModeOption.AddItem("Cửa sổ (Windowed)", 0);
-		WindowModeOption.AddItem("Không viền (Borderless)", 1);
-		WindowModeOption.AddItem("Toàn màn hình (Fullscreen)", 2);
-	}
-
-	private void PopulateFpsLimits()
-	{
-		if (FpsOption == null) return;
-		FpsOption.Clear();
-		for (int i = 0; i < DisplaySettingsManager.AvailableFpsLimits.Length; i++)
-		{
-			int f = DisplaySettingsManager.AvailableFpsLimits[i];
-			FpsOption.AddItem(f == 0 ? "Không giới hạn" : $"{f} FPS", i);
-		}
-	}
-
-	private void PopulateVsyncModes()
-	{
-		if (VsyncOption == null) return;
-		VsyncOption.Clear();
-		VsyncOption.AddItem("Tắt VSync", 0);
-		VsyncOption.AddItem("Bật VSync", 1);
-	}
-
 	private void SyncFromSettings()
 	{
 		DisplaySettingsManager? mgr = DisplaySettingsManager.Instance;
 		if (mgr == null) return;
-
-		SyncResolutionSelection(mgr);
-		SyncWindowModeSelection(mgr);
-		SyncFpsSelection(mgr);
-		SyncVsyncSelection(mgr);
-	}
-
-	private void SyncResolutionSelection(DisplaySettingsManager mgr)
-	{
-		for (int i = 0; i < DisplaySettingsManager.AvailableResolutions.Length; i++)
-		{
-			if (DisplaySettingsManager.AvailableResolutions[i] == mgr.CurrentResolution)
-			{
-				ResolutionOption?.Select(i);
-				break;
-			}
-		}
-	}
-
-	private void SyncWindowModeSelection(DisplaySettingsManager mgr)
-	{
-		int idx = mgr.CurrentWindowMode == DisplayServer.WindowMode.ExclusiveFullscreen ? 2 : (mgr.CurrentWindowMode == DisplayServer.WindowMode.Fullscreen ? 1 : 0);
-		WindowModeOption?.Select(idx);
-	}
-
-	private void SyncFpsSelection(DisplaySettingsManager mgr)
-	{
-		for (int i = 0; i < DisplaySettingsManager.AvailableFpsLimits.Length; i++)
-		{
-			if (DisplaySettingsManager.AvailableFpsLimits[i] == mgr.CurrentMaxFps)
-			{
-				FpsOption?.Select(i);
-				break;
-			}
-		}
-	}
-
-	private void SyncVsyncSelection(DisplaySettingsManager mgr)
-	{
-		int idx = mgr.CurrentVSync == DisplayServer.VSyncMode.Disabled ? 0 : 1;
-		VsyncOption?.Select(idx);
-	}
-
-	private void ApplySelectedResolution(DisplaySettingsManager mgr)
-	{
-		int idx = ResolutionOption?.Selected ?? 0;
-		if (idx >= 0 && idx < DisplaySettingsManager.AvailableResolutions.Length)
-		{
-			mgr.SetResolution(DisplaySettingsManager.AvailableResolutions[idx]);
-		}
-	}
-
-	private void ApplySelectedWindowMode(DisplaySettingsManager mgr)
-	{
-		int idx = WindowModeOption?.Selected ?? 0;
-		var mode = idx switch
-		{
-			1 => DisplayServer.WindowMode.Fullscreen,
-			2 => DisplayServer.WindowMode.ExclusiveFullscreen,
-			_ => DisplayServer.WindowMode.Windowed
-		};
-		mgr.SetWindowMode(mode);
-	}
-
-	private void ApplySelectedFps(DisplaySettingsManager mgr)
-	{
-		int idx = FpsOption?.Selected ?? 1;
-		if (idx >= 0 && idx < DisplaySettingsManager.AvailableFpsLimits.Length)
-		{
-			mgr.SetMaxFps(DisplaySettingsManager.AvailableFpsLimits[idx]);
-		}
-	}
-
-	private void ApplySelectedVsync(DisplaySettingsManager mgr)
-	{
-		int idx = VsyncOption?.Selected ?? 1;
-		mgr.SetVSync(idx == 0 ? DisplayServer.VSyncMode.Disabled : DisplayServer.VSyncMode.Enabled);
+		SettingsMenuBinder.SyncFromSettings(ResolutionOption, WindowModeOption, FpsOption, VsyncOption, mgr);
 	}
 
 	private void BindEvents()

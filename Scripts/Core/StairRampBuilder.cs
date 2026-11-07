@@ -115,28 +115,28 @@ public static class StairRampBuilder
 		topIsMin = true;
 		if (meshInstance.Mesh is not ArrayMesh arrayMesh || arrayMesh.GetSurfaceCount() == 0) return false;
 
-		Godot.Collections.Array arrays = arrayMesh.SurfaceGetArrays(0);
-		Vector3[] verts = (Vector3[])arrays[(int)Mesh.ArrayType.Vertex];
+		Vector3[] verts = (Vector3[])arrayMesh.SurfaceGetArrays(0)[(int)Mesh.ArrayType.Vertex];
 		if (verts.Length == 0) return false;
 
-		Vector3 topSum = Vector3.Zero;
-		Vector3 botSum = Vector3.Zero;
-		int topCount = 0;
-		int botCount = 0;
-		float topThresh = aabb.End.Y - HeightThreshold;
-		float botThresh = aabb.Position.Y + HeightThreshold;
+		if (!CalculateSlopeDelta(verts, aabb, out Vector3 delta)) return false;
+		isZAxis = Mathf.Abs(delta.Z) >= Mathf.Abs(delta.X);
+		topIsMin = isZAxis ? delta.Z < 0.0f : delta.X < 0.0f;
+		return true;
+	}
 
-		for (int i = 0; i < verts.Length; i++)
+	private static bool CalculateSlopeDelta(Vector3[] verts, Aabb aabb, out Vector3 delta)
+	{
+		Vector3 topSum = Vector3.Zero, botSum = Vector3.Zero;
+		int topCount = 0, botCount = 0;
+		float topThresh = aabb.End.Y - HeightThreshold, botThresh = aabb.Position.Y + HeightThreshold;
+
+		foreach (var v in verts)
 		{
-			Vector3 v = verts[i];
 			if (v.Y >= topThresh) { topSum += v; topCount++; }
 			if (v.Y <= botThresh) { botSum += v; botCount++; }
 		}
 
-		if (topCount == 0 || botCount == 0) return false;
-		Vector3 delta = (topSum / topCount) - (botSum / botCount);
-		isZAxis = Mathf.Abs(delta.Z) >= Mathf.Abs(delta.X);
-		topIsMin = isZAxis ? delta.Z < 0.0f : delta.X < 0.0f;
-		return true;
+		delta = (topCount > 0 && botCount > 0) ? (topSum / topCount) - (botSum / botCount) : Vector3.Zero;
+		return topCount > 0 && botCount > 0;
 	}
 }

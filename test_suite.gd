@@ -102,6 +102,12 @@ func _process(delta: float) -> bool:
 			var settings = test_map.find_child("SettingsMenu", true, false)
 			if settings:
 				settings.SetMenuOpen(true)
+				if settings.MainPanel != null:
+					settings.MainPanel.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+					settings.MainPanel.offset_left = -600.0
+					settings.MainPanel.offset_right = -40.0
+					settings.MainPanel.offset_top = -220.0
+					settings.MainPanel.offset_bottom = 220.0
 			test_phase = 4
 			phase_frame = 0
 		return false

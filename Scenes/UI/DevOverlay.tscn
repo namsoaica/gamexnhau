@@ -65,6 +65,7 @@ layout_mode = 2
 [node name="Tabs" type="TabContainer" parent="DevPanel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+clip_tabs = true
 current_tab = 0
 
 [node name="DevPlayerTab" type="VBoxContainer" parent="DevPanel/VBox/Tabs"]

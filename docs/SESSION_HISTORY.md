@@ -533,3 +533,24 @@
   - Chạy `test_suite.gd` trên Godot Mono Console (Windowed rendering): **372 / 372 Test cases PASSED (100% Pass, 0 Error)**.
   - Mắt thần tự soi 4 ảnh thực tế: 100% đạt chuẩn thẩm mỹ cao.
 
+
+## Phiên làm việc: 2026-11-08 (Chiều - Thiết Lập Mô Hình Tháp Giám Sát Phân Cấp 3 Tầng)
+- **Kiến trúc Tháp Giám Sát Phân Cấp 3 Tầng**:
+  - **Tầng 1 (3 Cặp Thợ & Giám sát riêng 1-kèm-1)**:
+    * Cặp 1 (Texture & Material): `@texture-architect` & `@texture-inspector` (`.agents/skills/texture-inspector/SKILL.md`).
+    * Cặp 2 (3D Model & Animation): `@blender-helper` & `@blender-inspector` (`.agents/skills/blender-inspector/SKILL.md`).
+    * Cặp 3 (C# Gameplay & Scene): `@csharp-coder` & `@csharp-inspector` (`.agents/skills/csharp-inspector/SKILL.md`).
+  - **Tầng 2 (Giám Sát Tổng Quản Độc Lập)**:
+    * `@chief-supervisor` (`.agents/skills/chief-supervisor/SKILL.md`): Chỉ nhận bàn giao khi cả 3 Giám sát con ký PASS, chạy `test_suite.gd` Windowed Rendering, kiểm tra Timestamp ảnh mới hơn code, soi Vision Side-by-Side đối chiếu `modelyeucau/`, điều phối vòng lặp sửa lỗi ngược (Reverse Loop).
+  - **Tầng 3 (Lead Orchestrator)**:
+    * Luồng chat chính chỉ điều phối qua `invoke_subagent`, chống loãng token, cập nhật trạng thái và báo cáo.
+- **Phát triển công cụ tự động Gatekeeper**:
+  - Tạo `tools/supervisor_gate.py` tự động quét dòng code, đếm hàm < 25 dòng, file < 200 dòng theo `CODING_STANDARDS.md`, kiểm tra an toàn bộ nhớ (hủy sự kiện `-=` trong `_ExitTree`), kiểm tra Input Action trong `project.godot` và chạy `dotnet build`.
+  - Refactor các hàm dài trong `MapAutoCollision.cs`, `StairRampBuilder.cs`, `DevGraphicsTab.cs`, tách `SettingsMenuBinder.cs` từ `SettingsMenu.cs`.
+- **Đồng bộ hóa Workflows & Quy Tắc Cốt Lõi**:
+  - Tạo `.agents/workflows/hierarchical_supervision.py`.
+  - Nâng cấp `.agents/workflows/dev_and_review.py` và `.agents/workflows/asset_and_material_pipeline.py`.
+  - Nâng cấp toàn diện `AGENTS.md` và `GEMINI.md`.
+- **Kiểm định chất lượng**:
+  - `python tools/supervisor_gate.py`: **100% PASS (Exit code 0)**.
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
