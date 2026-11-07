@@ -49,6 +49,12 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (3) Tự động gọi Godot Headless Mono Console tại `C:/xnhaugame/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe` và đọc toàn bộ log.
   - (4) Thiết lập vòng lặp tự chữa lỗi (Self-Healing Loop) phân tích log, sửa code/scene và chạy lại liên tục đến khi 100% Pass tuyệt đối.
   - Đã nâng cấp đồng bộ: `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md`, `.agents/workflows/dev_and_review.py`, và `test_suite.gd` đạt **368 / 368 tests Passed (100%)**.
+- [x] **[AI - agy-customizations & blender-helper]** Nâng cấp toàn diện kỹ năng Blender với 4 quy tắc bắt buộc nhằm khắc phục triệt để tình trạng dựng model lúc đẹp lúc xấu:
+  - (1) CẤM DỰNG KHỐI THÔ SƠ (No Raw Primitives): Dùng bmesh (Extrude, Inset, Bevel, Subdivide, Displace) kết hợp Modifiers (Bevel 2-3 segments bo viền bắt sáng, Solidify, Shade Auto Smooth).
+  - (2) XÂY DỰNG THƯ VIỆN PROCEDURAL CHUẨN (`tools/blender_kit.py`): Xây dựng thư viện chứa các hàm dựng sẵn chất lượng cao có tham số hóa (nhà tường-mái-hiên, cây tán tầng hữu cơ, đá vát cạnh ngẫu hóa, đường đất) và tự động căn chỉnh AABB (`snap_to_ground`, `stack_on_top`) chống bay lơ lửng / đâm xuyên.
+  - (3) CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (Visual Self-Correction Loop): Tự động render ảnh góc nhìn Isometric với Sun Light xuất ra `Assets/Models/_preview_render.png`, AI dùng công cụ đọc ảnh đối chiếu trực tiếp với concept `modelyeucau/`.
+  - (4) VÒNG LẶP CHẤT LƯỢNG: Tự sửa script bpy và render kiểm tra liên tục đến khi mô hình sắc nét, cân đối mới đưa vào Scene Godot.
+  - Đã refactor toàn bộ `Assets/Blender_Source/build_village_map.py` theo `tools/blender_kit.py`, xuất lại `Assets/Models/village_map.glb`, lưu `Assets/Blender_Source/village_map.blend`, render kiểm tra trực quan thành công và xác thực 368/368 test cases Pass trên Godot Headless.
 
 ---
 

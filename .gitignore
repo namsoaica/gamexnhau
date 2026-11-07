@@ -63,6 +63,8 @@ test_rot.gd.uid
 *.blend5
 *.blend@
 *.blend.tmp*
+__pycache__/
+*.py[cod]
 
 # =====================================================================
 # EXPORT / PACK BUILDS

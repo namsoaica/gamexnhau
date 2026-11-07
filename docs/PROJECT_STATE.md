@@ -620,7 +620,17 @@
    - `Scripts/UI/DevGraphicsTab.cs` (174 dòng): Tab tinh chỉnh độ phân giải, FPS, VSync và lưu cấu hình ngay trong game.
    - `Scripts/UI/DevOverlay.cs` (152 dòng) & `Scenes/UI/DevOverlay.tscn`: Nâng cấp giao diện 6 tab hoàn chỉnh.
 5. **Phân Hệ 5: Tích Hợp Scene & Kiểm Định Chất Lượng Toàn Diện**:
-   - `Scenes/Levels/VillageMap.tscn`: Scene bản đồ làng mở rộng hoàn chỉnh gồm mô hình `village_map.glb`, ánh sáng mặt trời ấm áp, ACES Tonemap, 4 `InteriorZone`, 8 NPC dân làng, Player, `IsometricCamera`, `VoidKillZone`, `DevOverlay` và `NpcInteractionDialog`.
+   - `Scenes/Levels/WorldMap.tscn`: Kết nối liền mạch toàn diện giữa Đảo Đá và Làng Mới (Seamless Connected World), loại bỏ Scene rời `VillageMap.tscn`.
    - **Đạt chuẩn Clean Code**: 100% file C# < 200 dòng, 100% method < 25 dòng, Guard Clauses, hủy `-=` trong `_ExitTree()`.
    - **Biên dịch C#**: `dotnet build` $\rightarrow$ **Build succeeded. 0 Warning(s), 0 Error(s)**.
-   - **Xác thực tự động Godot Headless**: `test_suite.gd` $\rightarrow$ **279 / 279 Test cases Passed (100% Pass, 0 Fail)**.
+
+
+### [2026-11-08] - Thiết Lập Requirement-Driven Auto-Playtest Loop & Nâng Cấp Procedural Blender Kit (Sub-agent code-reviewer & blender-helper)
+1. **Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế (Requirement-Driven Auto-Playtest Loop)**:
+   - Nâng cấp `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md` và `.agents/workflows/dev_and_review.py` với 4 quy tắc sống còn: Cấm chỉ chạy `dotnet build`; chuyển hóa 100% yêu cầu thành Playtest Assertions trong `test_suite.gd`; chạy Godot Headless đọc full log; Self-Healing Loop sửa lỗi liên tục đến khi 100% Pass.
+   - Mở rộng `test_suite.gd`: Giả lập bước vào/ra 4 ngôi nhà (kiểm tra Seamless Interior Transition, ẩn mái/tường trước, đổi camera, bật đèn); kiểm tra chống xuyên tường/sàn cho toàn bộ mesh; giả lập tương tác 8 NPC (State 3 Interacting, hiển thị danh xưng tiếng Việt, sinh đủ nút hành động); kiểm tra Dev Tool 6 Tabs và Teleport; kiểm tra DisplaySettingsManager thay đổi 720p/1080p, FPS 60/144, VSync.
+   - **Kết quả kiểm thử**: Chạy Godot Headless $\rightarrow$ **368 / 368 Test Cases PASSED (100% Tuyệt Đối, 0 Fail, 0 Error)**.
+2. **Nâng Cấp Toàn Diện Kỹ Năng Blender Với 4 Quy Tắc Bắt Buộc**:
+   - `.agents/skills/blender-helper/SKILL.md`, `AGENTS.md`, `GEMINI.md`: Thiết lập 4 quy tắc: (1) Cấm khối thô sơ, dùng bmesh + Modifiers (Bevel 2-3 segments, Solidify, Shade Auto Smooth); (2) Xây dựng thư viện procedural chuẩn `tools/blender_kit.py` tham số hóa, tự động căn chỉnh AABB (`snap_to_ground`, `stack_on_top`); (3) Cơ chế Mắt Thần Tự Kiểm Tra (Visual Self-Correction Loop) render `Assets/Models/_preview_render.png` bằng Workbench Cavity Shading; (4) Vòng lặp chất lượng đối chiếu trực quan với `modelyeucau/` trước khi xuất sang Godot.
+   - Thư viện `tools/blender_kit.py`: Cung cấp bộ công cụ chuyển đổi tọa độ Godot-Blender, căn chỉnh AABB, vật liệu Workbench + PBR, Bevel/Solidify Modifiers, Procedural Mesh Builders (hộp beveled, trụ, đá đa giác ngẫu hóa, cây tán tầng hữu cơ, mái nhà riềm chìa), và Render Preview tự động.
+   - Refactor toàn bộ `Assets/Blender_Source/build_village_map.py` theo `tools/blender_kit.py`, xuất ra `Assets/Models/village_map.glb`, render và kiểm tra trực quan thành công `Assets/Models/_preview_render.png`.

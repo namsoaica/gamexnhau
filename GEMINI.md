@@ -43,23 +43,38 @@ flowchart LR
     Integration --> State3D["Cập nhật PROJECT_STATE.md & Đóng tiến trình con"]
 ```
 
-### C. Quy Trình Đọc Ảnh Phác Họa Tạo Model 3D (Sketch-to-3D Pipeline)
+### C. Quy Trình Đọc Ảnh Phác Họa Tạo Model 3D (Sketch-to-3D & Procedural Pipeline)
 ```mermaid
-flowchart LR
-    UserSketch["Ảnh phác họa trong modelyeucau/"] --> Vision["Đọc ảnh & Phân tích thị giác<br>(Tọa độ X, Z, Màu sắc, Tỷ lệ)"]
-    Vision --> TexArch["@texture-architect<br>Tra cứu TEXTURE_CATALOG.md"]
-    TexArch --> BlenderScript["@blender-helper<br>Script bpy dựng Mesh & Collision<br>Xuất .glb vào Assets/Models/"]
-    BlenderScript --> GodotScene["Gắn vào Scene .tscn Godot 4"]
-    GodotScene --> Finish["Cập nhật PROJECT_STATE.md & Đóng tiến trình con"]
+flowchart TD
+    UserSketch["1. Ảnh phác họa trong modelyeucau/<br>(Dùng read_file phân tích X, Z, tỷ lệ, màu sắc)"] --> TexArch["2. Tra cứu Assets/Textures/TEXTURE_CATALOG.md<br>(Lấy Shared .tres / Seamless / Mask)"]
+    TexArch --> BlenderScript["3. Script bpy dùng tools/blender_kit.py<br>(bmesh, Bevel 2-3 segments, AABB snap)"]
+    BlenderScript --> EyeRender["4. Render _preview_render.png<br>& Mắt Thần Tự Kiểm Tra (read_file)"]
+    EyeRender --> Quality{"5. Đạt Thẩm Mỹ,<br>Đúng Tỷ Lệ & Chi Tiết?"}
+    Quality -- "Thô / Lệch / Xấu" --> BlenderScript
+    Quality -- "Sắc nét, Chuẩn đẹp" --> ExportGLB["6. Xuất Assets/Models/*.glb (export_yup=True)"]
+    ExportGLB --> GodotScene["7. Gắn vào Scene .tscn Godot 4<br>& Playtest Loop test_suite.gd"]
 ```
 
-**4 Bước Bắt Buộc Của Pipeline Sketch-to-3D**:
-1. **Thư mục ảnh phác họa**: Toàn bộ ảnh concept/phác họa của người dùng nằm tại thư mục `modelyeucau/` trong thư mục gốc dự án.
-2. **Phân tích thị giác bắt buộc**: Mỗi khi người dùng yêu cầu tạo map hoặc model từ một thư mục/ảnh trong `modelyeucau/` (ví dụ `modelyeucau/map2/1.png` hoặc `1.jpg`), AI **bắt buộc** phải dùng công cụ đọc ảnh (`read_file`) để phân tích kỹ bố cục không gian 2D, màu sắc, tỷ lệ kích thước và vị trí tương đối (tọa độ X, Z) của từng vật thể trên bức ảnh trước khi viết code.
-3. **Phối hợp Texture**: Phối hợp chặt chẽ với `@texture-architect` kiểm tra `Assets/Textures/TEXTURE_CATALOG.md` để lấy hoặc tạo vật liệu tương ứng với màu sắc trong ảnh phác họa (ưu tiên tái sử dụng `.tres` và Grayscale Masks).
-4. **Dựng 3D & Xuất Scene Godot**: Viết script Python (`bpy`) và gọi trình chạy Blender tại:
-   `C:/xnhaugame/blender-5.4.0-alpha+main.4f97ee24309d-windows.amd64-release/blender.exe --background --python <đường_dẫn_script.py>`
-   để dựng Mesh 3D đúng vị trí như trong ảnh phác họa, tự động tạo va chạm (Collision), xuất file `.glb` vào `Assets/Models/`, sau đó gắn vào Scene `.tscn` của Godot 4.
+**4 Quy Tắc Dựng Hình Bắt Buộc Để Khắc Phục Triệt Để Tình Trạng Model Thô Kệch**:
+1. **CẤM DỰNG KHỐI THÔ SƠ (No Raw Primitives)**:
+   - Cấm chỉ ghép các khối Cube/Cylinder/Sphere nguyên bản thô cứng.
+   - Mọi script Python (`bpy`) bắt buộc phải sử dụng `bmesh` (Extrude, Inset, Bevel, Subdivide, Vertex Displace) kết hợp với Blender Modifiers:
+     - `Bevel Modifier` (2 - 3 segments, width 0.02 - 0.04m, limit Angle 30°) để bo viền bắt sáng (edge highlight).
+     - `Solidify Modifier` (thickness 0.15m) cho tường/mái/ván có độ dày thực tế.
+     - `Displace / Noise` cho địa hình, đá núi, tán cây để tạo vẻ tự nhiên.
+     - Bật `Shade Auto Smooth` (góc 35° - 45°) trên toàn bộ bề mặt cong.
+2. **XÂY DỰNG & TÁI SỬ DỤNG THƯ VIỆN PROCEDURAL CHUẨN (`tools/blender_kit.py`)**:
+   - Mọi script dựng hình bắt buộc phải `import` từ thư viện dùng chung `tools/blender_kit.py`.
+   - Sử dụng các hàm dựng sẵn có tham số hóa cao: nhà cửa có khung tường-cửa sổ-mái hiên chìa ra ngoài (`overhang`), cây cối đa tầng tán, đá vát cạnh Low-Poly, đường đi, giếng nước, lò rèn, xe hàng.
+   - Bắt buộc dùng các hàm tự động căn chỉnh AABB: `snap_to_ground` và `stack_on_top` để đảm bảo không bao giờ có chi tiết bị bay lơ lửng hay đâm xuyên lỗi. Mọi chi tiết mới phát triển phải được đóng gói vào thư viện để tái sử dụng thay vì viết lại từ đầu.
+3. **CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (Visual Self-Correction Loop)**:
+   - Cuối mỗi script Blender, bắt buộc phải tự động thiết lập Camera Isometric + Sun Light và render nhanh Workbench/EEVEE xuất ra file ảnh:
+     `Assets/Models/_preview_render.png`.
+   - Sau khi chạy lệnh Blender CLI:
+     `C:/xnhaugame/blender-5.4.0-alpha+main.4f97ee24309d-windows.amd64-release/blender-5.4.0-alpha+main.4f97ee24309d-windows.amd64-release/blender.exe --background --python <script.py>`
+     AI **bắt buộc** phải dùng công cụ đọc ảnh (`read_file`) để trực tiếp xem file `Assets/Models/_preview_render.png` và đối chiếu với ảnh phác họa trong `modelyeucau/`.
+4. **VÒNG LẶP CHẤT LƯỢNG**:
+   - Nếu nhìn ảnh `_preview_render.png` thấy model bị thô kệch, sai tỷ lệ, lệch tâm, bay lơ lửng hoặc thiếu chi tiết, AI tuyệt đối không được dừng lại mà phải tự chỉnh sửa script Python và render kiểm tra lại cho đến khi hình dáng 3D sắc nét, cân đối mới được phép đưa vào Scene `.tscn` của Godot.
 
 ---
 
