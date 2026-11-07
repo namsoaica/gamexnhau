@@ -41,7 +41,23 @@
 
 ---
 
-## 3. Vật Liệu Godot Dùng Chung (`Assets/Materials_Shared/*.tres`)
+## 3. Hệ Thống Sprite 2.5D & Avatar Chân Dung 8 NPC (`Assets/Textures/NPCs/`)
+*Trích xuất trực tiếp từ concept art `modelyeucau/map2/1.jpg`, tách nền Alpha trong suốt 100%, phục vụ Sprite3D Y-billboard và hộp thoại tương tác RPG.*
+
+| Tên File Sprite | Đường Dẫn Sprite (`res://`) | File Avatar Chân Dung | Nghề Nghiệp & Đặc Điểm Nhận Diện |
+| :--- | :--- | :--- | :--- |
+| `sprite_blacksmith.png` | `res://Assets/Textures/NPCs/sprite_blacksmith.png` | `avatar_blacksmith.png` | **Thợ Rèn Vulcan**: Đầu trọc, râu quai nón, cơ bắp cuộn than, tạp dề da nâu, vác búa tạ. |
+| `sprite_alchemist.png` | `res://Assets/Textures/NPCs/sprite_alchemist.png` | `avatar_alchemist.png` | **Nhà Giả Kim Aria**: Mũ trùm tím viền vàng, túi da chéo, cầm 2 bình độc dược ma thuật phát sáng. |
+| `sprite_chef.png` | `res://Assets/Textures/NPCs/sprite_chef.png` | `avatar_chef.png` | **Đầu Bếp Gusteau**: Mũ bếp trắng cao xếp nếp, áo tạp dề trắng, bưng 2 ổ bánh mì baguette. |
+| `sprite_farmer.png` | `res://Assets/Textures/NPCs/sprite_farmer.png` | `avatar_farmer.png` | **Nông Dân George**: Nón lá chóp nhọn, áo nâu xắn tay cộc, vác cuốc đất và ôm bó lúa vàng. |
+| `sprite_fisherman.png` | `res://Assets/Textures/NPCs/sprite_fisherman.png` | `avatar_fisherman.png` | **Ngư Dân Finn**: Nón vành tròn, áo kaki, cần câu tre dài, giỏ nan tre đựng cá tươi bên bến cảng. |
+| `sprite_miner.png` | `res://Assets/Textures/NPCs/sprite_miner.png` | `avatar_miner.png` | **Thợ Mỏ Brock**: Mũ bảo hộ vàng có đèn mỏ, áo quần bảo hộ vàng cam sọc phản quang, vác cuốc chim. |
+| `sprite_lumberjack.png` | `res://Assets/Textures/NPCs/sprite_lumberjack.png` | `avatar_lumberjack.png` | **Tiều Phu Grover**: Mũ len đỏ, áo sơ mi caro đỏ đen dài tay, quần jean xanh, vác rìu đốn củi to bản. |
+| `sprite_guard.png` | `res://Assets/Textures/NPCs/sprite_guard.png` | `avatar_guard.png` | **Lính Canh Aegis & Phalanx**: Mũ giáp sắt, áo giáp vảy kim loại, khiên tròn viền đồng, giáo dài đỉnh bạc. |
+
+---
+
+## 4. Vật Liệu Godot Dùng Chung (`Assets/Materials_Shared/*.tres`)
 *Vật liệu `StandardMaterial3D` chuẩn Godot 4, sẵn sàng kéo thả trực tiếp vào MeshInstance3D hoặc gán vào Scene.*
 
 | Tên Material | Đường Dẫn (`res://`) | Texture Gốc Sử Dụng | Mục Đích & Thuộc Tính (`Albedo`, `Roughness`, `Metallic`) |

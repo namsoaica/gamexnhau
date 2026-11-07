@@ -22,6 +22,7 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 
 	[ExportGroup("Tham Chiếu Node")]
 	[Export] public Node3D? VisualModel { get; set; }
+	[Export] public Sprite3D? NpcSprite { get; set; }
 	[Export] public Label3D? OverheadLabel { get; set; }
 
 	public string PromptText => $"Trò chuyện với {NpcName}";
@@ -36,6 +37,11 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 	{
 		_initialPosition = GlobalPosition;
 		VisualModel ??= GetNodeOrNull<Node3D>("VisualModel") ?? GetNodeOrNull<Node3D>("CharacterModel");
+		if (VisualModel != null) VisualModel.Visible = false;
+		
+		NpcSprite ??= GetNodeOrNull<Sprite3D>("NpcSprite");
+		if (NpcSprite != null) NpcVisualHelper.ConfigureSprite(NpcSprite, Profession);
+
 		OverheadLabel ??= GetNodeOrNull<Label3D>("OverheadLabel");
 		UpdateOverheadText();
 	}
@@ -146,17 +152,19 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 		TurnTowards(target);
 	}
 
+	public Texture2D? GetAvatarTexture() => NpcVisualHelper.LoadAvatar(Profession);
+
 	private void ApplyProceduralWorkMotion()
 	{
-		if (VisualModel == null) return;
 		float bob = Mathf.Sin(_animTime * 4.0f) * 0.04f;
-		VisualModel.Position = new Vector3(VisualModel.Position.X, bob, VisualModel.Position.Z);
+		if (VisualModel != null) VisualModel.Position = new Vector3(VisualModel.Position.X, bob, VisualModel.Position.Z);
+		if (NpcSprite != null) NpcSprite.Position = new Vector3(0, 0.90f + bob, 0);
 	}
 
 	private void ResetWorkMotion()
 	{
-		if (VisualModel == null) return;
-		VisualModel.Position = new Vector3(VisualModel.Position.X, 0, VisualModel.Position.Z);
+		if (VisualModel != null) VisualModel.Position = new Vector3(VisualModel.Position.X, 0, VisualModel.Position.Z);
+		if (NpcSprite != null) NpcSprite.Position = new Vector3(0, 0.90f, 0);
 	}
 
 	private void TurnTowards(Vector3 targetPos)

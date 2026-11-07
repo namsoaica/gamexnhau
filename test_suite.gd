@@ -799,7 +799,8 @@ func test_village_map_and_gameplay():
 		var critical_meshes = [
 			"Floor_Smith", "Wall_North_Smith", "Floor_Alchemist", "Wall_North_Alchemist",
 			"Floor_Chef", "Wall_North_Chef", "Floor_House", "Wall_North_House",
-			"Well_Stone", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base"
+			"Well_Stone", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base",
+			"Pier_Dock_Deck", "Water_Fisher_Basin"
 		]
 		for mesh_name in critical_meshes:
 			var m_node = vlg_mesh.find_child(mesh_name, true, false)
@@ -826,7 +827,8 @@ func test_village_map_and_gameplay():
 		{"name": "Npc_Fisherman", "prof": 4, "title": "Ngư Dân"},
 		{"name": "Npc_Miner", "prof": 5, "title": "Thợ Mỏ"},
 		{"name": "Npc_Lumberjack", "prof": 6, "title": "Tiều Phu"},
-		{"name": "Npc_Guard", "prof": 7, "title": "Lính Canh"}
+		{"name": "Npc_Guard", "prof": 7, "title": "Lính Canh"},
+		{"name": "Npc_Guard_2", "prof": 7, "title": "Lính Canh"}
 	]
 	for npc_data in npcs:
 		var npc_node = vlg.find_child(npc_data["name"], true, false)
@@ -835,6 +837,9 @@ func test_village_map_and_gameplay():
 			assert_true(npc_node.is_in_group("VillageNPC"), npc_data["name"] + " is in group VillageNPC")
 			assert_true(int(npc_node.get("Profession")) == npc_data["prof"], npc_data["name"] + " has exact Profession " + str(npc_data["prof"]))
 			assert_true(npc_node.CanInteract(), npc_data["name"] + " CanInteract returns true initially")
+
+			var sprite = npc_node.find_child("NpcSprite", true, false)
+			assert_true(sprite != null and sprite.texture != null, npc_data["name"] + " has valid 2.5D Sprite3D texture")
 
 			# Simulating NPC Interaction Trigger
 			npc_node.Interact(player)
@@ -846,6 +851,9 @@ func test_village_map_and_gameplay():
 				var prof_lbl = dialog.get("ProfessionLabel")
 				if prof_lbl != null:
 					assert_true(npc_data["title"] in prof_lbl.text, "Dialogue displays correct Vietnamese profession title: " + npc_data["title"])
+				var av_rect = dialog.get("AvatarRect")
+				if av_rect != null:
+					assert_true(av_rect.texture != null, "Dialogue displays valid NPC Avatar portrait for " + npc_data["name"])
 				var actions = dialog.get("ActionsContainer")
 				if actions != null:
 					assert_true(actions.get_child_count() >= 2, "Dialogue generated at least 2 special actions for " + npc_data["name"])

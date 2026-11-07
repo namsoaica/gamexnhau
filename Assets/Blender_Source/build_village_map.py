@@ -95,19 +95,33 @@ def build_village():
             create_beveled_box(f"Fence_Rail_Top_{side}_{i}", (1.6, 0.08, 0.08), (fx - side * 0.75, 1.0, gate_z), bevel_width=0.015, material=mat_wood_fence)
             create_beveled_box(f"Fence_Rail_Bot_{side}_{i}", (1.6, 0.08, 0.08), (fx - side * 0.75, 0.5, gate_z), bevel_width=0.015, material=mat_wood_fence)
 
-    # Đạo cụ Lính Canh Aegis tại cổng làng (0, 0, 8.5)
-    create_beveled_cylinder("NPC_Aegis_Spear_Shaft", 0.04, 2.8, (0.8, 1.4, gate_z - 0.4), bevel_width=0.01, material=mat_wood)
-    create_beveled_box("NPC_Aegis_Spear_Blade", (0.10, 0.40, 0.04), (0.8, 2.9, gate_z - 0.4), bevel_width=0.01, material=mat_metal)
-    create_beveled_cylinder("NPC_Aegis_Shield", 0.45, 0.08, (1.1, 0.55, gate_z - 0.3), bevel_width=0.02, rotation=(0.2, 0, 0.3), vertices=16, material=mat_metal)
-    create_beveled_cylinder("NPC_Aegis_Iron_Helmet", 0.22, 0.30, (0.8, 0.25, gate_z + 0.3), bevel_width=0.02, material=mat_metal)
+    # Đạo cụ Lính Canh 1 (Aegis) tại cổng làng bên trái (-0.8, 0, 8.5)
+    create_beveled_cylinder("NPC_Aegis_Spear_Shaft", 0.04, 2.8, (-0.8, 1.4, gate_z - 0.4), bevel_width=0.01, material=mat_wood)
+    create_beveled_box("NPC_Aegis_Spear_Blade", (0.10, 0.40, 0.04), (-0.8, 2.9, gate_z - 0.4), bevel_width=0.01, material=mat_metal)
+    create_beveled_cylinder("NPC_Aegis_Shield", 0.45, 0.08, (-1.1, 0.55, gate_z - 0.3), bevel_width=0.02, rotation=(0.2, 0, 0.3), vertices=16, material=mat_metal)
+    create_beveled_cylinder("NPC_Aegis_Iron_Helmet", 0.22, 0.30, (-0.8, 0.25, gate_z + 0.3), bevel_width=0.02, material=mat_metal)
 
-    # Vườn rau cải & Đạo cụ Nông Dân George (-5.2, 0, 8.5)
+    # Đạo cụ Lính Canh 2 (Guard 2) tại cổng làng bên phải (0.8, 0, 8.5)
+    create_beveled_cylinder("NPC_Guard_2_Spear_Shaft", 0.04, 2.8, (0.8, 1.4, gate_z - 0.4), bevel_width=0.01, material=mat_wood)
+    create_beveled_box("NPC_Guard_2_Spear_Blade", (0.10, 0.40, 0.04), (0.8, 2.9, gate_z - 0.4), bevel_width=0.01, material=mat_metal)
+    create_beveled_cylinder("NPC_Guard_2_Shield", 0.45, 0.08, (1.1, 0.55, gate_z - 0.3), bevel_width=0.02, rotation=(-0.2, 0, -0.3), vertices=16, material=mat_metal)
+    create_beveled_cylinder("NPC_Guard_2_Iron_Helmet", 0.22, 0.30, (0.8, 0.25, gate_z + 0.3), bevel_width=0.02, material=mat_metal)
+
+    # Vườn rau cải 1 (Bên trái đường: -5.2, 0, 8.5)
     for row in range(3):
         rz = 7.5 + row * 1.1
-        create_beveled_box(f"Crop_Soil_{row}", (4.2, 0.1, 0.8), (-5.2, 0.05, rz), bevel_width=0.02, material=mat_dirt)
+        create_beveled_box(f"Crop_Soil_L_{row}", (4.2, 0.1, 0.8), (-5.2, 0.05, rz), bevel_width=0.02, material=mat_dirt)
         for col in range(4):
             cx = -6.5 + col * 0.9
-            build_chamfered_rock(f"Cabbage_{row}_{col}", (0.52, 0.44, 0.52), (cx, 0.22, rz), material=mat_vegetable, seed_val=row*10+col)
+            build_chamfered_rock(f"Cabbage_L_{row}_{col}", (0.52, 0.44, 0.52), (cx, 0.22, rz), material=mat_vegetable, seed_val=row*10+col)
+
+    # Vườn rau cải 2 (Bên phải đường: 5.2, 0, 8.5)
+    for row in range(3):
+        rz = 7.5 + row * 1.1
+        create_beveled_box(f"Crop_Soil_R_{row}", (3.6, 0.1, 0.8), (4.8, 0.05, rz), bevel_width=0.02, material=mat_dirt)
+        for col in range(3):
+            cx = 3.9 + col * 0.9
+            build_chamfered_rock(f"Cabbage_R_{row}_{col}", (0.50, 0.42, 0.50), (cx, 0.22, rz), material=mat_vegetable, seed_val=100+row*10+col)
 
     create_beveled_cylinder("NPC_George_Straw_Hat", 0.38, 0.18, (-4.2, 0.70, 8.5), bevel_width=0.02, vertices=12, material=mat_wheat)
     create_beveled_cylinder("NPC_George_Garden_Hoe_Handle", 0.04, 1.8, (-4.4, 0.90, 8.8), bevel_width=0.01, rotation=(0.1, 0, 0.2), material=mat_wood)
@@ -142,6 +156,28 @@ def build_village():
     create_beveled_box("NPC_Gusteau_Baguette_Tray", (0.55, 0.10, 0.80), (5.1, 0.65, 7.5), bevel_width=0.02, material=mat_wood)
     create_beveled_cylinder("NPC_Gusteau_Baguette_Prop", 0.08, 0.65, (5.1, 0.75, 7.5), bevel_width=0.02, rotation=(0, 0, 1.57), material=mat_bread)
 
+    # 4.1 BẾN CẢNG NGƯ DÂN (FISHERMAN'S WHARF & PIER: X in [12, 18], Z in [5, 11])
+    dock_x, dock_z = 13.5, 7.5
+    # Mặt nước sông / bờ biển trong xanh
+    create_beveled_box("Water_Fisher_Basin-col", (7.0, 0.10, 8.0), (16.2, 0.02, dock_z), bevel_width=0.02, material=mat_water)
+    # Cầu cảng gỗ vươn ra mặt nước
+    create_beveled_box("Pier_Dock_Deck-col", (2.8, 0.16, 5.0), (dock_x, 0.18, dock_z), bevel_width=0.03, material=mat_wood)
+    for pi, (px, pz) in enumerate([(dock_x - 1.1, dock_z - 2.0), (dock_x + 1.1, dock_z - 2.0), (dock_x - 1.1, dock_z + 2.0), (dock_x + 1.1, dock_z + 2.0)]):
+        create_beveled_cylinder(f"Pier_Piling_{pi+1}", 0.14, 0.8, (px, -0.15, pz), bevel_width=0.02, material=mat_wood_fence)
+    # Cọc buộc dây thừng
+    create_beveled_cylinder("Pier_Bollard_1", 0.12, 0.5, (dock_x + 1.2, 0.42, dock_z - 1.8), bevel_width=0.02, material=mat_wood_fence)
+    create_beveled_cylinder("Pier_Bollard_2", 0.12, 0.5, (dock_x + 1.2, 0.42, dock_z + 1.8), bevel_width=0.02, material=mat_wood_fence)
+    # Thuyền gỗ nan đậu sát cầu cảng
+    create_beveled_box("Fisher_Boat_Hull", (1.4, 0.40, 2.8), (16.0, 0.12, dock_z), bevel_width=0.03, material=mat_wood_fence)
+    create_beveled_box("Fisher_Boat_Seat", (1.2, 0.08, 0.4), (16.0, 0.25, dock_z), bevel_width=0.02, material=mat_wood)
+    create_beveled_cylinder("Fisher_Boat_Oar", 0.04, 2.2, (15.7, 0.35, dock_z), bevel_width=0.01, rotation=(0, 0.4, 0.6), material=mat_wood)
+    # Giỏ cá tươi và giàn phơi cá
+    create_beveled_cylinder("Fisher_Basket_OnDock", 0.32, 0.45, (dock_x + 0.8, 0.40, dock_z - 0.8), bevel_width=0.02, vertices=12, material=mat_wood)
+    create_beveled_box("Fish_Drying_Rack", (0.3, 1.4, 1.8), (dock_x - 0.8, 0.70, dock_z + 1.6), bevel_width=0.02, material=mat_wood_fence)
+    # Cần câu tre của Finn trên cầu cảng
+    create_beveled_cylinder("NPC_Finn_Pier_Rod", 0.03, 3.2, (dock_x + 0.6, 1.6, dock_z), bevel_width=0.01, rotation=(0.4, 0, 0.3), material=mat_wood)
+    create_beveled_cylinder("NPC_Finn_Bucket_Hat", 0.25, 0.15, (dock_x, 0.50, dock_z - 0.6), bevel_width=0.02, material=mat_wheat)
+
     # 5. CHỢ TRUNG TÂM (Z in [14, 20], X in [-4, 4])
     well_x, well_z = -1.6, 16.5
     create_beveled_cylinder("Well_Stone", 1.25, 0.95, (well_x, 0.48, well_z), bevel_width=0.04, vertices=16, material=mat_cobble)
@@ -149,11 +185,6 @@ def build_village():
     create_beveled_cylinder("Well_Post_1", 0.08, 2.4, (well_x - 1.0, 1.2, well_z), bevel_width=0.02, material=mat_wood)
     create_beveled_cylinder("Well_Post_2", 0.08, 2.4, (well_x + 1.0, 1.2, well_z), bevel_width=0.02, material=mat_wood)
     build_detailed_roof_gabled("Well_Roof", 2.2, 1.5, 0.7, (well_x, 2.2, well_z), overhang=0.2, ridge_along_x=True, material=mat_roof_red)
-
-    # Đạo cụ Ngư Dân Finn bên giếng (-1.6, 0, 15.0)
-    create_beveled_cylinder("NPC_Finn_Fishing_Rod", 0.03, 3.2, (well_x - 0.7, 1.6, 15.0), bevel_width=0.01, rotation=(0.3, 0, -0.2), material=mat_wood)
-    create_beveled_cylinder("NPC_Finn_Fish_Basket", 0.28, 0.45, (well_x - 0.2, 0.22, 14.8), bevel_width=0.02, vertices=10, material=mat_wood)
-    create_beveled_cylinder("NPC_Finn_Bucket_Hat", 0.25, 0.15, (well_x - 0.2, 0.50, 14.8), bevel_width=0.02, material=mat_wheat)
 
     # 2 Sạp chợ có bạt sọc đỏ trắng
     for i, sz in enumerate([15.0, 18.5]):

@@ -82,6 +82,12 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (6) Render mắt thần `Assets/Models/_preview_render.png`, `Assets/Models/_char_preview.png` và ảnh bọc thử 3D `docs/test_screenshots/_texture_3d_check.png`.
   - (7) Nâng cấp `MaterialCatalogHelper.cs` và `MapAutoCollision.cs`: Ánh xạ vật liệu sàn, lò rèn, đá cuội `M_Stone_Cobble.tres`, ưu tiên lá cây `foliage` xanh mát.
   - (8) Biên dịch `dotnet build` đạt 0 lỗi 0 cảnh báo; chạy Windowed Visual Playtest `test_suite.gd` đạt **372/372 Passed (100%)**, chụp và tự soi 4 ảnh màn hình thực tế đạt chuẩn thẩm mỹ cao.
+- [x] **[AI - texture-architect, csharp-coder & blender-helper]** Khắc phục triệt để điểm mù thị giác NPC và bổ sung hoàn chỉnh các phân khu còn thiếu theo ảnh `modelyeucau/map2/1.jpg`:
+  - (1) **Trích xuất 8 Sprite 2.5D & 8 Avatar chân dung HD** (`Assets/Textures/NPCs/`): Dùng script Python tách nền Alpha trong suốt 100% từ ảnh concept gốc `1.jpg` cho cả 8 nhân vật: Thợ Rèn Vulcan, Nhà Giả Kim Aria, Đầu Bếp Gusteau, Nông Dân George, Ngư Dân Finn, Thợ Mỏ Brock, Tiều Phu Grover, Lính Canh Aegis/Phalanx.
+  - (2) **Xóa sổ hoàn toàn người que trắng tím cho NPC**: Thay thế placeholder `character_25d.glb` trong `VillageNpc.tscn` bằng `Sprite3D` Y-billboard (chiều cao chuẩn 1.80m, bóng đổ DoubleSided, độ nét cao).
+  - (3) **Tích hợp Avatar chân dung vào hộp thoại RPG**: Cập nhật `NpcInteractionDialog.cs` và `NpcInteractionDialog.tscn` với `AvatarRect` hiển thị ảnh chân dung của từng NPC khi trò chuyện.
+  - (4) **Bổ sung Bến Cảng Ngư Dân & Cổng Làng 2 Lính Canh**: Thêm mặt nước trong xanh, cầu cảng gỗ, thuyền nan, giỏ cá, cọc buộc dây, đưa Ngư Dân Finn đứng câu cá trên cầu cảng; thêm Lính Canh 2 gác bên phải cổng làng; thêm ruộng rau thứ 2 bên phải đường vào làng.
+  - (5) **Kiểm thử nghiệm thu thực tế**: `dotnet build` 0 cảnh báo 0 lỗi; Windowed Visual Playtest `test_suite.gd` đạt **403 / 403 Passed (100% Pass, 0 Fail)**; 4 bức ảnh chụp màn hình đạt chất lượng thẩm mỹ cao, chuẩn xác 100% so với ảnh mẫu.
 
 ---
 

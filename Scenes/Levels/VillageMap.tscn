@@ -160,8 +160,14 @@ omni_range = 8.0
 [node name="Village_NPCs" type="Node3D" parent="."]
 
 [node name="Npc_Guard" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 8.5)
 NpcName = "Aegis"
+Profession = 7
+CurrentState = 0
+
+[node name="Npc_Guard_2" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 8.5)
+NpcName = "Phalanx"
 Profession = 7
 CurrentState = 0
 
@@ -178,7 +184,7 @@ Profession = 2
 CurrentState = 1
 
 [node name="Npc_Fisherman" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0.18, 7.5)
 NpcName = "Finn"
 Profession = 4
 CurrentState = 1

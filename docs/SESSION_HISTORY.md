@@ -1,5 +1,32 @@
 # LỊCH SỬ PHIÊN LÀM VIỆC (SESSION HISTORY)
 
+## Phiên làm việc: 2026-11-08 (Hoàn thiện Đồ Họa 8 NPC, Bến Cảng Ngư Dân & Cổng Làng 2 Lính Canh theo modelyeucau/map2/1.jpg)
+- **Rà soát thực tế theo phản hồi người dùng & ảnh mẫu `1.jpg`**:
+  - Nhận diện đúng điểm mấu chốt: Game trước đó vẫn dùng model người que `character_25d.glb` (trắng tím của Player) cắm nhãn chữ cho 8 NPC dân làng; thiếu Bến Cảng Ngư Dân; thiếu lính canh thứ 2 và thửa ruộng thứ 2 tại cổng làng; hộp thoại thiếu Avatar chân dung.
+- **Trích xuất 8 Sprite 2.5D & 8 Avatar chân dung (`Assets/Textures/NPCs/`)**:
+  - Viết `tools/extract_npc_sprites.py` và `tools/polish_clean.py`: Cắt trực tiếp 8 nhân vật từ hàng dưới cùng của ảnh `modelyeucau/map2/1.jpg`, dùng thuật toán tách màu nền kem `#F4F3E4` thành Alpha trong suốt 100%, khử sạch mọi tạp vật viền xung quanh.
+  - Lưu 8 sprite toàn thân (`sprite_{name}.png`) và 8 avatar chân dung (`avatar_{name}.png`) cho: Thợ Rèn Vulcan, Nhà Giả Kim Aria, Đầu Bếp Gusteau, Nông Dân George, Ngư Dân Finn, Thợ Mỏ Brock, Tiều Phu Grover, Lính Canh Aegis/Phalanx.
+  - Xuất ảnh tổng hợp `_npcs_extracted_preview.png` và `_avatars_preview.png` kiểm tra bằng mắt thần.
+- **Nâng cấp C# NPC & Hệ thống tương tác**:
+  - Tạo `Scripts/NPC/NpcVisualHelper.cs`: Quản lý nạp an toàn Sprite 2.5D và Avatar chân dung cho từng nghề nghiệp, cấu hình `Sprite3D` Y-billboard cao chuẩn 1.80m, bóng đổ hai mặt `DoubleSided`, cắt Alpha `OpaquePrepass`.
+  - Cập nhật `Scripts/NPC/NpcBehavior.cs`: Tự động gắn Sprite 2.5D và ẩn hoàn toàn placeholder stickman.
+  - Nâng cấp `Scripts/UI/NpcInteractionDialog.cs` & `Scenes/UI/NpcInteractionDialog.tscn`: Bổ sung `AvatarRect` hiển thị chân dung HD của NPC đang tương tác bên cạnh tên và danh hiệu tiếng Việt.
+- **Bổ sung Bến Cảng Ngư Dân & Cổng Làng trong Blender (`build_village_map.py`)**:
+  - Thêm Bến Cảng Ngư Dân phía Đông Nam: Mặt nước trong xanh `Water_Fisher_Basin-col`, cầu cảng gỗ `Pier_Dock_Deck-col`, 4 cọc gỗ trụ, 2 cọc buộc dây thừng, thuyền nan gỗ `Fisher_Boat_Hull`, giỏ cá tươi, giàn phơi cá và cần câu tre.
+  - Chuyển vị trí Ngư Dân Finn đứng trực tiếp trên cầu cảng gỗ câu cá ra mặt nước.
+  - Thêm Lính Canh thứ 2 (`Phalanx`) gác ở trụ bên phải cổng làng với khiên và giáo dài.
+  - Thêm thửa ruộng rau thứ 2 bên phải đường vào làng với luống đất nâng cao và các cây bắp cải xanh tươi.
+  - Xuất lại `Assets/Models/village_map.glb` (1.88 MB) và render `_preview_render.png`.
+- **Kiểm định & Nghiệm thu toàn diện**:
+  - `dotnet build`: **0 Warning(s), 0 Error(s)**.
+  - Windowed Visual Playtest qua `test_suite.gd`: **403 / 403 Test cases PASSED (100% Pass, 0 Fail)**.
+  - Chụp lại 4 bức ảnh màn hình thực tế lưu vào `docs/test_screenshots/`:
+    * `1_map_overview.png`: Toàn cảnh làng với 2 lính canh gác cổng, 2 vườn rau cải, Bến Cảng Ngư Dân, chợ, các NPC hiển thị đồ họa concept art sắc nét sống động.
+    * `2_interior_view.png`: Nội thất nhà rèn với Thợ Rèn Vulcan đứng cạnh đe và lò rèn, mái nhà và tường ẩn mượt mà.
+    * `3_npc_ui.png`: Hộp thoại tương tác hiển thị rõ ràng Avatar chân dung Thợ Rèn Vulcan cùng chức danh tiếng Việt và các nút hành động.
+    * `4_devtools_ui.png`: Bảng DevMode HUD đồ họa và chuyển đổi độ phân giải / FPS.
+  - Mắt thần soi trực tiếp 4 ảnh chụp màn hình bằng `read_file`: Đạt chuẩn 100% thẩm mỹ, chân thực so với ảnh concept mẫu.
+
 ## Phiên làm việc: 2026-11-08 (Lead 3D & Gameplay Integrator - Hoàn thiện toàn diện Bản Đồ Làng theo phác họa modelyeucau/map2/1.jpg)
 - **Trích xuất bảng màu & họa tiết thực tế (`tools/extract_palette_map2.py`)**:
   - Dùng Python PIL & numpy phân tích trực tiếp `modelyeucau/map2/1.jpg`, trích xuất chính xác mã màu Hex/RGB của cỏ xanh, đường đất, ngói đỏ, ngói teal, vách đá, thân gỗ, khói ma thuật cyan, lửa lò rèn cam vàng, bạt sọc đỏ trắng, và trang phục 8 NPC.

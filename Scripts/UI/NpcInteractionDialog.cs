@@ -13,6 +13,7 @@ public partial class NpcInteractionDialog : CanvasLayer
 
 	[ExportGroup("Tham Chiếu Controls")]
 	[Export] public Control? DialogPanel { get; set; }
+	[Export] public TextureRect? AvatarRect { get; set; }
 	[Export] public Label? NameLabel { get; set; }
 	[Export] public Label? ProfessionLabel { get; set; }
 	[Export] public Label? MessageLabel { get; set; }
@@ -84,6 +85,11 @@ public partial class NpcInteractionDialog : CanvasLayer
 
 	private void PopulateNpcInfo(NpcBehavior npc)
 	{
+		if (AvatarRect != null)
+		{
+			AvatarRect.Texture = npc.GetAvatarTexture();
+			AvatarRect.Visible = AvatarRect.Texture != null;
+		}
 		if (NameLabel != null) NameLabel.Text = npc.NpcName;
 		if (ProfessionLabel != null) ProfessionLabel.Text = $"[{npc.Profession.GetVietnameseTitle()}]";
 		if (MessageLabel != null) MessageLabel.Text = npc.Profession.GetDefaultGreeting();
@@ -130,8 +136,9 @@ public partial class NpcInteractionDialog : CanvasLayer
 	private void LocateControls()
 	{
 		DialogPanel ??= GetNodeOrNull<Control>("PanelContainer");
-		NameLabel ??= GetNodeOrNull<Label>("PanelContainer/VBox/Header/NameLabel");
-		ProfessionLabel ??= GetNodeOrNull<Label>("PanelContainer/VBox/Header/ProfLabel");
+		AvatarRect ??= GetNodeOrNull<TextureRect>("PanelContainer/VBox/Header/AvatarRect");
+		NameLabel ??= GetNodeOrNull<Label>("PanelContainer/VBox/Header/TitleBox/NameLabel");
+		ProfessionLabel ??= GetNodeOrNull<Label>("PanelContainer/VBox/Header/TitleBox/ProfLabel");
 		MessageLabel ??= GetNodeOrNull<Label>("PanelContainer/VBox/MessageLabel");
 		ActionsContainer ??= GetNodeOrNull<VBoxContainer>("PanelContainer/VBox/Scroll/ActionsList");
 		CloseButton ??= GetNodeOrNull<Button>("PanelContainer/VBox/CloseButton");

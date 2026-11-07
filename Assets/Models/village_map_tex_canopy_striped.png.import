@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3r4tvjp0nw3c"
-path="res://.godot/imported/village_map_tex_canopy_striped.png-30c340dd70e400ab3d10c9445392f586.ctex"
+path.s3tc="res://.godot/imported/village_map_tex_canopy_striped.png-30c340dd70e400ab3d10c9445392f586.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "160d2ab768ade95c43da60b36a22ea43"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://Assets/Models/village_map_tex_canopy_striped.png"
-dest_files=["res://.godot/imported/village_map_tex_canopy_striped.png-30c340dd70e400ab3d10c9445392f586.ctex"]
+dest_files=["res://.godot/imported/village_map_tex_canopy_striped.png-30c340dd70e400ab3d10c9445392f586.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
