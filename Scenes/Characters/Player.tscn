@@ -4,10 +4,14 @@
 [ext_resource type="PackedScene" uid="uid://8mty0la5evqd" path="res://Assets/Models_Exported/character_25d.glb" id="2_model"]
 [ext_resource type="Script" uid="uid://dic3neyglppy0" path="res://Scripts/Player/PlayerAnimation.cs" id="3_anim"]
 [ext_resource type="Script" path="res://Scripts/Player/PlayerInteractor.cs" id="4_interactor"]
+[ext_resource type="Script" path="res://Scripts/Player/PlayerCombat.cs" id="5_combat"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
 height = 1.8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_attack"]
+radius = 0.9
 
 [node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("VisualNode")]
 script = ExtResource("1_movement")
@@ -25,3 +29,17 @@ TargetCharacter = NodePath("..")
 
 [node name="PlayerInteractor" type="Area3D" parent="."]
 script = ExtResource("4_interactor")
+
+[node name="AttackArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 1.1)
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AttackArea"]
+shape = SubResource("SphereShape3D_attack")
+
+[node name="PlayerCombat" type="Node" parent="." node_paths=PackedStringArray("AttackArea", "TargetCharacter", "AnimationHandler")]
+script = ExtResource("5_combat")
+AttackArea = NodePath("../AttackArea")
+TargetCharacter = NodePath("..")
+AnimationHandler = NodePath("../PlayerAnimation")

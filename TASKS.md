@@ -1,32 +1,24 @@
-# BẢNG PHÂN CHIA CÔNG VIỆC (TASKS TRACKER)
+# KẾ HOẠCH & TIẾN ĐỘ DỰ ÁN (PROJECT TASKS)
 
-## 📌 Đã Hoàn Thành (Done)
-- [x] **[HUMAN]** Dựng model nhân vật `character_25d.blend` và xuất sang `character_25d.glb`.
-- [x] **[HUMAN]** Dựng bản đồ thế giới `map_25d.blend` và xuất sang `map_25d.glb`.
-- [x] **[AI - csharp-coder]** Viết `PlayerMovement.cs` (điều khiển vận tốc, gia tốc, nhảy, xoay mặt theo góc camera Isometric).
-- [x] **[AI - csharp-coder]** Viết `PlayerAnimation.cs` (tự động phát hoạt ảnh `Idle`, `Walk`, `Jump`).
-- [x] **[AI - csharp-coder]** Viết `MapAutoCollision.cs` (tự động tạo va chạm cho địa hình và cầu thang Blender).
-- [x] **[AI - csharp-coder]** Viết `CameraFollow.cs` (camera trượt mượt mà theo nhân vật chuẩn góc Isometric).
-- [x] **[AI - csharp-coder]** Tạo Scene hoàn chỉnh `Player.tscn` và `WorldMap.tscn`, đồng bộ mã UID và cấu hình Main Scene.
-- [x] **[AI - blender-helper]** Mở rộng thế giới 2.5D (84m x 84m): Cánh đồng, 4 dãy núi ranh giới, 45 tảng đá, 70 cây phong/thông, 90 bụi cỏ/hoa cúc (`map_surroundings.glb`).
-- [x] **[AI - code-reviewer]** Rà soát toàn diện dự án: 100% Clean Code, Guard Clauses, XML tiếng Việt, kiểm tra rò rỉ bộ nhớ, build 0 lỗi 0 cảnh báo.
-- [x] **[AI - producer]** Chuẩn hóa Git & Môi trường cộng tác: Cập nhật `.gitignore`, `.gitattributes`, `.editorconfig` (Allman style, LF/CRLF, binary 3D).
-- [x] **[AI - producer]** Dọn dẹp kho Git: Xóa file thừa/lỗi font `1.gitinore.txt`, untrack và dọn các file backup `*.blend1`.
-- [x] **[AI - producer]** Thiết lập tài liệu `README.md` chuyên nghiệp tại thư mục gốc và tạo hardlink đồng bộ sang dự án Godot.
-- [x] **[AI - producer]** Xây dựng tài liệu `docs/CONTRIBUTING.md` hướng dẫn quy trình cộng tác, branching strategy, PR template và giải quyết xung đột Scene Godot.
-- [x] **[AI - producer]** Nâng cấp mục 4 "Quy Trình Cộng Tác Nhóm" trong `README.md`: Hướng dẫn phân quyền cho Trưởng nhóm (Collaborators, bảo vệ nhánh `main`), quy trình thực hành 7 bước kèm khối lệnh bash cho thành viên, và sơ đồ Mermaid trực quan.
-- [x] **[HUMAN - AiichaN]** Đóng góp hệ thống tương tác NPC (`IInteractable`, `InteractableArea`, `SimpleNpc`), chống rơi vực (`VoidKillZone`), bộ dò tương tác (`PlayerInteractor`), Coyote Time, Jump Buffer, Anti-moonwalk, Procedural Animation, kịch bản test `test_suite.gd`.
-- [x] **[AI - code-reviewer]** Rà soát chất lượng mã nguồn nhánh `origin/dev`: phát hiện và sửa triệt để 3 nguy cơ rò rỉ bộ nhớ (memory leaks) trong `_ExitTree()`.
-- [x] **[AI - code-reviewer]** Sáp nhập (Merge) nhánh `origin/dev` vào `main`, giải quyết xung đột `WorldMap.tscn`, `.gitignore`, `PlayerAnimation.cs`, bảo tồn trọn vẹn mở rộng `Map_Surroundings`.
-- [x] **[AI - code-reviewer]** Chạy kiểm thử tự động Godot Headless `test_suite.gd` (32/32 tests Pass) và biên dịch `dotnet build` đạt 0 Warning 0 Error.
-- [x] **[AI - blender-helper]** Cải tạo bản đồ 3D: chỉ giữ lại 1 dãy núi phía Bắc hùng vĩ, xóa 3 dãy núi che tầm nhìn, đổi màu xanh cỏ cho nền gạch và làm phẳng kết nối đảo trung tâm.
-- [x] **[AI - code-reviewer]** Rà soát toàn bộ 9 file C# trong `Scripts/`: 100% hàm <= 19 dòng (< 25 dòng), file < 195 dòng (< 200 dòng), Guard Clauses, XML tiếng Việt, an toàn bộ nhớ trong `_ExitTree()`.
-- [x] **[AI - code-reviewer]** Kiểm định tự động chất lượng cao: Biên dịch `dotnet build` đạt 0 Warning 0 Error và chạy Godot Headless `test_suite.gd` đạt 53/53 test cases Passed (100%).
-- [x] **[AI - blender-helper]** Cải tạo mô hình 3D bản đồ: Gán vật liệu Mat_Grass kèm texture tex_grass_grid.png và UV phẳng cho SM_Tier2_Pavers, mở rộng mép tiếp giáp về Y=6.99m đóng kín khe hở bậc thềm 3.6cm, extrude độ dày 0.42m thành khối 3D đặc chống xuyên vật lý, xuất map_25d.glb và lưu an toàn map_25d_fixed.blend. (Test suite: 66/66 Pass).
-- [x] **[AI - csharp-coder]** Bổ sung tính năng Zoom Camera bằng con lăn chuột (`CameraFollow.cs`), đưa NPC xuống mặt đất và hoàn thiện hội thoại (`SimpleNpc.cs`, `WorldMap.tscn`).
-- [x] **[AI - csharp-coder]** Xây dựng Chế Độ Dev (Dev Mode / Debug Overlay HUD - `DevOverlay.cs`, `DevPlayerTab.cs`, `DevNpcTab.cs`): phím tắt `F1`/`~`/`F3`, tinh chỉnh `MoveSpeed`, `JumpVelocity`, `Gravity`, `InfiniteJump`, dịch chuyển tức thời `TeleportTo`, Live Dialogue Editor sửa câu thoại NPC trực tiếp khi chơi, slider zoom camera, hiển thị FPS & tọa độ Player theo thời gian thực. (Build 0 lỗi 0 cảnh báo, 66/66 test cases Pass).
-- [x] **[AI - csharp-coder]** Tái thiết ánh sáng môi trường (ACES Tonemap, ProceduralSky dịu mát, SSAO, bóng đổ PSSM) và xây dựng hệ thống dốc va chạm phẳng `StairRampBuilder` (`ConvexPolygonShape3D`) + `FloorMaxAngle >= 58°` giúp leo cầu thang trơn tru. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
-- [x] **[AI - blender-helper]** Khắc phục lỗi đất xung quanh trắng xóa: Gán vật liệu cỏ xanh `Mat_Grass_Plain` (#529934) kèm texture `tex_grass_grid.png` đóng gói và UV mapping planar projection `(x/4, y/4)` cho `Terrain_Plains_Mesh` trong `map_surroundings.blend`, xuất `map_surroundings.glb`; đo đạc chính xác AABB, bước bậc và độ dốc (51.11° & 57.12°) của 2 cầu thang `SM_Staircase_01` & `SM_Staircase_02` trong `map_25d_fixed.blend`. (Build 0 lỗi 0 cảnh báo, 91/91 test cases Pass).
+Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân định rõ ràng giữa phần việc của **Người dùng (Human)** và các **Sub-agent AI**.
+
+---
+
+## 📋 Trạng Thái Tiến Độ Hiện Tại
+
+- [x] **[AI - csharp-coder]** Khởi tạo nhân vật Player 2.5D dạng khối hộp (`CharacterBody3D`) với chuyển động 8 hướng mượt mà, quán tính gia tốc / giảm tốc, nhảy và trọng lực (`PlayerMovement.cs`).
+- [x] **[AI - csharp-coder]** Hoạt họa nhân vật Player bằng `AnimationPlayer` và `Sprite3D` (Idle, Walk, Jump, Fall) xoay hướng theo chiều di chuyển (`PlayerAnimation.cs`).
+- [x] **[AI - csharp-coder]** Camera Isometric 2.5D bám theo Player mượt mà qua hàm `Lerp`, có góc nghiêng chuẩn 45° và độ trễ êm ái (`CameraFollow.cs`).
+- [x] **[AI - csharp-coder]** Xây dựng hệ thống NPC tương tác (`IInteractable`, `InteractableArea.cs`, `SimpleNpc.cs`), phạm vi kích hoạt tương tác khi Player đến gần và nhấn phím tương tác.
+- [x] **[AI - csharp-coder]** Hiển thị bóng thoại / nhãn 3D billboard trên đầu NPC với nội dung hội thoại, tự động xoay theo camera và biến mất sau khoảng thời gian cấu hình.
+- [x] **[AI - csharp-coder]** Hệ thống Dev Mode HUD toàn năng (`F1`, phím `~` hoặc phím `Select` trên Gamepad):
+  - Tab 1: **Nhân vật (Player Tweaks)** - Tinh chỉnh trực tiếp tốc độ, lực nhảy, trọng lực, gia tốc, tự động hồi sinh.
+  - Tab 2: **Hội thoại (Dialogue Editor)** - Chỉnh sửa lời thoại NPC trực tiếp khi đang chạy game, thêm câu thoại mới, phát thử câu thoại.
+  - Tab 3: **Thế giới & Camera (World & Camera)** - Chuyển đổi qua lại giữa camera Isometric và **Camera Tự Do 6-DOF (Free Cam)**, đóng băng chuyển động nhân vật (**Freeze Player**), tinh chỉnh trường nhìn (FOV), tốc độ bay, bật/tắt lưới tọa độ.
+- [x] **[AI - csharp-coder]** Tự động phát hiện và gán va chạm địa hình (`MapAutoCollision.cs`), sinh `CollisionShape3D` dạng Trimesh cho toàn bộ bề mặt di chuyển trong Scene `WorldMap.tscn`.
+- [x] **[AI - csharp-coder]** Khắc phục triệt để hiện tượng Player bị kẹt / cản trở tại các mép bậc thang vuông góc 90° bằng script `StairRampBuilder.cs`, tự động dựng dốc nghiêng ConvexPolygonShape3D vô hình phủ trên các bậc thang.
+- [x] **[AI - csharp-coder]** Vực sâu tự cứu sinh (`VoidKillZone.cs`): Tự động phát hiện khi Player rơi khỏi đảo lơ lửng xuống dưới độ cao an toàn, triệt tiêu gia tốc rơi và đưa Player trở lại điểm xuất phát an toàn.
+- [x] **[AI - code-reviewer]** Rà soát toàn bộ codebase theo chuẩn Clean Code: Mỗi hàm dưới 25 dòng, mỗi file dưới 200 dòng, XML comment tiếng Việt, biến `[Export]` tường minh, bảo đảm biên dịch `dotnet build` 0 lỗi 0 cảnh báo.
 - [x] **[AI - blender-helper]** Loại bỏ phông nền trắng khổng lồ: Xóa object `SM_Sky_Backdrop_Plane` và vật liệu `Mat_Sky_Gradient` khỏi `map_25d_fixed.blend`, xuất `map_25d.glb` chuẩn Godot, bảo tồn nguyên vẹn 100% file gốc `map_25d.blend` và các thành phần khác, giải phóng tầm nhìn thông thoáng cho bầu trời Procedural Sky. (Build 0 lỗi 0 cảnh báo, 92/92 test cases Pass).
 - [x] **[AI - blender-helper]** Mở rộng đài cao tầng 2 gấp 6.8x diện tích (**2.60m x 2.41m**), khép kín 0 gap với đỉnh thang `SM_Staircase_02`, tái thiết hàng rào gỗ 9 cột quanh 3 mặt Tây-Bắc-Đông chừa lối vào thang rộng 1.24m; tạo texture cỏ mịn tự nhiên không vết kẻ ô vuông `tex_grass_clean.png` (#529934) đồng bộ toàn bản đồ; xóa bỏ 5 chóp núi nón tím chen chúc chắn tầm nhìn đài cao, giải phóng bầu trời thoáng đãng. (Build 0 lỗi 0 cảnh báo, 128/128 test cases Pass).
 - [x] **[AI - csharp-coder]** Triển khai Chế Độ Camera Tự Do (Free Cam 6-DOF - `FreeCameraController.cs`, `CameraFollow.cs`, `DevWorldTab.cs`), tích hợp cơ chế Freeze Player khóa nhân vật đứng im hoàn toàn khi đang bay Free Cam, tích hợp tay cầm Gamepad toàn diện cho gameplay và Dev HUD. (Build 0 lỗi 0 cảnh báo, 131/131 test cases Pass).
@@ -34,13 +26,14 @@
 - [x] **[AI - texture-architect]** Khởi tạo hệ thống Texture & Material dùng chung nền tảng (`Assets/Textures/`, `Assets/Materials_Shared/`, `TEXTURE_CATALOG.md`), tối ưu VRAM và chống phân mảnh tài nguyên.
 - [x] **[AI - csharp-coder]** Chuẩn hóa vật liệu Player (`M_Character_Body.tres`, `M_Character_Face.tres`), refactor `MapAutoCollision.cs` tải và gán trực tiếp shared materials cho toàn bộ mesh địa hình/đường đất/rào gỗ/núi tím/đá tảng trên Map, mở rộng `test_suite.gd` đạt 193/193 test cases Passed (100%).
 - [x] **[AI - blender-helper]** Áp dụng bộ texture nền tảng mới vào Map trong Blender (cỏ `tex_grass_seamless.png`, đất `tex_dirt_seamless.png`, gỗ `tex_wood_seamless.png`, đá `tex_rock_seamless.png`), sinh planar UV cho đường đất và smart UV cho cầu thang/biển báo, đóng gói vào `map_25d_fixed.blend` và `map_surroundings.blend`, xuất `map_25d.glb` và `map_surroundings.glb` chuẩn Godot, mở rộng `test_suite.gd` đạt 203/203 tests Pass (100%).
+- [x] **[AI - agy-customizations & producer]** Hoàn thiện cấu hình Workspace Antigravity CLI theo chuẩn Local Scope: Nâng cấp 5 kỹ năng chính (`.agents/skills/{skill_name}/SKILL.md`) và checkpoint với natural-language triggers song ngữ, làm phong phú `Assets/Textures/TEXTURE_CATALOG.md` với định dạng/mục đích/hướng dẫn tái sử dụng, cập nhật `AGENTS.md` và `GEMINI.md`, loại bỏ đường dẫn tuyệt đối, xác thực `dotnet build` 0 lỗi 0 cảnh báo và 203/203 test cases Passed.
+- [x] **[AI - csharp-coder]** Triển khai Hệ Thống Tấn Công Cơ Bản (`PlayerCombat.cs`, `IDamageable.cs`, `DummyTarget.cs`): Kích hoạt hoạt ảnh `Attack` từ `character_25d.glb`, cấu hình phím tấn công (Chuột trái, Phím J, Gamepad X), hitbox `AttackArea` quét đa mục tiêu, hủy sự kiện `-=` trong `_ExitTree()`, mở rộng `test_suite.gd` đạt 223/223 test cases Passed (100%).
 
 ---
 
 ## 🎯 Việc Cần Làm Tiếp Theo (Backlog / Next Steps)
 
 ### Phân Nhóm 1: Gameplay & Lập Trình (AI / Developer)
-- [ ] **[AI - csharp-coder]** Lập trình hệ thống đòn đánh / tấn công cơ bản (`PlayerCombat.cs`) sử dụng animation `Attack` có sẵn trong model `character_25d.glb`.
 - [ ] **[AI - csharp-coder]** Lập trình thanh máu, thể lực hoặc giao diện UI cơ bản (`Scripts/UI/`).
 - [ ] **[AI - csharp-coder]** Lập trình AI cho quái vật tuần tra và tấn công (`Scripts/Enemies/`).
 - [ ] **[AI - code-reviewer]** Rà soát Clean Code và kiểm tra build `dotnet build` sau mỗi tính năng mới.

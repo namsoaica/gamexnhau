@@ -353,3 +353,35 @@
 
 
 
+
+## Phiên làm việc: 2026-11-07 (Tối - Cấu Hình Toàn Diện Workspace Antigravity CLI Theo Chuẩn Local Scope)
+- **Thực thi nguyên tắc Strict Local Scope**:
+  - Giữ toàn bộ rules, skills, agents, workflows và manifest trong nội bộ workspace `gamexnhau`. Không truy cập hay sửa đổi bất kỳ tài nguyên toàn cục nào (`~/.gemini/`).
+- **Nâng cấp và Chuẩn hóa 5 Kỹ Năng Chính + Kỹ Năng Phụ Trợ (`.agents/skills/`)**:
+  - `csharp-coder`: Bổ sung mô tả kích hoạt tự nhiên song ngữ (Anh/Việt), chuyển sang đường dẫn tương đối dự án, ràng buộc Clean Code theo `docs/CODING_STANDARDS.md` (< 25 dòng/hàm, < 200 dòng/file, hủy `-=` trong `_ExitTree()`, `dotnet build` 0 lỗi 0 cảnh báo).
+  - `code-reviewer`: Rà soát chất lượng code, kiểm định độ dài hàm/file, an toàn bộ nhớ và lệnh biên dịch.
+  - `producer`: Quản lý tiến độ, phân chia việc giữa Human và AI, đồng bộ hóa `docs/TASKS.md` và `docs/PROJECT_STATE.md`.
+  - `blender-helper`: Tự động tìm `blender.exe` linh hoạt (PATH / Program Files Blender 5.2), cấm nhúng texture trùng lặp vào `.glb`, bảo vệ tuyệt đối `.blend` gốc.
+  - `texture-architect`: Cây quyết định 3 bước tối ưu VRAM, chuẩn ảnh lũy thừa 2, quản lý `TEXTURE_CATALOG.md`.
+  - `checkpoint`: Tự động quét và đóng gói trạng thái phiên làm việc.
+- **Nâng cấp Danh mục Tài nguyên Dùng chung (`Assets/Textures/TEXTURE_CATALOG.md`)**:
+  - Bổ sung định dạng (PNG RGBA8, Godot StandardMaterial3D .tres), mục đích sử dụng và hướng dẫn chi tiết cho từng tài nguyên Palettes, Grayscale Masks, Tileable Seamless và Shared Materials.
+  - Tích hợp nguyên tắc bắt buộc: `@texture-architect` và `@blender-helper` phải tra cứu catalog trước khi thao tác và cập nhật ngay khi tài nguyên thay đổi.
+- **Đồng bộ hóa Quy tắc Workspace (`AGENTS.md` & `GEMINI.md`)**:
+  - Thống nhất quy tắc Orchestrator, luồng điều phối tự động theo yêu cầu tự nhiên, và quy chuẩn kỹ thuật cho Sub-agents.
+- **Kiểm định chất lượng & Hồi quy**:
+  - `dotnet build "Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Godot 4.7.2 Headless `test_suite.gd`: **203 / 203 Test cases Passed (100% Pass, 0 Fail)**.
+
+## Phiên làm việc: 2026-11-08 (Rạng sáng - Triển Khai Hệ Thống Tấn Công Cơ Bản PlayerCombat)
+- **Triển khai Hệ thống Tấn công & Hitbox**:
+  - Tạo `Scripts/Core/IDamageable.cs` và `Scripts/Core/DummyTarget.cs`.
+  - Tạo `Scripts/Player/PlayerCombat.cs` và cập nhật `Scripts/Player/PlayerAnimation.cs`.
+  - Bổ sung node `AttackArea` và `PlayerCombat` vào `Scenes/Characters/Player.tscn`.
+  - Thêm hành động `attack` vào `project.godot` (Chuột trái / Phím J / Gamepad X).
+- **Tuân thủ Clean Code & Memory Safety**:
+  - Toàn bộ các file `.cs` đều dưới 170 dòng (< 200 dòng), các hàm < 25 dòng.
+  - Hủy đăng ký sự kiện `-=` trong `PlayerCombat._ExitTree()`.
+- **Kiểm định chất lượng & Test Suite**:
+  - `dotnet build "Dự án Trò chơi Mới.csproj"`: **Build succeeded. 0 Warning(s), 0 Error(s)**.
+  - Chạy `test_suite.gd`: **223 / 223 Test cases Passed (100% Pass, 0 Fail)**.
