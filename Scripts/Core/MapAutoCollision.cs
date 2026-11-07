@@ -24,6 +24,7 @@ public partial class MapAutoCollision : Node
 	private StandardMaterial3D? _matRoofRed;
 	private StandardMaterial3D? _matRoofTeal;
 	private StandardMaterial3D? _matCanopy;
+	private StandardMaterial3D? _matCobble;
 	private StandardMaterial3D? _matMysticCyan;
 	private StandardMaterial3D? _matLavaFire;
 
@@ -48,6 +49,7 @@ public partial class MapAutoCollision : Node
 		_matRoofRed = null;
 		_matRoofTeal = null;
 		_matCanopy = null;
+		_matCobble = null;
 		_matMysticCyan = null;
 		_matLavaFire = null;
 	}
@@ -64,6 +66,7 @@ public partial class MapAutoCollision : Node
 		_matRoofRed = LoadSharedMaterial($"{SharedMaterialsDir}M_Roof_Tiles_Red.tres");
 		_matRoofTeal = LoadSharedMaterial($"{SharedMaterialsDir}M_Roof_Tiles_Teal.tres");
 		_matCanopy = LoadSharedMaterial($"{SharedMaterialsDir}M_Canopy_Striped.tres");
+		_matCobble = LoadSharedMaterial($"{SharedMaterialsDir}M_Stone_Cobble.tres");
 		_matMysticCyan = LoadSharedMaterial($"{SharedMaterialsDir}M_Mystic_Cyan.tres");
 		_matLavaFire = LoadSharedMaterial($"{SharedMaterialsDir}M_Lava_Fire.tres");
 	}
@@ -120,6 +123,7 @@ public partial class MapAutoCollision : Node
 			"RoofTeal" => _matRoofTeal,
 			"RoofRed" => _matRoofRed,
 			"Canopy" => _matCanopy,
+			"Cobble" => _matCobble,
 			"Metal" => _matMetal,
 			"WoodFence" => _matWoodFence,
 			"Wood" => _matWood,

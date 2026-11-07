@@ -35,6 +35,9 @@
 | `tex_wood_seamless.png` | `res://Assets/Textures/Tileable/tex_wood_seamless.png` | PNG (RGBA8) | 512x512 | **Vân gỗ sồi tự nhiên** (`#A8764A`); dùng lát sàn gỗ, thùng hàng, xe ngựa, hàng rào đài cao, nhịp cầu gỗ. |
 | `tex_metal_seamless.png` | `res://Assets/Textures/Tileable/tex_metal_seamless.png` | PNG (RGBA8) | 512x512 | **Mặt kim loại phay xước nhẹ Stylized ánh bạc**; dùng cho chấn song, đường ray, rương báu kim loại, máy móc. |
 | `tex_canopy_striped.png` | `res://Assets/Textures/Tileable/tex_canopy_striped.png` | PNG (RGBA8) | 128x128 | **Bạt sọc đỏ-trắng Stylized** (`#DA3028` và trắng kem); dùng cho mái che lều sạp chợ, xe hàng. |
+| `tex_roof_tiles_red.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_red.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy đỏ cam Stylized** (`#A83828`), viền vát bắt sáng và bóng rãnh; dùng cho mái nhà rèn, quán ăn, nhà dân. |
+| `tex_roof_tiles_teal.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_teal.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy xanh ngọc teal** (`#268C82`); dùng cho mái nhà giả kim huyền bí. |
+| `tex_stone_cobble.png` | `res://Assets/Textures/Tileable/tex_stone_cobble.png` | PNG (RGB8) | 256x256 | **Đá cuội gạch xây Stylized** (`#686C70`); dùng cho lò rèn, ống khói, giếng nước, lò nướng bánh. |
 
 ---
 
@@ -56,8 +59,9 @@
 | `M_Palette_Stylized.tres` | `res://Assets/Materials_Shared/M_Palette_Stylized.tres` | `palette_standard_stylized.png` | Chuẩn dùng chung cho toàn bộ Model Blender UV Palette. Roughness 0.60. |
 | `M_Character_Body.tres` | `res://Assets/Materials_Shared/M_Character_Body.tres` | `character_box_texture.png` | Chuẩn vật liệu thân nhân vật Player / NPC Box. Roughness 0.60. |
 | `M_Character_Face.tres` | `res://Assets/Materials_Shared/M_Character_Face.tres` | `character_face.png` | Chuẩn vật liệu khuôn mặt nhân vật Player. Roughness 0.60. |
-| `M_Roof_Tiles_Red.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Red.tres` | `mask_rock_detail.png` | Mái ngói đỏ cam nhà rèn & nhà dân. Albedo `Color(0.78, 0.28, 0.22, 1)`, Roughness 0.80, UV Scale 3x. |
-| `M_Roof_Tiles_Teal.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Teal.tres` | `mask_rock_detail.png` | Mái ngói xanh ngọc teal nhà giả kim. Albedo `Color(0.18, 0.55, 0.52, 1)`, Roughness 0.80, UV Scale 3x. |
+| `M_Roof_Tiles_Red.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Red.tres` | `tex_roof_tiles_red.png` | Mái ngói đỏ cam nhà rèn & nhà dân. Triplanar UV, Albedo trắng thuần, Roughness 0.75. |
+| `M_Roof_Tiles_Teal.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Teal.tres` | `tex_roof_tiles_teal.png` | Mái ngói xanh ngọc teal nhà giả kim. Triplanar UV, Albedo trắng thuần, Roughness 0.75. |
+| `M_Stone_Cobble.tres` | `res://Assets/Materials_Shared/M_Stone_Cobble.tres` | `tex_stone_cobble.png` | Đá cuội lò rèn, ống khói, giếng đá, lò nướng. Triplanar UV, Roughness 0.80. |
 | `M_Canopy_Striped.tres` | `res://Assets/Materials_Shared/M_Canopy_Striped.tres` | `tex_canopy_striped.png` | Mái bạt sọc đỏ trắng sạp chợ. Roughness 0.85. |
 | `M_Mystic_Cyan.tres` | `res://Assets/Materials_Shared/M_Mystic_Cyan.tres` | N/A (Emission) | Vạc ma thuật, khói phép thuật. Albedo `Color(0.2, 0.85, 0.8, 0.85)`, Emission x2.0 cyan. |
 | `M_Lava_Fire.tres` | `res://Assets/Materials_Shared/M_Lava_Fire.tres` | N/A (Emission) | Lửa lò rèn, lò nướng bánh, lò luyện quặng. Albedo `Color(1.0, 0.45, 0.05, 1)`, Emission x2.5 vàng cam. |

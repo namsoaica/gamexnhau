@@ -73,6 +73,15 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (4) **Đối chiếu song song với ảnh gốc** (Side-by-Side Visual Diff): Mắt thần mở song song ảnh gốc trong `modelyeucau/` và ảnh chụp màn hình trong game để so sánh màu sắc, hoa văn, triệt tiêu mọi vật thể bị trơn màu phẳng hoặc mất material.
   - (5) **Quy Chuẩn Dựng Nhân Vật 3D & Animation (Character & Rigging Pipeline)**: Dựng tách bộ phận cơ thể (`Head`, `Torso`, `Arm_L/R`, `Leg_L/R`, `Weapon_Slot`), căn chỉnh tâm xoay (Pivot/Origin) đúng khớp vai/háng/cổ, bo tròn `bmesh`, lấy mẫu màu trang phục/mặt từ ảnh mẫu, tạo sẵn 4 Actions animation cơ bản (`Idle`, `Walk`, `Run`, `Attack`/`Work`), và render `_char_preview.png` đối chiếu tỷ lệ 1.8m trước khi đưa vào Godot.
   - Đã cập nhật đồng bộ toàn diện: `.agents/skills/texture-architect/SKILL.md`, `.agents/skills/blender-helper/SKILL.md`, `AGENTS.md`, và `GEMINI.md`.
+- [x] **[AI - Lead 3D & Gameplay Integrator]** Hoàn thiện toàn diện dự án game theo ảnh phác họa `modelyeucau/map2/1.jpg`:
+  - (1) Trích xuất bảng màu thật bằng Python PIL/numpy (`tools/extract_palette_map2.py`) lưu `Assets/Textures/extracted_map2_palette.py`.
+  - (2) Sinh 3 Texture Tileable chất lượng cao: `tex_roof_tiles_red.png` (ngói đỏ cam), `tex_roof_tiles_teal.png` (ngói xanh ngọc), `tex_stone_cobble.png` (đá cuội lò rèn/ống khói/giếng), xuất 3 ảnh kiểm tra mép nối 2x2.
+  - (3) Nâng cấp `tools/blender_kit.py` với giao thức `unwrap_mesh` bắt buộc cho mọi mesh, tạo vật liệu liên kết ảnh texture tileable, cấu hình setup preview render trực diện Isometric.
+  - (4) Hoàn thiện `Assets/Blender_Source/build_village_map.py`: Nội thất 4 phòng (Nhà Rèn có giá vũ khí, đe, rương than, rương sắt vụn, máng nước, lò rèn than hồng; Nhà Giả Kim có vạc thuốc phát sáng, kệ sách ma thuật, chai lọ độc dược, khói ma thuật uốn lượn; Quán Ăn có lò nướng bánh, bàn ăn dài, 2 ghế băng, giỏ bánh baguette; Nhà Dân có giường nệm đỏ gối trắng, tủ áo, thảm sọc, bàn ghế); 8 cụm đạo cụ đặc trưng cho 8 NPC (Vulcan, Aria, Gusteau, George, Finn, Brock, Grover, Aegis).
+  - (5) Xuất `Assets/Models/village_map.glb` (1.87 MB) và lưu an toàn `Assets/Blender_Source/village_map.blend`.
+  - (6) Render mắt thần `Assets/Models/_preview_render.png`, `Assets/Models/_char_preview.png` và ảnh bọc thử 3D `docs/test_screenshots/_texture_3d_check.png`.
+  - (7) Nâng cấp `MaterialCatalogHelper.cs` và `MapAutoCollision.cs`: Ánh xạ vật liệu sàn, lò rèn, đá cuội `M_Stone_Cobble.tres`, ưu tiên lá cây `foliage` xanh mát.
+  - (8) Biên dịch `dotnet build` đạt 0 lỗi 0 cảnh báo; chạy Windowed Visual Playtest `test_suite.gd` đạt **372/372 Passed (100%)**, chụp và tự soi 4 ảnh màn hình thực tế đạt chuẩn thẩm mỹ cao.
 
 ---
 

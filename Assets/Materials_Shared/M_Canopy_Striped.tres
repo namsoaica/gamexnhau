@@ -6,3 +6,5 @@
 albedo_texture = ExtResource("1_tex_canopy")
 roughness = 0.85
 texture_filter = 1
+uv1_scale = Vector3(2, 2, 2)
+uv1_triplanar = true

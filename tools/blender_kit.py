@@ -3,9 +3,11 @@ Thư Viện Procedural Chuẩn Cho Blender 3D (tools/blender_kit.py)
 Dự án: Trò Chơi Mới - Antigravity Pipeline
 Quy chuẩn:
 - Cấm dùng primitive thô sơ (No Raw Primitives).
-- Sử dụng bmesh, Blender Modifiers (Bevel 2-3 segments, Solidify, Displace).
+- Bắt buộc trải UV tự động (unwrap_mesh) cho TẤT CẢ các mesh tạo ra.
+- Sử dụng bmesh, Blender Modifiers (Bevel 2-3 segments bo viền bắt sáng, Solidify, Displace).
+- Gán vật liệu Principled BSDF liên kết Texture Seamless (thớ gỗ, thớ đá, bạt sọc, vân đất, ngói đỏ, ngói teal).
 - Tự động căn chỉnh AABB (snap_to_ground, stack_on_top) chống bay lơ lửng / đâm xuyên.
-- Hỗ trợ cơ chế Mắt Thần Tự Kiểm Tra (setup_preview_render xuất _preview_render.png).
+- Hỗ trợ cơ chế Mắt Thần Tự Kiểm Tra (setup_preview_render xuất _preview_render.png, _char_preview.png, _texture_3d_check.png).
 """
 
 import bpy
@@ -45,11 +47,39 @@ def clean_scene():
             bpy.data.materials.remove(block)
 
 # ==============================================================================
-# 2. VẬT LIỆU & SHADING
+# 2. TRẢI UV TỰ ĐỘNG BẮT BUỘC (AUTO UV UNWRAP PROTOCOL)
 # ==============================================================================
 
-def create_material(name, color, roughness=0.7, metallic=0.0, emission_color=None, emission_strength=0.0):
-    """Tạo vật liệu Principled BSDF hỗ trợ màu sắc, độ nhám, kim loại và phát sáng."""
+def unwrap_mesh(obj, project_type='cube', cube_size=1.0):
+    """
+    Bắt buộc trải UV tự động (cube_project hoặc smart_project) cho Mesh.
+    Xóa bỏ hoàn toàn tình trạng mất UV hoặc bệt màu.
+    """
+    if obj is None or obj.type != 'MESH':
+        return
+    try:
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        if project_type == 'smart':
+            bpy.ops.uv.smart_project(angle_limit=math.radians(66.0), island_margin=0.02)
+        else:
+            bpy.ops.uv.cube_project(cube_size=cube_size)
+        bpy.ops.object.mode_set(mode='OBJECT')
+    except Exception as e:
+        print(f"[blender_kit] unwrap_mesh warning on {obj.name}: {e}")
+        try:
+            bpy.ops.object.mode_set(mode='OBJECT')
+        except Exception:
+            pass
+
+# ==============================================================================
+# 3. VẬT LIỆU & SHADING CÓ TEXTURE SEAMLESS
+# ==============================================================================
+
+def create_material(name, color, roughness=0.7, metallic=0.0, emission_color=None, emission_strength=0.0, texture_path=None):
+    """Tạo vật liệu Principled BSDF hỗ trợ màu sắc, độ nhám, kim loại, phát sáng và Texture Image."""
     mat = bpy.data.materials.get(name)
     if mat is None:
         mat = bpy.data.materials.new(name=name)
@@ -59,7 +89,7 @@ def create_material(name, color, roughness=0.7, metallic=0.0, emission_color=Non
     nodes.clear()
     
     node_output = nodes.new(type='ShaderNodeOutputMaterial')
-    node_output.location = (300, 0)
+    node_output.location = (450, 0)
     
     node_bsdf = nodes.new(type='ShaderNodeBsdfPrincipled')
     node_bsdf.location = (0, 0)
@@ -67,6 +97,16 @@ def create_material(name, color, roughness=0.7, metallic=0.0, emission_color=Non
     node_bsdf.inputs['Roughness'].default_value = roughness
     node_bsdf.inputs['Metallic'].default_value = metallic
     
+    if texture_path and os.path.exists(texture_path):
+        try:
+            img = bpy.data.images.load(os.path.abspath(texture_path), check_existing=True)
+            node_tex = nodes.new(type='ShaderNodeTexImage')
+            node_tex.location = (-400, 0)
+            node_tex.image = img
+            mat.node_tree.links.new(node_tex.outputs['Color'], node_bsdf.inputs['Base Color'])
+        except Exception as e:
+            print(f"[blender_kit] Lỗi tải texture {texture_path}: {e}")
+            
     if emission_color and emission_strength > 0:
         if 'Emission Color' in node_bsdf.inputs:
             node_bsdf.inputs['Emission Color'].default_value = (emission_color[0], emission_color[1], emission_color[2], 1.0)
@@ -84,14 +124,11 @@ def apply_auto_smooth(obj, angle_deg=35.0):
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
     bpy.ops.object.shade_smooth()
-    # Kiểm tra hỗ trợ auto smooth trên Blender 4.x / 5.x
     if hasattr(obj.data, "use_auto_smooth"):
         obj.data.use_auto_smooth = True
         obj.data.auto_smooth_angle = math.radians(angle_deg)
     else:
-        # Blender 4.1+ dùng Geometry Nodes modifier Smooth by Angle
         mod = obj.modifiers.new(name="SmoothByAngle", type='NODES')
-        # Nếu có node group mặc định
         try:
             bpy.ops.object.modifier_set_active(modifier="SmoothByAngle")
         except Exception:
@@ -114,7 +151,7 @@ def add_solidify_modifier(obj, thickness=0.15):
     return mod
 
 # ==============================================================================
-# 3. CĂN CHỈNH TỰ ĐỘNG AABB (BOUNDING BOX HELPERS)
+# 4. CĂN CHỈNH TỰ ĐỘNG AABB (BOUNDING BOX HELPERS)
 # ==============================================================================
 
 def get_world_bounds(obj):
@@ -137,11 +174,11 @@ def stack_on_top(child_obj, base_obj, offset_z=0.0):
     snap_to_ground(child_obj, ground_z=base_max.z + offset_z)
 
 # ==============================================================================
-# 4. CÁC HÀM DỰNG HÌNH PROCEDURAL NÂNG CAO (BMESH BUILDERS)
+# 5. CÁC HÀM DỰNG HÌNH PROCEDURAL NÂNG CAO (BMESH BUILDERS)
 # ==============================================================================
 
-def create_beveled_box(name, size, location, bevel_width=0.04, rotation=(0, 0, 0), material=None):
-    """Tạo khối hộp có vát cạnh bắt sáng (Bevel) chuẩn tỷ lệ."""
+def create_beveled_box(name, size, location, bevel_width=0.04, rotation=(0, 0, 0), material=None, unwrap=True):
+    """Tạo khối hộp có vát cạnh bắt sáng (Bevel) chuẩn tỷ lệ và trải UV tự động."""
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0))
     obj = bpy.context.active_object
     obj.name = name
@@ -150,6 +187,9 @@ def create_beveled_box(name, size, location, bevel_width=0.04, rotation=(0, 0, 0
     obj.rotation_euler = (rotation[0], -rotation[2], rotation[1])
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     
+    if unwrap:
+        unwrap_mesh(obj, project_type='cube', cube_size=1.0)
+        
     if bevel_width > 0:
         add_bevel_modifier(obj, width=bevel_width, segments=2)
     apply_auto_smooth(obj)
@@ -158,8 +198,8 @@ def create_beveled_box(name, size, location, bevel_width=0.04, rotation=(0, 0, 0
         obj.data.materials.append(material)
     return obj
 
-def create_beveled_cylinder(name, radius, depth, location, bevel_width=0.02, rotation=(0, 0, 0), vertices=16, material=None):
-    """Tạo hình trụ thẳng đứng có bo cạnh trên/dưới."""
+def create_beveled_cylinder(name, radius, depth, location, bevel_width=0.02, rotation=(0, 0, 0), vertices=16, material=None, unwrap=True):
+    """Tạo hình trụ thẳng đứng có bo cạnh trên/dưới và trải UV tự động."""
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=vertices,
         radius=radius,
@@ -172,6 +212,9 @@ def create_beveled_cylinder(name, radius, depth, location, bevel_width=0.02, rot
     obj.rotation_euler = (rotation[0], -rotation[2], rotation[1])
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     
+    if unwrap:
+        unwrap_mesh(obj, project_type='cube', cube_size=1.0)
+        
     if bevel_width > 0:
         add_bevel_modifier(obj, width=bevel_width, segments=2)
     apply_auto_smooth(obj, angle_deg=45.0)
@@ -181,7 +224,7 @@ def create_beveled_cylinder(name, radius, depth, location, bevel_width=0.02, rot
     return obj
 
 def build_chamfered_rock(name, size, location, material=None, seed_val=42):
-    """Dựng tảng đá tự nhiên vát cạnh Low-Poly phong cách Isometric."""
+    """Dựng tảng đá tự nhiên vát cạnh Low-Poly phong cách Isometric và trải UV tự động."""
     random.seed(seed_val)
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     obj = bpy.data.objects.new(name, mesh)
@@ -207,6 +250,7 @@ def build_chamfered_rock(name, size, location, material=None, seed_val=42):
     obj.scale = godot_to_blender_size(*size)
     obj.location = godot_to_blender_pos(*location)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    unwrap_mesh(obj, project_type='smart')
     apply_auto_smooth(obj, angle_deg=40.0)
     
     if material:
@@ -225,12 +269,12 @@ def build_stylized_tree(name, location, scale=1.0, mat_wood=None, mat_foliage=No
     # Tán lá tầng 1
     f1_r = 1.45 * scale
     f1_y = gy + trunk_h + 0.3 * scale
-    f1 = build_chamfered_rock(f"{name}_Foliage1", (f1_r * 2, f1_r * 1.5, f1_r * 2), (gx, f1_y, gz), material=mat_foliage, seed_val=int(gx * 10))
+    f1 = build_chamfered_rock(f"{name}_Foliage1", (f1_r * 2, f1_r * 1.5, f1_r * 2), (gx, f1_y, gz), material=mat_foliage, seed_val=int(abs(gx) * 10 + 1))
     
     # Tán lá tầng 2 lệch nhẹ tự nhiên
     f2_r = 1.05 * scale
     f2_y = f1_y + 0.85 * scale
-    f2 = build_chamfered_rock(f"{name}_Foliage2", (f2_r * 2, f2_r * 1.4, f2_r * 2), (gx + 0.18 * scale, f2_y, gz - 0.15 * scale), material=mat_foliage, seed_val=int(gz * 10))
+    f2 = build_chamfered_rock(f"{name}_Foliage2", (f2_r * 2, f2_r * 1.4, f2_r * 2), (gx + 0.18 * scale, f2_y, gz - 0.15 * scale), material=mat_foliage, seed_val=int(abs(gz) * 10 + 2))
     return f1, f2
 
 def build_detailed_roof_gabled(name, width, length, height, center_pos, overhang=0.25, ridge_along_x=True, material=None):
@@ -284,6 +328,7 @@ def build_detailed_roof_gabled(name, width, length, height, center_pos, overhang
     
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
+    unwrap_mesh(obj, project_type='cube', cube_size=1.0)
     add_bevel_modifier(obj, width=0.04, segments=2)
     apply_auto_smooth(obj, angle_deg=35.0)
     
@@ -292,39 +337,36 @@ def build_detailed_roof_gabled(name, width, length, height, center_pos, overhang
     return obj
 
 # ==============================================================================
-# 5. CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (VISUAL PREVIEW RENDER)
+# 6. CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (VISUAL PREVIEW RENDER)
 # ==============================================================================
 
-def setup_preview_render(output_path, resolution=(1280, 720), camera_pos=(26, -26, 20), target_pos=(0, -20, 2)):
+def setup_preview_render(output_path, resolution=(1280, 720), camera_pos=(-24, -4, 24), target_pos=(0, -22, 1)):
     """
     Thiết lập Camera Isometric + Ánh sáng mặt trời và render ảnh kiểm tra trực quan.
+    Góc nhìn khớp chuẩn với Isometric Camera của Godot và ảnh mẫu modelyeucau/map2/1.jpg.
     """
-    # 1. Tạo Sun Light
     light_data = bpy.data.lights.new(name="PreviewSun", type='SUN')
-    light_data.energy = 2.0
-    light_data.color = (1.0, 0.96, 0.90)
+    light_data.energy = 2.8
+    light_data.color = (1.0, 0.97, 0.92)
     light_obj = bpy.data.objects.new(name="PreviewSun", object_data=light_data)
     bpy.context.collection.objects.link(light_obj)
-    light_obj.location = (20, -10, 35)
+    light_obj.location = (-15, -10, 35)
     light_obj.rotation_euler = (math.radians(45), math.radians(20), math.radians(45))
     
-    # 2. Tạo Camera Isometric
     cam_data = bpy.data.cameras.new(name="PreviewCamera")
     cam_data.type = 'ORTHO'
-    cam_data.ortho_scale = 48.0
+    cam_data.ortho_scale = 46.0
     cam_obj = bpy.data.objects.new(name="PreviewCamera", object_data=cam_data)
     bpy.context.collection.objects.link(cam_obj)
     cam_obj.location = camera_pos
     
-    # Hướng camera nhìn về tâm cảnh
     direction = Vector(target_pos) - Vector(camera_pos)
     rot_quat = direction.to_track_quat('-Z', 'Y')
     cam_obj.rotation_euler = rot_quat.to_euler()
     bpy.context.scene.camera = cam_obj
     
-    # 3. Cấu hình Render Workbench sắc nét
     bpy.context.scene.render.engine = 'BLENDER_WORKBENCH'
-    bpy.context.scene.display.shading.color_type = 'MATERIAL'
+    bpy.context.scene.display.shading.color_type = 'TEXTURE'
     bpy.context.scene.display.shading.show_cavity = True
     bpy.context.scene.display.shading.cavity_type = 'BOTH'
     bpy.context.scene.display.shading.cavity_ridge_factor = 2.5

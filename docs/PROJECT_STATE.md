@@ -59,17 +59,21 @@
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
 - **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; đã liên kết bộ texture seamless mới: `tex_grass_seamless.png` (`Mat_Grass`), `tex_dirt_seamless.png` (`Mat_Cliff_Dirt`, `Mat_Dirt_Path`), `tex_wood_seamless.png` (`Mat_Wood`), `tex_rock_seamless.png` (`Mat_Stone`, `Mat_Cliff_Rock`); toàn bộ texture được pack trực tiếp vào file blend an toàn `map_25d_fixed.blend` và xuất sang `.glb` chuẩn Godot `export_yup=True`, `export_materials='EXPORT'`).
 - **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` liên kết texture chuẩn `tex_grass_seamless.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; toàn bộ 45 tảng đá `Rock_Mesh_*` được gán vật liệu `Mat_Stone` liên kết texture `tex_rock_seamless.png`; toàn bộ texture được pack trực tiếp vào `map_surroundings.blend` và xuất sang `.glb` chuẩn Godot; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
-- **Village Map Model**: `Assets/Models/village_map.glb` (Kích thước 884 KB, gồm 428 object, 117 mesh va chạm `-col`, địa hình 48m x 48m, 6 phân khu: Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Cổng Làng & Vườn Rau; nội thất 4 phòng; tách riêng các bộ phận mái `Roof_*` và tường trước `Wall_Front_*` cho cơ chế Seamless Interior Transition).
-- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn tuyệt đối; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`; File nguồn làng: `village_map.blend`, script sinh tự động: `build_village_map.py`).
+- **Village Map Model**: `Assets/Models/village_map.glb` (Kích thước 1.87 MB, địa hình 48m x 48m, 6 phân khu: Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Cổng Làng & Vườn Rau; hoàn thiện nội thất 4 phòng chi tiết theo modelyeucau/map2/1.jpg gồm giá vũ khí, đe, rương than, rương sắt vụn, vạc ma thuật phát sáng, kệ sách ma thuật, chai lọ độc dược, lò nướng bánh, bàn ăn dài, giỏ bánh mì, giường gối trắng nệm đỏ, tủ áo; 8 cụm phụ kiện đạo cụ đặc trưng cho 8 NPC; tách riêng các bộ phận mái `Roof_*` và tường trước `Wall_Front_*` cho cơ chế Seamless Interior Transition).
+- **Blender Sources**: `Assets/Blender_Source/` (Vùng cấm ghi đè: `character_25d.blend`, `map_25d.blend` - tuân thủ nguyên vẹn tuyệt đối; File lưu an toàn cải tiến: `map_25d_fixed.blend`; File nguồn môi trường: `map_surroundings.blend`; File nguồn làng: `village_map.blend`, script sinh tự động: `build_village_map.py` tuân thủ tools/blender_kit.py và unwrap_mesh tự động 100%).
 
 ### D. Hệ Thống Texture & Vật Liệu Dùng Chung (`Assets/Textures/` & `Assets/Materials_Shared/`)
 - **Tra cứu bắt buộc trước khi tạo Model / Scene**: `Assets/Textures/TEXTURE_CATALOG.md`.
-- **Tileable Textures (512x512 Seamless 100%)**:
+- **Tileable Textures (Seamless 100%)**:
   * `tex_grass_seamless.png` (`uid://drvty0xy4e6jc`): Thảm cỏ xanh mát Stylized `#529934`.
   * `tex_dirt_seamless.png` (`uid://cj7r7nm3t4kwv`): Đất/đường mòn nâu tự nhiên hữu cơ `#8A5C35`.
   * `tex_rock_seamless.png` (`uid://u5lhns2a7ofk`): Vách đá xám phiến Stylized, vết nứt sắc nét.
   * `tex_wood_seamless.png` (`uid://cylrbgem14pnb`): Thớ vân gỗ sồi ấm áp tự nhiên `#A8764A`.
   * `tex_metal_seamless.png` (`uid://bkow053hg3twe`): Mặt kim loại phay xước nhẹ Stylized ánh bạc xám.
+  * `tex_canopy_striped.png` (`uid://dpsaox5koc3ve`): Bạt sọc đỏ trắng cho sạp chợ.
+  * `tex_roof_tiles_red.png` (`uid://b8e78ukphvtme`): Ngói vảy đỏ cam cho nhà rèn, quán ăn, nhà dân.
+  * `tex_roof_tiles_teal.png` (`uid://d08e7du43tohb`): Ngói vảy xanh ngọc teal cho nhà giả kim.
+  * `tex_stone_cobble.png` (`uid://bkw3f617222ku`): Đá cuội xây lò rèn, ống khói, giếng nước.
 - **Grayscale Masks (512x512 Tương phản cao [0.25 - 1.0] để đổi màu tự do bằng `albedo_color`)**:
   * `mask_grass_detail.png` (`uid://dl88hu1ndt3py`): Mặt nạ cụm vi sợi cỏ cách điệu.
   * `mask_dirt_detail.png` (`uid://ctmnogu3s05aq`): Mặt nạ lấm tấm sỏi đất hữu cơ.
@@ -88,6 +92,7 @@
   * `M_Metal_DarkIron.tres`: Sắt đen rèn thô.
   * `M_Roof_Tiles_Red.tres`: Mái ngói đỏ cam nhà rèn & nhà dân.
   * `M_Roof_Tiles_Teal.tres`: Mái ngói xanh ngọc teal nhà giả kim.
+  * `M_Stone_Cobble.tres`: Đá cuội xây lò rèn, ống khói, giếng nước, lò nướng bánh.
   * `M_Canopy_Striped.tres`: Mái bạt sọc đỏ trắng sạp chợ.
   * `M_Mystic_Cyan.tres`: Dung dịch & khói ma thuật cyan phát sáng emission.
   * `M_Lava_Fire.tres`: Lửa lò rèn & lò luyện nung phát sáng emission vàng cam.

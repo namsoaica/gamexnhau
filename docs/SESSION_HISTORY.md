@@ -1,5 +1,45 @@
 # LỊCH SỬ PHIÊN LÀM VIỆC (SESSION HISTORY)
 
+## Phiên làm việc: 2026-11-08 (Lead 3D & Gameplay Integrator - Hoàn thiện toàn diện Bản Đồ Làng theo phác họa modelyeucau/map2/1.jpg)
+- **Trích xuất bảng màu & họa tiết thực tế (`tools/extract_palette_map2.py`)**:
+  - Dùng Python PIL & numpy phân tích trực tiếp `modelyeucau/map2/1.jpg`, trích xuất chính xác mã màu Hex/RGB của cỏ xanh, đường đất, ngói đỏ, ngói teal, vách đá, thân gỗ, khói ma thuật cyan, lửa lò rèn cam vàng, bạt sọc đỏ trắng, và trang phục 8 NPC.
+  - Lưu bảng màu chuẩn vào `Assets/Textures/extracted_map2_palette.py`.
+- **Sinh Texture Seamless & Vật liệu dùng chung**:
+  - Viết `tools/generate_village_textures.py` sinh 3 texture tileable chuẩn Stylized 256x256: `tex_roof_tiles_red.png`, `tex_roof_tiles_teal.png`, `tex_stone_cobble.png`.
+  - Xuất 3 ảnh lát thử 2x2 (`_tile_preview_roof_red.png`, `_tile_preview_roof_teal.png`, `_tile_preview.png`) tự kiểm tra mép nối Seamless 100%.
+  - Tạo các file `.tres` dùng chung: `M_Roof_Tiles_Red.tres`, `M_Roof_Tiles_Teal.tres`, `M_Stone_Cobble.tres` với `uv1_triplanar = true`.
+- **Nâng cấp Thư viện Procedural Blender (`tools/blender_kit.py`)**:
+  - Tích hợp hàm bắt buộc trải UV tự động `unwrap_mesh(obj)` (`cube_project` hoặc `smart_project`).
+  - Nâng cấp `create_material` liên kết trực tiếp Texture Image vào Principled BSDF node tree.
+  - Cấu hình Camera Isometric chuẩn góc nhìn game và bật chế độ hiển thị `color_type = 'TEXTURE'`.
+- **Dựng chi tiết 3D Bản Đồ Làng (`Assets/Blender_Source/build_village_map.py`)**:
+  - Nội thất chi tiết 4 phòng:
+    * Nhà Rèn: Lò rèn vòm đá than hồng rực lửa, đe sắt bục gỗ, rương thép vụn, rương than củi, bể nước làm nguội, giá treo vũ khí trên tường gắn kiếm sắt & khiên tròn.
+    * Nhà Giả Kim: Vạc thuốc ma thuật phát sáng tím-cyan, kệ sách ma thuật, bàn thí nghiệm, các chai lọ độc dược đủ màu, 3 cụm khói ma thuật uốn lượn bay ra từ ống khói, vườn thảo mộc ngoài hiên.
+    * Quán Ăn / Nhà Bếp: Lò nướng bánh đá lửa đỏ, bàn ăn dài, 2 ghế băng dài, kệ quầy bát đĩa, giỏ bánh mì baguette vàng óng.
+    * Nhà Dân: Giường ngủ nệm đỏ gối trắng, tủ áo gỗ 2 cánh, thảm sàn sọc hoa văn, bàn tròn và ghế tựa.
+  - 8 cụm phụ kiện đạo cụ đặc trưng cho 8 NPC:
+    * Vulcan (Thợ rèn): Cầm búa rèn, tạp dề da, đe sắt.
+    * Aria (Giả kim): Áo choàng tím, bình thuốc ma thuật cyan & tím.
+    * Gusteau (Đầu bếp): Mũ bếp trắng cao, khay bánh mì baguette.
+    * George (Nông dân): Nón lá tre, cuốc làm vườn, bó lúa mì vàng, giỏ bắp cải.
+    * Finn (Ngư dân): Cần câu tre dài vươn ra giếng, giỏ cá đan tre, nón vành.
+    * Brock (Thợ mỏ): Mũ đèn bảo hộ, cuốc chim cắm vào quặng đá bên xe goòng.
+    * Grover (Tiều phu): Mũ len đỏ, rìu đốn củi cắm vào khúc gỗ tròn bên xưởng gỗ.
+    * Aegis (Lính canh): Mũ giáp sắt, ngọn giáo dài mũi thép sáng và khiên tròn gác cổng.
+  - Xuất mô hình `Assets/Models/village_map.glb` (1.87 MB) kèm đầy đủ mesh va chạm `-col` và lưu an toàn `Assets/Blender_Source/village_map.blend`.
+- **Render Mắt Thần Tự Kiểm Tra (Zero-Blindspot Protocol)**:
+  - Render `Assets/Models/_preview_render.png` (toàn cảnh làng góc Isometric trực diện).
+  - Render `Assets/Models/_char_preview.png` (đối chiếu tỷ lệ và phụ kiện 8 NPC).
+  - Render `docs/test_screenshots/_texture_3d_check.png` (kiểm tra bọc texture 3D thực tế).
+- **Cải tiến C# Gameplay & Tích hợp Godot**:
+  - `MaterialCatalogHelper.cs`: Bổ sung nhận diện sàn, đá cuội `Cobble`, nhận diện ưu tiên lá cây `foliage` xanh tươi.
+  - `MapAutoCollision.cs`: Tích hợp tải và gán `M_Stone_Cobble.tres`.
+  - Biên dịch `dotnet build "Dự án Trò chơi Mới.csproj"`: **0 Warning(s), 0 Error(s)**.
+  - Chạy Windowed Visual Playtest qua `test_suite.gd`: **372 / 372 Test cases PASSED (100%)**.
+  - Soi 4 ảnh chụp màn hình trong `docs/test_screenshots/` bằng `read_file` đối chiếu Side-by-Side: Đạt chuẩn thẩm mỹ cao, không lỗi hiển thị hay lún sàn.
+
+
 ## Phiên làm việc: 2026-11-05
 - **Khởi tạo nhân vật**: Viết `PlayerMovement.cs` và `PlayerAnimation.cs` theo Clean Code.
 - **Tích hợp bản đồ**: Đưa `map_25d.glb` vào `Assets/Models_Exported/`, viết `MapAutoCollision.cs`, `CameraFollow.cs`.

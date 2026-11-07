@@ -1,0 +1,21 @@
+# Tự động trích xuất bảng màu từ modelyeucau/map2/1.jpg
+PALETTE = {
+    "grass": {'hex': '#3E6722', 'rgb255': (np.int64(62), np.int64(103), np.int64(34)), 'rgb_norm': (np.float64(0.243), np.float64(0.404), np.float64(0.133))},
+    "dirt_road": {'hex': '#B8B2A5', 'rgb255': (np.int64(184), np.int64(178), np.int64(165)), 'rgb_norm': (np.float64(0.722), np.float64(0.698), np.float64(0.647))},
+    "roof_red": {'hex': '#E48373', 'rgb255': (np.int64(228), np.int64(131), np.int64(115)), 'rgb_norm': (np.float64(0.894), np.float64(0.514), np.float64(0.451))},
+    "roof_teal": {'hex': '#844D42', 'rgb255': (np.int64(132), np.int64(77), np.int64(66)), 'rgb_norm': (np.float64(0.518), np.float64(0.302), np.float64(0.259))},
+    "rock_cliff": {'hex': '#48403B', 'rgb255': (np.int64(72), np.int64(64), np.int64(59)), 'rgb_norm': (np.float64(0.282), np.float64(0.251), np.float64(0.231))},
+    "wood_beam": {'hex': '#683D34', 'rgb255': (np.int64(104), np.int64(61), np.int64(52)), 'rgb_norm': (np.float64(0.408), np.float64(0.239), np.float64(0.204))},
+    "smoke_cyan": {'hex': '#92BB8F', 'rgb255': (np.int64(146), np.int64(187), np.int64(143)), 'rgb_norm': (np.float64(0.573), np.float64(0.733), np.float64(0.561))},
+    "lava_fire": {'hex': '#504130', 'rgb255': (np.int64(80), np.int64(65), np.int64(48)), 'rgb_norm': (np.float64(0.314), np.float64(0.255), np.float64(0.188))},
+    "canopy_red": {'hex': '#D08A5E', 'rgb255': (np.int64(208), np.int64(138), np.int64(94)), 'rgb_norm': (np.float64(0.816), np.float64(0.541), np.float64(0.369))},
+    "canopy_white": {'hex': '#E8A873', 'rgb255': (np.int64(232), np.int64(168), np.int64(115)), 'rgb_norm': (np.float64(0.91), np.float64(0.659), np.float64(0.451))},
+    "npc_vulcan_apron": {'hex': '#583F3A', 'rgb255': (np.int64(88), np.int64(63), np.int64(58)), 'rgb_norm': (np.float64(0.345), np.float64(0.247), np.float64(0.227))},
+    "npc_aria_cloak": {'hex': '#654340', 'rgb255': (np.int64(101), np.int64(67), np.int64(64)), 'rgb_norm': (np.float64(0.396), np.float64(0.263), np.float64(0.251))},
+    "npc_gusteau_hat": {'hex': '#8D8680', 'rgb255': (np.int64(141), np.int64(134), np.int64(128)), 'rgb_norm': (np.float64(0.553), np.float64(0.525), np.float64(0.502))},
+    "npc_george_hat": {'hex': '#CEA161', 'rgb255': (np.int64(206), np.int64(161), np.int64(97)), 'rgb_norm': (np.float64(0.808), np.float64(0.631), np.float64(0.38))},
+    "npc_finn_hat": {'hex': '#A08A68', 'rgb255': (np.int64(160), np.int64(138), np.int64(104)), 'rgb_norm': (np.float64(0.627), np.float64(0.541), np.float64(0.408))},
+    "npc_brock_suit": {'hex': '#BE9043', 'rgb255': (np.int64(190), np.int64(144), np.int64(67)), 'rgb_norm': (np.float64(0.745), np.float64(0.565), np.float64(0.263))},
+    "npc_grover_shirt": {'hex': '#722627', 'rgb255': (np.int64(114), np.int64(38), np.int64(39)), 'rgb_norm': (np.float64(0.447), np.float64(0.149), np.float64(0.153))},
+    "npc_aegis_armor": {'hex': '#90929B', 'rgb255': (np.int64(144), np.int64(146), np.int64(155)), 'rgb_norm': (np.float64(0.565), np.float64(0.573), np.float64(0.608))},
+}

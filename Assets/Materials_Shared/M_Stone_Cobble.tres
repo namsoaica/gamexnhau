@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://bkw3f617222ku" path="res://Assets/Textures/Tileable/tex_stone_cobble.png" id="1_tex_cobble"]
+
+[resource]
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("1_tex_cobble")
+roughness = 0.8
+uv1_scale = Vector3(2, 2, 2)
+uv1_triplanar = true
