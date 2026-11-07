@@ -8,6 +8,11 @@
 [ext_resource type="PackedScene" uid="uid://sdy3ykn64aus" path="res://Assets/Models_Exported/map_surroundings.glb" id="5_surroundings"]
 [ext_resource type="Script" uid="uid://dwpklcl7pp863" path="res://Scripts/Core/VoidKillZone.cs" id="6_void"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/DevOverlay.tscn" id="7_dev"]
+[ext_resource type="PackedScene" path="res://Assets/Models/village_map.glb" id="8_vlgmesh"]
+[ext_resource type="Script" path="res://Scripts/Core/InteriorZone.cs" id="9_interior"]
+[ext_resource type="PackedScene" uid="uid://b2v8npcbehav1" path="res://Scenes/Characters/VillageNpc.tscn" id="10_vlgnpc"]
+[ext_resource type="Script" path="res://Scripts/Core/DisplaySettingsManager.cs" id="11_display"]
+[ext_resource type="PackedScene" uid="uid://c3q8npcdialog1" path="res://Scenes/UI/NpcInteractionDialog.tscn" id="12_dialog"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_world"]
 sky_top_color = Color(0.35, 0.62, 0.95, 1)
@@ -27,10 +32,25 @@ tonemap_mode = 3
 tonemap_exposure = 1.0
 ssao_enabled = true
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_smith"]
+size = Vector3(6.0, 3.2, 5.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_alchemist"]
+size = Vector3(6.0, 3.2, 5.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chef"]
+size = Vector3(5.4, 3.0, 4.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_house"]
+size = Vector3(5.4, 3.0, 4.8)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_void"]
 size = Vector3(400, 10, 400)
 
 [node name="WorldMap" type="Node3D" unique_id=1742541137]
+
+[node name="DisplaySettingsManager" type="Node" parent="."]
+script = ExtResource("11_display")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=622661758]
 environment = SubResource("Environment_vibrant")
@@ -53,6 +73,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0023872852, 0.0102472305, -
 
 [node name="Map_Surroundings" parent="." unique_id=2089334411 instance=ExtResource("5_surroundings")]
 
+[node name="VillageMesh" parent="." instance=ExtResource("8_vlgmesh")]
+
 [node name="Player" parent="." unique_id=2044242254 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, -6)
 
@@ -67,14 +89,133 @@ Target = NodePath("../Player")
 [node name="NPC" parent="." unique_id=395481746 instance=ExtResource("5_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -4)
 
+[node name="InteriorZone_Smith" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.4, 36)
+script = ExtResource("9_interior")
+RoofPaths = [NodePath("../VillageMesh/Roof_Smith")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Smith_L"), NodePath("../VillageMesh/Wall_Front_Smith_R"), NodePath("../VillageMesh/Wall_Front_Smith_Top")]
+InteriorLight = NodePath("Light_Smith")
+InteriorCameraZoom = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Smith"]
+shape = SubResource("BoxShape3D_smith")
+
+[node name="Light_Smith" type="OmniLight3D" parent="InteriorZone_Smith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 2.2
+omni_range = 8.0
+
+[node name="InteriorZone_Alchemist" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.4, 36)
+script = ExtResource("9_interior")
+RoofPaths = [NodePath("../VillageMesh/Roof_Alchemist")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Alchemist_L"), NodePath("../VillageMesh/Wall_Front_Alchemist_R"), NodePath("../VillageMesh/Wall_Front_Alchemist_Top")]
+InteriorLight = NodePath("Light_Alchemist")
+InteriorCameraZoom = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Alchemist"]
+shape = SubResource("BoxShape3D_alchemist")
+
+[node name="Light_Alchemist" type="OmniLight3D" parent="InteriorZone_Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(0.4, 0.9, 0.85, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="InteriorZone_Chef" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.3, 24)
+script = ExtResource("9_interior")
+RoofPaths = [NodePath("../VillageMesh/Roof_Chef")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Chef_L"), NodePath("../VillageMesh/Wall_Front_Chef_R"), NodePath("../VillageMesh/Wall_Front_Chef_Top")]
+InteriorLight = NodePath("Light_Chef")
+InteriorCameraZoom = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Chef"]
+shape = SubResource("BoxShape3D_chef")
+
+[node name="Light_Chef" type="OmniLight3D" parent="InteriorZone_Chef"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(1, 0.8, 0.5, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="InteriorZone_House" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.3, 24)
+script = ExtResource("9_interior")
+RoofPaths = [NodePath("../VillageMesh/Roof_House")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_House_L"), NodePath("../VillageMesh/Wall_Front_House_R"), NodePath("../VillageMesh/Wall_Front_House_Top")]
+InteriorLight = NodePath("Light_House")
+InteriorCameraZoom = 12.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_House"]
+shape = SubResource("BoxShape3D_house")
+
+[node name="Light_House" type="OmniLight3D" parent="InteriorZone_House"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(1, 0.9, 0.65, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Village_NPCs" type="Node3D" parent="."]
+
+[node name="Npc_Guard" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17.5)
+NpcName = "Aegis"
+Profession = 7
+CurrentState = 0
+
+[node name="Npc_Farmer" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 20)
+NpcName = "George"
+Profession = 3
+CurrentState = 1
+
+[node name="Npc_Chef" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 24)
+NpcName = "Gusteau"
+Profession = 2
+CurrentState = 1
+
+[node name="Npc_Fisherman" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 27)
+NpcName = "Finn"
+Profession = 4
+CurrentState = 1
+
+[node name="Npc_Blacksmith" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0, 35)
+NpcName = "Vulcan"
+Profession = 0
+CurrentState = 1
+
+[node name="Npc_Alchemist" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 35)
+NpcName = "Aria"
+Profession = 1
+CurrentState = 1
+
+[node name="Npc_Lumberjack" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 43.5)
+NpcName = "Grover"
+Profession = 6
+CurrentState = 1
+
+[node name="Npc_Miner" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 42.5)
+NpcName = "Brock"
+Profession = 5
+CurrentState = 1
+
 [node name="VoidKillZone" type="Area3D" parent="." unique_id=981247120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15, 0)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("6_void")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="VoidKillZone" unique_id=981247121]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VoidKillZone"]
 shape = SubResource("BoxShape3D_void")
 
 [node name="DevOverlay" parent="." instance=ExtResource("7_dev")]
 
+[node name="NpcInteractionDialog" parent="." instance=ExtResource("12_dialog")]
