@@ -225,12 +225,12 @@ def build_village():
     create_beveled_box("Minecart_Body", (1.2, 0.65, 1.6), (mn_cx + 2.4, 0.58, mn_cz - 1.5), bevel_width=0.03, material=mat_metal)
     create_beveled_box("Minecart_Ore", (0.9, 0.3, 1.3), (mn_cx + 2.4, 0.88, mn_cz - 1.5), bevel_width=0.03, material=mat_stone)
 
-    # 11. CÂY CỐI TRANG TRÍ BAO QUANH LÀNG
+    # 11. CÂY CỐI TRANG TRÍ BAO QUANH LÀNG (Bố trí khéo léo để không che khuất góc nhìn Camera Isometric vào các ngôi nhà)
     build_stylized_tree("Tree_Gate_L", (-5.0, 0, 5.0), scale=1.1, mat_wood=mat_wood, mat_foliage=mat_foliage)
     build_stylized_tree("Tree_Gate_R", (5.5, 0, 4.5), scale=1.2, mat_wood=mat_wood, mat_foliage=mat_foliage)
-    build_stylized_tree("Tree_Smith_Back", (-16.0, 0, 21.0), scale=1.4, mat_wood=mat_wood, mat_foliage=mat_foliage)
-    build_stylized_tree("Tree_Alchemist_Back", (16.0, 0, 21.0), scale=1.3, mat_wood=mat_wood, mat_foliage=mat_foliage)
-    build_stylized_tree("Tree_House_South", (-12.0, 0, 32.0), scale=1.2, mat_wood=mat_wood, mat_foliage=mat_foliage)
+    build_stylized_tree("Tree_Smith_Back", (-18.5, 0, 14.0), scale=1.0, mat_wood=mat_wood, mat_foliage=mat_foliage)
+    build_stylized_tree("Tree_Alchemist_Back", (16.5, 0, 16.0), scale=1.3, mat_wood=mat_wood, mat_foliage=mat_foliage)
+    build_stylized_tree("Tree_House_South", (-17.0, 0, 32.0), scale=1.3, mat_wood=mat_wood, mat_foliage=mat_foliage)
     build_stylized_tree("Tree_Mine_East", (18.5, 0, 35.0), scale=1.5, mat_wood=mat_wood, mat_foliage=mat_foliage)
 
     # 12. XUẤT RA GLB & LƯU FILE BLEND AN TOÀN

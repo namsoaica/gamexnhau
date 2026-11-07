@@ -93,9 +93,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.6, 21)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Smith")]
-WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Smith_L"), NodePath("../VillageMesh/Wall_Front_Smith_R"), NodePath("../VillageMesh/Wall_Front_Smith_Top")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Smith_L"), NodePath("../VillageMesh/Wall_Front_Smith_R"), NodePath("../VillageMesh/Wall_Front_Smith_Top"), NodePath("../VillageMesh/Wall_South_Smith"), NodePath("../VillageMesh/Wall_West_Smith")]
 InteriorLight = NodePath("Light_Smith")
-InteriorCameraZoom = 12.0
+InteriorCameraZoom = 9.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Smith"]
 shape = SubResource("BoxShape3D_smith")
@@ -110,9 +110,9 @@ omni_range = 8.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.6, 21)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Alchemist")]
-WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Alchemist_L"), NodePath("../VillageMesh/Wall_Front_Alchemist_R"), NodePath("../VillageMesh/Wall_Front_Alchemist_Top")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Alchemist_L"), NodePath("../VillageMesh/Wall_Front_Alchemist_R"), NodePath("../VillageMesh/Wall_Front_Alchemist_Top"), NodePath("../VillageMesh/Wall_South_Alchemist")]
 InteriorLight = NodePath("Light_Alchemist")
-InteriorCameraZoom = 12.0
+InteriorCameraZoom = 9.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Alchemist"]
 shape = SubResource("BoxShape3D_alchemist")
@@ -127,9 +127,9 @@ omni_range = 8.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, 7.5)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Chef")]
-WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Chef_L"), NodePath("../VillageMesh/Wall_Front_Chef_R"), NodePath("../VillageMesh/Wall_Front_Chef_Top")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Chef_L"), NodePath("../VillageMesh/Wall_Front_Chef_R"), NodePath("../VillageMesh/Wall_Front_Chef_Top"), NodePath("../VillageMesh/Wall_South_Chef")]
 InteriorLight = NodePath("Light_Chef")
-InteriorCameraZoom = 12.0
+InteriorCameraZoom = 9.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Chef"]
 shape = SubResource("BoxShape3D_chef")
@@ -144,9 +144,9 @@ omni_range = 8.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.5, 28.5)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_House")]
-WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_House_L"), NodePath("../VillageMesh/Wall_Front_House_R"), NodePath("../VillageMesh/Wall_Front_House_Top")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_House_L"), NodePath("../VillageMesh/Wall_Front_House_R"), NodePath("../VillageMesh/Wall_Front_House_Top"), NodePath("../VillageMesh/Wall_South_House"), NodePath("../VillageMesh/Wall_West_House")]
 InteriorLight = NodePath("Light_House")
-InteriorCameraZoom = 12.0
+InteriorCameraZoom = 9.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_House"]
 shape = SubResource("BoxShape3D_house")

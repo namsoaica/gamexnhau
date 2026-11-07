@@ -86,7 +86,14 @@ public partial class MapAutoCollision : Node
 
 	private void ProcessMeshInstance(MeshInstance3D meshInstance)
 	{
-		if (IsSkyBackdrop(meshInstance.Name))
+		if (MaterialCatalogHelper.IsSkyBackdrop(meshInstance.Name))
+		{
+			meshInstance.Visible = false;
+			meshInstance.QueueFree();
+			return;
+		}
+
+		if (MaterialCatalogHelper.IsClashingSurroundingProp(meshInstance))
 		{
 			meshInstance.Visible = false;
 			meshInstance.QueueFree();
@@ -95,7 +102,7 @@ public partial class MapAutoCollision : Node
 
 		ApplyMaterialIfMatching(meshInstance);
 
-		if (IsWalkableSurface(meshInstance.Name))
+		if (MaterialCatalogHelper.IsWalkableSurface(meshInstance.Name))
 		{
 			CreateCollisionIfMissing(meshInstance);
 		}
@@ -103,56 +110,27 @@ public partial class MapAutoCollision : Node
 
 	private void ApplyMaterialIfMatching(MeshInstance3D meshInstance)
 	{
-		StandardMaterial3D? mat = GetSharedMaterialForMesh(meshInstance.Name);
-		if (mat != null)
+		string? matType = MaterialCatalogHelper.MatchMaterialType(meshInstance.Name);
+		if (matType == null) return;
+
+		StandardMaterial3D? mat = matType switch
 		{
-			meshInstance.MaterialOverride = mat;
-		}
-	}
+			"LavaFire" => _matLavaFire,
+			"MysticCyan" => _matMysticCyan,
+			"RoofTeal" => _matRoofTeal,
+			"RoofRed" => _matRoofRed,
+			"Canopy" => _matCanopy,
+			"Metal" => _matMetal,
+			"WoodFence" => _matWoodFence,
+			"Wood" => _matWood,
+			"RockPurple" => _matRockMountainPurple,
+			"Rock" => _matRock,
+			"Dirt" => _matDirt,
+			"Grass" => _matGrass,
+			_ => null
+		};
 
-	private StandardMaterial3D? GetSharedMaterialForMesh(string nodeName)
-	{
-		string lower = nodeName.ToLower();
-
-		// Hiệu ứng đặc biệt (Emission)
-		if (lower.Contains("lava") || lower.Contains("fire") || lower.Contains("furnace") || lower.Contains("oven"))
-			return _matLavaFire;
-		if (lower.Contains("mystic") || lower.Contains("potion") || lower.Contains("smoke") || lower.Contains("cauldron"))
-			return _matMysticCyan;
-
-		// Mái nhà & Bạt
-		if (lower.Contains("roof_alchemist") || lower.Contains("teal"))
-			return _matRoofTeal;
-		if (lower.Contains("roof") || lower.Contains("mattress"))
-			return _matRoofRed;
-		if (lower.Contains("canopy") || lower.Contains("rug") || lower.Contains("striped"))
-			return _matCanopy;
-
-		// Kim loại
-		if (lower.Contains("metal") || lower.Contains("rail") || lower.Contains("minecart") || lower.Contains("anvil") || lower.Contains("blade") || lower.Contains("iron"))
-			return _matMetal;
-
-		// Gỗ & Hàng rào
-		if (lower.Contains("fence") || lower.Contains("wardrobe") || lower.Contains("chest") || lower.Contains("bookshelf"))
-			return _matWoodFence;
-		if (lower.Contains("wood") || lower.Contains("log") || lower.Contains("table") || lower.Contains("bench") || lower.Contains("cart") || lower.Contains("shed") || lower.Contains("gate") || lower.Contains("beam") || lower.Contains("post"))
-			return _matWood;
-
-		// Đá & Núi
-		if (lower.Contains("mountains_background"))
-			return _matRockMountainPurple;
-		if (lower.Contains("rock") || lower.Contains("stone") || lower.Contains("wall") || lower.Contains("chimney") || lower.Contains("well") || lower.Contains("mine") || lower.Contains("cliff"))
-			return _matRock;
-
-		// Đường mòn & Đất
-		if (lower.Contains("dirt") || lower.Contains("path"))
-			return _matDirt;
-
-		// Cỏ & Nông sản
-		if (lower.Contains("paver") || lower.Contains("plains") || lower.Contains("grass") || lower.Contains("cabbage") || lower.Contains("vegetable") || lower.Contains("foliage") || lower.Contains("herb"))
-			return _matGrass;
-
-		return null;
+		if (mat != null) meshInstance.MaterialOverride = mat;
 	}
 
 	private void CreateCollisionIfMissing(MeshInstance3D meshInstance)
@@ -197,23 +175,5 @@ public partial class MapAutoCollision : Node
 			if (child is StaticBody3D) return true;
 		}
 		return false;
-	}
-
-	private static bool IsSkyBackdrop(string nodeName)
-	{
-		string lower = nodeName.ToLower();
-		return lower.Contains("sky_backdrop") || lower.Contains("backdrop") || lower.Contains("sky_plane");
-	}
-
-	private static bool IsWalkableSurface(string nodeName)
-	{
-		string lower = nodeName.ToLower();
-		return lower.Contains("terrain") || lower.Contains("stair") || lower.Contains("path") ||
-		       lower.Contains("paver") || lower.Contains("fence") || lower.Contains("floor") ||
-		       lower.Contains("ground") || lower.Contains("rock") || lower.Contains("mountain") ||
-		       lower.Contains("cliff") || lower.Contains("overlook") || lower.Contains("gate") ||
-		       lower.Contains("shed") || lower.Contains("cart") || lower.Contains("wall") ||
-		       lower.Contains("chimney") || lower.Contains("well") || lower.Contains("trunk") ||
-		       lower.Contains("anvil") || lower.Contains("table") || lower.Contains("furnace");
 	}
 }

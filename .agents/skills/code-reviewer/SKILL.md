@@ -1,12 +1,12 @@
 ---
 name: code-reviewer
 description: >-
-  Use this skill whenever the user asks to review, audit, lint, or check C# code quality in Godot 4, verify Clean Code standards, inspect method length (< 25 lines) and file length (< 200 lines), check memory leaks (event unsubscription -= in _ExitTree), execute the Requirement-Driven Auto-Playtest Loop via test_suite.gd on Godot Headless, or verify dotnet build results. Chuyên gia rà soát chất lượng mã nguồn C# và kiểm thử nghiệm thu tự động Godot 4 (.NET 8). Bắt buộc tuân thủ CODING_STANDARDS.md, chạy Playtest Loop trên Godot Headless và Self-Healing đến khi 100% Pass.
+  Use this skill whenever the user asks to review, audit, lint, or check C# code quality in Godot 4, verify Clean Code standards, inspect method length (< 25 lines) and file length (< 200 lines), check memory leaks (event unsubscription -= in _ExitTree), execute the Visual Playtest & Screenshot Inspection Loop via test_suite.gd with Windowed rendering (no --headless), inspect captured screenshots in docs/test_screenshots/ using Vision tools, or verify dotnet build results. Chuyên gia rà soát Clean Code và kiểm thử thị giác thực tế Godot 4 (.NET 8). Bắt buộc chạy dựng hình thực tế, chụp ảnh màn hình, soi ảnh tự kiểm tra bằng mắt thần và Self-Healing đến khi 100% Pass và giao diện hoàn hảo.
 ---
 
-# Vai Trò: Clean Code Reviewer & Playtest QA (Kiểm Định Chất Lượng & Nghiệm Thu Tự Động)
+# Vai Trò: Clean Code Reviewer & Visual Playtest QA (Kiểm Thử Thị Giác Thực Tế & Nghiệm Thu Tự Động)
 
-Kỹ năng này chịu trách nhiệm tối cao về chất lượng mã nguồn C# và **Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế Đến Khi Đạt Yêu Cầu (Requirement-Driven Auto-Playtest Loop)** trong toàn bộ dự án.
+Kỹ năng này chịu trách nhiệm tối cao về chất lượng mã nguồn C# và **Cơ Chế Kiểm Thử Thị Giác Thực Tế (Visual Playtest & Screenshot Inspection Loop)** xóa bỏ hoàn toàn tình trạng kiểm thử mù trong bóng tối (`--headless`).
 
 ---
 
@@ -14,7 +14,8 @@ Kỹ năng này chịu trách nhiệm tối cao về chất lượng mã nguồn
 - **Quy chuẩn mã nguồn bắt buộc**: `docs/CODING_STANDARDS.md`
 - **File dự án .csproj**: `Dự án Trò chơi Mới.csproj`
 - **Thư mục mã nguồn C#**: `Scripts/` (và các file `.cs` mới được thêm/sửa)
-- **Kịch bản kiểm thử nghiệm thu thực tế**: `test_suite.gd`
+- **Kịch bản kiểm thử thị giác thực tế**: `test_suite.gd`
+- **Thư mục lưu ảnh chụp màn hình kiểm định**: `docs/test_screenshots/`
 - **Trình thực thi Godot Mono Console**:
   `C:/xnhaugame/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe`
 
@@ -41,44 +42,56 @@ Kỹ năng này chịu trách nhiệm tối cao về chất lượng mã nguồn
 
 ---
 
-## 3. Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế (Requirement-Driven Auto-Playtest Loop)
+## 3. Cơ Chế Kiểm Thử Thị Giác Thực Tế (Visual Playtest & Screenshot Inspection Loop)
 
-### 4 Quy Tắc Bắt Buộc:
-1. **Quy tắc 1: Cấm kết thúc nhiệm vụ khi mới chỉ chạy `dotnet build`**:
-   - `dotnet build` chỉ là bước kiểm tra cú pháp và kiểu dữ liệu tối thiểu.
-   - Biên dịch thành công **KHÔNG ĐỒNG NGHĨA** với việc tính năng chạy đúng trong Godot Engine.
-2. **Quy tắc 2: Chuyển hóa 100% yêu cầu người dùng thành Automated Playtest Assertions trong `test_suite.gd`**:
-   - Trước và sau khi viết code C#, AI bắt buộc phải viết các bài kiểm tra hành vi thực tế vào `test_suite.gd`.
-   - **Nạp Scene thế giới**: Tự động instantiate `WorldMap.tscn`, kiểm tra cây Node, ánh sáng, vật lý.
-   - **Giả lập chuyển đổi nội thất (Seamless Interior Transition)**: Giả lập phát tín hiệu `body_entered` khi Player bước vào trong nhà, xác thực mái nhà (`Roof_*`) và tường trước (`Wall_Front_*`) bị ẩn đi (`Visible == false`), đèn phòng ấm áp tự bật, Camera bám đổi góc nhìn và zoom gần (`TargetZoomSize`). Giả lập `body_exited` xác thực mái/tường hiện lại và camera khôi phục góc nhìn rộng.
-   - **Kiểm tra va chạm địa hình & công trình (Anti-Wall/Floor-Clipping)**: Quét toàn bộ Mesh mới trong mô hình, xác thực có `StaticBody3D` và `CollisionShape3D` hợp lệ, cấm tình trạng xuyên tường, xuyên sàn hay rơi khỏi map.
-   - **Giả lập tương tác NPC & Dialogue**: Kích hoạt `npc.Interact(player)`, kiểm tra AI State chuyển sang `Interacting`, popup hội thoại mở lên hiển thị đúng chức danh nghề nghiệp tiếng Việt, sinh đủ các nút hành động đặc biệt, đóng hộp thoại sạch sẽ.
-   - **Kiểm tra Dev Tool & Đồ họa**: Kiểm tra 6 tab Dev HUD, giả lập dịch chuyển tức thời (Teleport) đến tọa độ đích, kiểm tra `DisplaySettingsManager` đổi độ phân giải (720p, 1080p, 4K), đổi FPS trần (30, 60, 144, Unlimited), bật tắt VSync và lưu `user://settings.cfg`.
-3. **Quy tắc 3: Tự động chạy Godot Headless và đọc toàn bộ log**:
-   - Gọi lệnh PowerShell:
+Xóa bỏ hoàn toàn việc "kiểm thử mù trong bóng tối (--headless)" bằng 4 bước bắt buộc sau:
+
+### 4 Bước Bắt Buộc:
+1. **Bước 1: Chạy Dựng Hình Thực Tế (Windowed Rendering - CẤM dùng cờ `--headless`) & Tự Động Chụp Ảnh Màn Hình**:
+   - Kịch bản `test_suite.gd` bắt buộc chạy ở chế độ dựng hình thực tế qua trình chạy Godot Mono Console:
      ```powershell
-     & "C:\xnhaugame\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe" --headless --script test_suite.gd
+     & "C:\xnhaugame\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe" --script test_suite.gd
      ```
-   - Đọc từng dòng log kiểm tra kết quả `[PASS]`, `[FAIL]`, `SCRIPT ERROR`, hoặc `NullReferenceException`.
-4. **Quy tắc 4: Vòng lặp tự chữa lỗi (Self-Healing Loop)**:
-   - Nếu xuất hiện bất kỳ `[FAIL]` nào hoặc lỗi runtime:
-     1. Phân tích nguyên nhân gốc rễ (Root Cause Analysis).
-     2. Tự sửa code C# hoặc tinh chỉnh lại Scene `.tscn` / script Blender.
-     3. Biên dịch lại `dotnet build`.
-     4. Chạy lại `test_suite.gd`.
-   - Lặp lại liên tục cho đến khi **100% tiêu chí yêu cầu đều đạt [PASS] tuyệt đối (0 FAIL, 0 Error)** mới được phép cập nhật `PROJECT_STATE.md` và bàn giao cho người dùng.
+   - Trong quá trình chạy, kịch bản tự động điều khiển nhân vật trải nghiệm các tính năng vừa code, chờ khung hình ổn định và dùng lệnh `get_viewport().get_texture().get_image().save_png()` lưu 4 bức ảnh màn hình thực tế vào thư mục `docs/test_screenshots/`:
+     * `docs/test_screenshots/1_map_overview.png`: Khi ở ngoài trời, kiểm tra toàn cảnh làng, ánh sáng mặt trời, con đường đất, cổng làng, khu chợ và các NPC.
+     * `docs/test_screenshots/2_interior_view.png`: Khi nhân vật đứng bên trong nhà (Seamless Interior Transition), kiểm tra mái nhà và các bức tường phía trước/South/West có biến mất sạch sẽ hay không, ánh sáng đèn phòng ấm áp có bật không, nhân vật và nội thất (lò rèn, đe, bàn ghế) có lộ rõ hoàn toàn không bị che khuất.
+     * `docs/test_screenshots/3_npc_ui.png`: Khi tương tác với NPC dân làng, kiểm tra bảng hội thoại `NpcInteractionDialog` popup ở trung tâm, hiển thị chức danh tiếng Việt, câu chào và các nút hành động đặc biệt.
+     * `docs/test_screenshots/4_devtools_ui.png`: Khi bật bảng Chế Độ Dev (DevOverlay HUD), hiển thị đầy đủ 6 tab, tab đồ họa (Độ phân giải, Cửa sổ, FPS, VSync) hoặc Teleport.
+
+2. **Bước 2: Mắt Thần Tự Soi Ảnh (Visual Inspection via Vision Tool `read_file`)**:
+   - Sau khi chụp xong, AI **BẮT BUỘC** phải dùng công cụ đọc ảnh (`read_file`) mở từng bức ảnh trong `docs/test_screenshots/` lên để trực tiếp kiểm tra bằng thị giác:
+     * **Ánh sáng & Màu sắc**: Có bị tối đen như mực, mù sương xám hay cháy sáng lóa mắt không?
+     * **Góc nhìn nội thất (Interior Occlusion)**: Khi vào trong nhà, mái và tường có thực sự ẩn đi để nhìn rõ nhân vật và đồ đạc bên trong không, hay vẫn bị tường/cây cối bên ngoài chắn tầm nhìn?
+     * **Độ cao nhân vật (Footing & Ground Contact)**: Nhân vật có đứng vững trên mặt sàn/mặt đất không, có bị lún chân xuống đất hay bay lơ lửng không?
+     * **Bố cục giao diện UI**: Bảng Dev Tool, hộp thoại NPC, thanh chữ có bị tràn viền màn hình, vỡ khung hay đè chữ lên nhau không?
+
+3. **Bước 3: Vòng Lặp Tự Sửa Lỗi Thị Giác (Visual Self-Healing Loop)**:
+   - Nếu nhìn ảnh phát hiện bất kỳ lỗi hiển thị, cây cối mọc xuyên nhà, che khuất góc nhìn camera hay vỡ bố cục UI nào (dù log code báo `[PASS] 368/368`):
+     * AI **tuyệt đối không được dừng lại** hay bàn giao kết quả lỗi cho người dùng.
+     * Bắt buộc phải tự phân tích nguyên nhân gốc rễ (Root Cause Analysis).
+     * Sửa lại code C#, Scene `.tscn`, vị trí đặt cây trong script Blender, hoặc căn chỉnh lại Camera / UI anchors.
+     * Chạy lại `dotnet build` và chạy lại `test_suite.gd` để chụp lại bộ ảnh mới.
+     * Tiếp tục soi ảnh cho đến khi toàn bộ 4 bức ảnh đều đạt chất lượng thẩm mỹ cao, cân đối, sắc nét và không có bất kỳ dị vật nào che khuất.
+
+4. **Bước 4: Nghiệm Thu Hoàn Toàn Diện**:
+   - Chỉ khi nào **đồng thời thỏa mãn cả 2 điều kiện**:
+     1. 100% tiêu chí logic trong log đều đạt `[PASS]` tuyệt đối (0 FAIL, 0 Error).
+     2. Toàn bộ 4 bức ảnh chụp màn hình trong `docs/test_screenshots/` đều được AI tự soi đạt độ thẩm mỹ, góc nhìn và bố cục chuẩn 100%.
+   - Khi đó mới được phép cập nhật `PROJECT_STATE.md`, `TASKS.md` và báo cáo hoàn thành cho người dùng.
 
 ---
 
 ## 4. Dây Chuyền Thực Thi Của Code Reviewer
 ```mermaid
 flowchart TD
-    Start["Nhận code C# từ @csharp-coder"] --> CleanCode["1. Kiểm tra Clean Code<br>(Hàm <25 dòng, File <200 dòng, -= _ExitTree)"]
+    Start["Nhận code C# từ @csharp-coder"] --> CleanCode["1. Rà soát Clean Code<br>(Hàm <25 dòng, File <200 dòng, -= _ExitTree)"]
     CleanCode --> DotnetBuild["2. dotnet build<br>(0 Warning, 0 Error)"]
-    DotnetBuild --> Playtest["3. Chạy test_suite.gd Headless<br>(Godot Mono Console)"]
-    Playtest --> CheckResult{"100% PASS<br>& 0 Error?"}
-    CheckResult -- "CÓ (Đạt chuẩn)" --> UpdateDocs["4. Cập nhật PROJECT_STATE.md & TASKS.md"]
-    UpdateDocs --> Done["Báo cáo nghiệm thu súc tích cho User"]
-    CheckResult -- "KHÔNG (FAIL / Lỗi)" --> SelfHealing["VÒNG LẶP TỰ CHỮA LỖI<br>Phân tích Log -> Sửa Code/Scene -> Retest"]
+    DotnetBuild --> VisualPlaytest["3. Chạy test_suite.gd Dựng Hình Thực Tế<br>(Godot Mono Windowed - Không dùng --headless)"]
+    VisualPlaytest --> TakeShots["4. Tự động chụp 4 ảnh màn hình<br>lưu docs/test_screenshots/*.png"]
+    TakeShots --> VisionInspect["5. MẮT THẦN SOI ẢNH (read_file)<br>Soi sáng/tối, che khuất, lún đất, vỡ UI"]
+    VisionInspect --> EvalQuality{"Logic 100% PASS<br>& Ảnh Đẹp Chuẩn 100%?"}
+    EvalQuality -- "CÓ (Đạt Tuyệt Đối)" --> UpdateDocs["6. Cập nhật PROJECT_STATE.md & TASKS.md"]
+    UpdateDocs --> Done["Báo cáo nghiệm thu hoàn chỉnh cho User"]
+    EvalQuality -- "KHÔNG (Có lỗi / Che khuất / Vỡ UI)" --> SelfHealing["VÒNG LẶP TỰ CHỮA LỖI THỊ GIÁC<br>Sửa Code C# / Scene .tscn / Blender -> Retest"]
     SelfHealing --> DotnetBuild
 ```

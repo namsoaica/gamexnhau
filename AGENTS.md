@@ -92,31 +92,34 @@ Mỗi khi khởi tạo Sub-agent, prompt giao việc BẮT BUỘC phải kèm c�
 
 ---
 
-## 4. Cơ Chế Kiểm Thử Nghiệm Thu Thực Tế Đến Khi Đạt Yêu Cầu (Requirement-Driven Auto-Playtest Loop)
+## 4. Cơ Chế Kiểm Thử Thị Giác Thực Tế & Nghiệm Thu Tự Động (Visual Playtest & Screenshot Inspection Loop)
 
-Đây là quy trình nghiệm thu sống còn nhằm ngăn chặn tuyệt đối tình trạng bàn giao code lỗi, model lộn xộn hoặc tính năng chưa chạy được:
+Xóa bỏ hoàn toàn tình trạng "kiểm thử mù trong bóng tối (--headless)" bằng quy trình 4 bước bắt buộc:
 
-1. **Quy tắc 1: Cấm kết thúc nhiệm vụ khi mới chỉ chạy `dotnet build`**:
-   - `dotnet build` chỉ là bước kiểm tra cú pháp và liên kết kiểu dữ liệu tối thiểu.
-   - Biên dịch thành công **KHÔNG ĐỒNG NGHĨA** với việc tính năng gameplay hoạt động đúng trong Godot Engine.
-2. **Quy tắc 2: Chuyển hóa 100% yêu cầu thành Automated Playtest Assertions trong `test_suite.gd`**:
-   - Trước và sau khi viết code C#, AI bắt buộc phải chuyển hóa từng yêu cầu người dùng thành các bài kiểm tra hành vi thực tế (Playtest Simulation) trong `test_suite.gd`:
-     - Tự động nạp Scene thế giới (`WorldMap.tscn`).
-     - Giả lập dịch chuyển Player bước vào trong các ngôi nhà để kiểm tra mái nhà (`Roof_*`) và tường trước (`Wall_Front_*`) có tự ẩn đi không, đèn nội thất có bật không, và Camera có chuyển đổi góc nhìn mượt mà (`SetInteriorFocus`) hay không (**Seamless Interior Transition**).
-     - Kiểm tra toàn bộ Mesh kết cấu kiến trúc mới có `StaticBody3D` và `CollisionShape3D` hợp lệ, cấm tình trạng xuyên tường, xuyên sàn hay rơi khỏi map.
-     - Giả lập kích hoạt tương tác với từng NPC để kiểm tra trạng thái **NPC Behavior System** (`Interacting`), mở hộp thoại (`NpcInteractionDialog`), hiển thị chức danh tiếng Việt và sinh đủ nút hành động.
-     - Kiểm tra Dev Tool (đủ 6 tabs, dịch chuyển tức thời Teleport thành công, quản lý NPC, đồ họa).
-     - Thay đổi độ phân giải (720p, 1080p, 4K), đo FPS trần (30, 60, 144, Unlimited) và bật tắt VSync trong `DisplaySettingsManager`.
-3. **Quy tắc 3: Tự động chạy Godot Headless và đọc toàn bộ log**:
-   - Tự động thực thi lệnh chạy Godot Mono Console:
-     `& "C:\xnhaugame\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe" --headless --script test_suite.gd`
-   - Đọc và phân tích toàn bộ log đầu ra, bắt mọi lỗi `[FAIL]`, `SCRIPT ERROR`, `NullReferenceException` hoặc crash.
-4. **Quy tắc 4: Vòng lặp tự chữa lỗi (Self-Healing Loop)**:
-   - Nếu bất kỳ tiêu chí tính năng nào báo `[FAIL]` hoặc có lỗi Runtime trong log Godot:
-     - AI bắt buộc phải tự phân tích nguyên nhân gốc rễ (Root Cause Analysis).
-     - Tự sửa lại code C#, Scene `.tscn` hoặc script Blender.
-     - Biên dịch lại `dotnet build` và chạy lại `test_suite.gd` liên tục.
-   - Chỉ khi nào **100% tiêu chí yêu cầu đều đạt [PASS] tuyệt đối (0 FAIL, 0 Error)** mới được phép cập nhật `PROJECT_STATE.md` và báo cáo hoàn thành cho người dùng.
+1. **Bước 1: Chạy Dựng Hình Thực Tế (Windowed Rendering - CẤM dùng cờ `--headless`) & Tự Động Chụp Ảnh Màn Hình**:
+   - Ngoài việc kiểm tra thông số logic, kịch bản `test_suite.gd` bắt buộc phải chạy ở chế độ có dựng hình thực tế (Windowed Rendering) bằng trình chạy Godot Mono Console:
+     `& "C:\xnhaugame\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe" --script test_suite.gd`
+   - Kịch bản tự động điều khiển nhân vật đi qua các tính năng vừa code, đợi khung hình ổn định và dùng lệnh `get_viewport().get_texture().get_image().save_png()` chụp lại 4 bức ảnh màn hình thực tế lưu vào thư mục `docs/test_screenshots/`:
+     - `1_map_overview.png`: Khi ở ngoài trời (toàn cảnh làng, con đường đất, cổng làng, khu chợ, NPC).
+     - `2_interior_view.png`: Khi nhân vật đứng bên trong nhà (Seamless Interior Transition: mái và tường trước/South/West biến mất sạch sẽ, đèn phòng bật sáng, nhân vật và nội thất rõ ràng không bị che khuất).
+     - `3_npc_ui.png`: Khi đang tương tác với NPC dân làng (hộp thoại `NpcInteractionDialog` popup ở trung tâm, hiển thị chức danh tiếng Việt, câu chào và các nút hành động đặc biệt).
+     - `4_devtools_ui.png`: Khi bật Dev Tool (DevOverlay HUD) và đổi cấu hình độ phân giải / đồ họa.
+
+2. **Bước 2: Mắt Thần Tự Soi Ảnh (Visual Inspection qua Vision Tool `read_file`)**:
+   - Sau khi chụp xong, AI **BẮT BUỘC** phải dùng công cụ đọc ảnh (`read_file`) mở từng bức ảnh trong `docs/test_screenshots/` lên để tự kiểm tra bằng mắt:
+     - **Ánh sáng & Màu sắc**: Có bị tối đen như mực hay cháy sáng lóa mắt không?
+     - **Góc nhìn nội thất**: Khi vào trong nhà, tường và mái có thực sự ẩn đi để nhìn rõ nhân vật và đồ đạc bên trong không hay vẫn bị che khuất bởi tường/cây cối bên ngoài?
+     - **Tiếp xúc mặt đất**: Nhân vật có đứng vững trên mặt sàn/đất không, có bị lún chân xuống đất hay bay lơ lửng không?
+     - **Bố cục giao diện UI**: Bảng Dev Tool, hộp thoại NPC có bị tràn viền màn hình, vỡ khung hay đè chữ lên nhau không?
+
+3. **Bước 3: Vòng Lặp Tự Sửa Lỗi Thị Giác (Visual Self-Healing Loop)**:
+   - Nếu nhìn ảnh phát hiện bất kỳ lỗi hiển thị, cây cối mọc xuyên nhà, che khuất góc nhìn camera hay vỡ bố cục UI nào (dù log code báo PASS):
+     - AI tuyệt đối không được dừng lại mà phải tự sửa code C#, Scene `.tscn` hoặc script Blender.
+     - Biên dịch lại `dotnet build` và chạy lại `test_suite.gd` để chụp lại bộ ảnh mới.
+     - Tiếp tục soi ảnh cho đến khi toàn bộ 4 bức ảnh đều đạt chất lượng thẩm mỹ cao, cân đối, sắc nét.
+
+4. **Bước 4: Nghiệm Thu Hoàn Toàn Diện**:
+   - Chỉ khi cả thông số logic (100% PASS, 0 Error) lẫn 4 hình ảnh chụp màn hình thực tế đều đạt yêu cầu 100% mới được phép cập nhật `PROJECT_STATE.md`, `TASKS.md` và báo cáo hoàn thành cho người dùng.
 
 ---
 

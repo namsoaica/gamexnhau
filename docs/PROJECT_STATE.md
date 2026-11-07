@@ -634,3 +634,22 @@
    - `.agents/skills/blender-helper/SKILL.md`, `AGENTS.md`, `GEMINI.md`: Thiết lập 4 quy tắc: (1) Cấm khối thô sơ, dùng bmesh + Modifiers (Bevel 2-3 segments, Solidify, Shade Auto Smooth); (2) Xây dựng thư viện procedural chuẩn `tools/blender_kit.py` tham số hóa, tự động căn chỉnh AABB (`snap_to_ground`, `stack_on_top`); (3) Cơ chế Mắt Thần Tự Kiểm Tra (Visual Self-Correction Loop) render `Assets/Models/_preview_render.png` bằng Workbench Cavity Shading; (4) Vòng lặp chất lượng đối chiếu trực quan với `modelyeucau/` trước khi xuất sang Godot.
    - Thư viện `tools/blender_kit.py`: Cung cấp bộ công cụ chuyển đổi tọa độ Godot-Blender, căn chỉnh AABB, vật liệu Workbench + PBR, Bevel/Solidify Modifiers, Procedural Mesh Builders (hộp beveled, trụ, đá đa giác ngẫu hóa, cây tán tầng hữu cơ, mái nhà riềm chìa), và Render Preview tự động.
    - Refactor toàn bộ `Assets/Blender_Source/build_village_map.py` theo `tools/blender_kit.py`, xuất ra `Assets/Models/village_map.glb`, render và kiểm tra trực quan thành công `Assets/Models/_preview_render.png`.
+
+
+### [2026-11-08] - Thiết Lập Cơ Chế Kiểm Thử Thị Giác Thực Tế & Soi Ảnh Chụp Màn Hình (Visual Playtest & Screenshot Inspection Loop)
+1. **Xóa Bỏ Kiểm Thử Mù Trong Bóng Tối (`--headless`)**:
+   - Nâng cấp `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md`, `.agents/workflows/dev_and_review.py` và `test_suite.gd`.
+   - Chạy `test_suite.gd` trực tiếp ở chế độ dựng hình thực tế (Windowed rendering qua D3D12 / Vulkan Forward+ trên Godot Mono Console) không dùng cờ `--headless`.
+   - Tự động điều khiển nhân vật chạy thử nghiệm các tính năng và chụp 4 bức ảnh thực tế lưu vào `docs/test_screenshots/`:
+     * `docs/test_screenshots/1_map_overview.png`: Ngoài trời toàn cảnh làng, đường đất, cổng làng, chợ, NPC.
+     * `docs/test_screenshots/2_interior_view.png`: Bên trong nhà với Seamless Interior Transition (mái và tường South/West ẩn đi, đèn sáng, nhân vật và nội thất rõ ràng không bị che khuất).
+     * `docs/test_screenshots/3_npc_ui.png`: Tương tác với NPC dân làng, hộp thoại popup không tràn viền, text tiếng Việt chuẩn.
+     * `docs/test_screenshots/4_devtools_ui.png`: Dev Mode HUD 6 tabs và điều chỉnh đồ họa đa độ phân giải.
+2. **Mắt Thần Tự Soi Ảnh & Sửa Lỗi Thị Giác (Visual Self-Healing Loop)**:
+   - Dùng công cụ đọc ảnh (Vision) mở từng bức ảnh lên tự kiểm tra bằng mắt.
+   - **Phát hiện & khắc phục lỗi thị giác nghiêm trọng**: Phát hiện 65 đạo cụ xung quanh (`Map_Surroundings`) mọc xuyên vào sàn nhà rèn và đường làng; đã tạo `MaterialCatalogHelper.cs` và nâng cấp `MapAutoCollision.cs` tự động dọn dẹp sạch sẽ các node xung đột.
+   - **Tối ưu góc nhìn Seamless Interior Transition**: Bổ sung `Wall_South_*` và `Wall_West_*` vào danh sách ẩn khi vào nhà trong `WorldMap.tscn`, điều chỉnh `InteriorCameraZoom = 9.5`, di chuyển cây cối phía sau nhà rèn ra xa sightline camera, giúp không gian nội thất mở ra như mô hình diorama trong suốt tuyệt đẹp.
+3. **Kiểm Định Toàn Diện**:
+   - `dotnet build`: Build succeeded. 0 Warning(s), 0 Error(s).
+   - Kiểm thử thực tế Windowed: **372 / 372 Test cases PASSED (100% Tuyệt Đối, 0 Fail, 0 Error)**.
+   - Soi ảnh thực tế: 100% 4 bức ảnh đạt chuẩn thẩm mỹ cao, ánh sáng cân đối, không lún đất, không che khuất, không vỡ UI.

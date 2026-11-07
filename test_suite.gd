@@ -2,7 +2,8 @@ extends SceneTree
 
 var passed = 0
 var failed = 0
-var frame_count = 0
+var test_phase = 0
+var phase_frame = 0
 var test_map = null
 
 func assert_true(cond: bool, msg: String):
@@ -17,21 +18,117 @@ func _init():
 	print("=== INITIALIZING VERIFICATION SUITE ===")
 
 func _process(delta: float) -> bool:
-	frame_count += 1
-	if frame_count == 1:
-		var map_res = load("res://Scenes/Levels/WorldMap.tscn")
-		test_map = map_res.instantiate()
-		root.add_child(test_map)
+	phase_frame += 1
+
+	if test_phase == 0:
+		if phase_frame == 1:
+			var map_res = load("res://Scenes/Levels/WorldMap.tscn")
+			test_map = map_res.instantiate()
+			root.add_child(test_map)
+			DirAccess.make_dir_recursive_absolute("res://docs/test_screenshots")
+			return false
+		
+		if phase_frame == 2:
+			# At frame 2, all _Ready() methods have executed
+			run_suite()
+			if DisplayServer.get_name() == "headless":
+				print("\n[NOTE] Đang chạy ở chế độ --headless: Bỏ qua chụp ảnh màn hình Windowed.")
+				test_map.queue_free()
+				quit(0 if failed == 0 else 1)
+				return true
+			print("\n=== BẮT ĐẦU KIỂM THỬ THỊ GIÁC THỰC TẾ (VISUAL PLAYTEST & SCREENSHOTS) ===")
+			test_phase = 1
+			phase_frame = 0
+			return false
+
+	# Phase 1: 1_map_overview.png (Ngoài trời toàn cảnh làng)
+	elif test_phase == 1:
+		if phase_frame == 1:
+			var player = test_map.find_child("Player", true, false)
+			if player:
+				player.TeleportTo(Vector3(0.0, 0.5, 12.0))
+			var cam = test_map.find_child("IsometricCamera", true, false)
+			if cam:
+				cam.ResetToPlayer()
+		elif phase_frame >= 15:
+			capture_screenshot("res://docs/test_screenshots/1_map_overview.png", "1_map_overview.png (Ngoài trời toàn cảnh)")
+			# Prepare for Phase 2: Interior view of Blacksmith
+			var player = test_map.find_child("Player", true, false)
+			var smith_zone = test_map.find_child("InteriorZone_Smith", true, false)
+			if player:
+				player.TeleportTo(Vector3(-11.5, 0.5, 20.5))
+			if smith_zone and player:
+				smith_zone.emit_signal("body_entered", player)
+			test_phase = 2
+			phase_frame = 0
 		return false
-	
-	if frame_count == 2:
-		# At frame 2, all _Ready() methods have executed
-		run_suite()
+
+	# Phase 2: 2_interior_view.png (Bên trong nhà Seamless Interior Transition)
+	elif test_phase == 2:
+		if phase_frame >= 20:
+			capture_screenshot("res://docs/test_screenshots/2_interior_view.png", "2_interior_view.png (Nội thất Seamless Transition)")
+			# Reset interior
+			var player = test_map.find_child("Player", true, false)
+			var smith_zone = test_map.find_child("InteriorZone_Smith", true, false)
+			if smith_zone and player:
+				smith_zone.emit_signal("body_exited", player)
+			# Prepare for Phase 3: Interact with NPC
+			var npc = test_map.find_child("Npc_Blacksmith", true, false)
+			if player and npc:
+				player.TeleportTo(npc.global_position + Vector3(0.0, 0.0, 1.8))
+				var cam = test_map.find_child("IsometricCamera", true, false)
+				if cam:
+					cam.ResetToPlayer()
+				npc.Interact(player)
+			test_phase = 3
+			phase_frame = 0
+		return false
+
+	# Phase 3: 3_npc_ui.png (Hội thoại tương tác NPC)
+	elif test_phase == 3:
+		if phase_frame >= 15:
+			capture_screenshot("res://docs/test_screenshots/3_npc_ui.png", "3_npc_ui.png (Hộp thoại tương tác NPC)")
+			# Close dialog
+			var dialog = test_map.find_child("NpcInteractionDialog", true, false)
+			if dialog:
+				dialog.CloseDialog()
+			# Prepare for Phase 4: Open DevOverlay
+			var dev = test_map.find_child("DevOverlay", true, false)
+			if dev:
+				dev.SetDevModeVisible(true)
+				var tabs = dev.get("Tabs")
+				if tabs != null:
+					tabs.current_tab = 5 # DevGraphicsTab
+			test_phase = 4
+			phase_frame = 0
+		return false
+
+	# Phase 4: 4_devtools_ui.png (Dev HUD & Đồ họa)
+	elif test_phase == 4:
+		if phase_frame >= 15:
+			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Đồ Họa)")
+			var dev = test_map.find_child("DevOverlay", true, false)
+			if dev:
+				dev.SetDevModeVisible(false)
+			test_phase = 5
+			phase_frame = 0
+		return false
+
+	# Phase 5: Complete & Summary
+	elif test_phase == 5:
+		print("\n=== HOÀN TẤT KIỂM THỬ THỊ GIÁC: Toàn bộ ảnh đã được lưu vào docs/test_screenshots/ ===")
+		print("=== TỔNG KẾT CUỐI CÙNG: Passed: ", passed, " | Failed: ", failed, " ===")
 		test_map.queue_free()
 		quit(0 if failed == 0 else 1)
 		return true
 
 	return false
+
+func capture_screenshot(path: String, label: String):
+	var vp = root.get_viewport()
+	var img = vp.get_texture().get_image()
+	var err = img.save_png(path)
+	assert_true(err == OK and not img.is_empty(), "Ảnh chụp thực tế: " + label + " (" + str(img.get_size().x) + "x" + str(img.get_size().y) + ")")
 
 func run_suite():
 	print("\n=== RUNNING VERIFICATION SUITE ===")

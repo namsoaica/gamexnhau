@@ -55,6 +55,12 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (3) CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (Visual Self-Correction Loop): Tự động render ảnh góc nhìn Isometric với Sun Light xuất ra `Assets/Models/_preview_render.png`, AI dùng công cụ đọc ảnh đối chiếu trực tiếp với concept `modelyeucau/`.
   - (4) VÒNG LẶP CHẤT LƯỢNG: Tự sửa script bpy và render kiểm tra liên tục đến khi mô hình sắc nét, cân đối mới đưa vào Scene Godot.
   - Đã refactor toàn bộ `Assets/Blender_Source/build_village_map.py` theo `tools/blender_kit.py`, xuất lại `Assets/Models/village_map.glb`, lưu `Assets/Blender_Source/village_map.blend`, render kiểm tra trực quan thành công và xác thực 368/368 test cases Pass trên Godot Headless.
+- [x] **[AI - agy-customizations & code-reviewer]** Nâng cấp toàn diện cơ chế "Kiểm Thử Thị Giác Thực Tế (Visual Playtest & Screenshot Inspection Loop)", xóa bỏ triệt để tình trạng kiểm thử mù trong bóng tối (`--headless`):
+  - (1) Bắt buộc chạy dựng hình thực tế (Windowed rendering) qua Godot Mono Console: Tự động điều khiển nhân vật trải nghiệm các tính năng và chụp 4 bức ảnh màn hình thực tế lưu vào `docs/test_screenshots/` (`1_map_overview.png`, `2_interior_view.png`, `3_npc_ui.png`, `4_devtools_ui.png`).
+  - (2) AI BẮT BUỘC dùng công cụ đọc ảnh (Vision) mở từng bức ảnh lên tự kiểm tra bằng mắt (ánh sáng/màu sắc, góc nhìn nội thất không bị che khuất, tiếp xúc mặt đất của nhân vật, bố cục giao diện UI).
+  - (3) Phát hiện và loại bỏ triệt để 65 đạo cụ xung quanh (`Map_Surroundings`) mọc xuyên vào làng/nhà dân qua `MaterialCatalogHelper.cs` và `MapAutoCollision.cs`; cấu hình `InteriorZone` ẩn tường South/West cho góc nhìn diorama thông thoáng; điều chỉnh vị trí cây cối bao quanh.
+  - (4) Đạt chuẩn 100% cả về logic lẫn hình ảnh: **372 / 372 Test cases PASSED (100% Pass, 0 Error)** và 4/4 ảnh chụp màn hình đạt chuẩn thẩm mỹ cao.
+  - Đã cập nhật đồng bộ: `.agents/skills/code-reviewer/SKILL.md`, `AGENTS.md`, `GEMINI.md`, `.agents/workflows/dev_and_review.py`, `test_suite.gd`, và `WorldMap.tscn`.
 
 ---
 
