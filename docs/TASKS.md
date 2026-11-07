@@ -31,12 +31,18 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
 - [x] **[AI - agy-customizations & blender-helper]** Thiết lập quy trình "Đọc Ảnh Phác Họa Tạo Model 3D (Sketch-to-3D Pipeline)" trong `.agents/skills/blender-helper/SKILL.md`, `AGENTS.md` và `GEMINI.md`: đọc ảnh từ `modelyeucau/`, phân tích thị giác 2D (tọa độ X, Z, tỷ lệ, màu sắc), phối hợp `@texture-architect` tra cứu `Assets/Textures/TEXTURE_CATALOG.md`, viết script Python `bpy` gọi Blender CLI dựng Mesh và Collision tự động, xuất `.glb` vào `Assets/Models/` và gắn vào scene `.tscn` của Godot 4.
 - [x] **[AI - texture-architect]** Chuẩn bị texture bạt sọc đỏ-trắng `tex_canopy_striped.png` (Tileable 128x128) và 5 vật liệu `StandardMaterial3D` dùng chung Godot 4: `M_Roof_Tiles_Red.tres`, `M_Roof_Tiles_Teal.tres`, `M_Canopy_Striped.tres`, `M_Mystic_Cyan.tres` (Emission x2.0), `M_Lava_Fire.tres` (Emission x2.5), đăng ký đầy đủ vào `Assets/Textures/TEXTURE_CATALOG.md`.
 - [x] **[AI - blender-helper]** Hiện thực hóa Bản Đồ Làng Mở Rộng và Nội Thất từ ảnh concept `modelyeucau/map2/1.jpg`: Soạn thảo `Assets/Blender_Source/build_village_map.py`, dựng mô hình 3D Stylized Low-Poly Isometric quy mô 48m x 48m gồm 6 phân khu (Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Cổng Làng & Vườn Rau) và nội thất 4 phòng (Nhà Rèn, Giả Kim, Quán Ăn, Nhà Dân); tách riêng `Roof_*` và `Wall_Front_*` cho cơ chế Seamless Interior Transition; tự động tạo 117 mesh va chạm `-col`; xuất ra `Assets/Models/village_map.glb` (884 KB) và lưu an toàn `Assets/Blender_Source/village_map.blend`.
-- [x] **[AI - csharp-coder & code-reviewer]** Lập trình trọn gói 4 phân hệ gameplay cho Bản Đồ Làng Mới (`VillageMap.tscn`):
+- [x] **[AI - csharp-coder & code-reviewer]** Lập trình trọn gói 4 phân hệ gameplay cho Bản Đồ Làng Mới:
   - Phân hệ 1: Chuyển đổi nội thất liền mạch (`InteriorZone.cs`, `CameraFollow.cs` mở rộng `SetInteriorFocus`).
   - Phân hệ 2: Hệ thống hành vi AI NPC và tương tác chuyên biệt 8 dân làng (`NpcProfession.cs`, `NpcState.cs`, `NpcSpecialActionManager.cs`, `NpcBehavior.cs`, `NpcInteractionDialog.cs`, `VillageNpc.tscn`, `NpcInteractionDialog.tscn`).
   - Phân hệ 3: Cài đặt hiển thị và tối ưu hóa khung hình đa cấu hình (`DisplaySettingsManager.cs` lưu `user://settings.cfg`).
   - Phân hệ 4: Mở rộng Dev Mode HUD (`DevTeleportTab.cs`, `DevNpcSystemTab.cs`, `DevGraphicsTab.cs`, `DevOverlay.cs`, `DevOverlay.tscn`).
-  - Tích hợp Scene `VillageMap.tscn`, đạt chuẩn Clean Code (100% file < 200 dòng, method < 25 dòng), `dotnet build` 0 cảnh báo 0 lỗi, Godot Headless `test_suite.gd` đạt 279/279 tests Passed (100%).
+- [x] **[AI - blender-helper & csharp-coder]** Hợp nhất 2 Map liền nhau hoàn toàn trong `WorldMap.tscn` (Seamless Connected World):
+  - Khắc phục triệt để lỗi đảo trục tọa độ Blender Y-Z trong `build_village_map.py`: Chuyển đổi chính xác 100% tọa độ Godot sang Blender, đưa mô hình làng nằm phẳng hoàn toàn trên mặt cỏ cánh đồng, nối thẳng con đường đất từ chân dốc Đảo Đá (`Z=0.2`) qua Cổng Làng (`Z=8.5`) tới Chợ Trung Tâm (`Z=17.0`) và các phân khu.
+  - Xóa bỏ scene rời `VillageMap.tscn`, quy về 1 màn chơi duy nhất `WorldMap.tscn`.
+  - Cập nhật vị trí 4 vùng nội thất `InteriorZone_*` (Smith, Alchemist, Chef, House) và 8 dân làng `Village_NPCs` khớp với bản đồ thực.
+  - Cập nhật tọa độ dịch chuyển trong `DevTeleportTab.cs`.
+  - Bổ sung va chạm tự động cho tường, giếng, đe sắt, lò luyện trong `MapAutoCollision.cs`.
+  - Xác thực `dotnet build` 0 lỗi 0 cảnh báo, Godot Headless `test_suite.gd` đạt 279/279 test cases Passed (100%).
 
 ---
 

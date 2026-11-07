@@ -212,6 +212,8 @@ public partial class MapAutoCollision : Node
 		       lower.Contains("paver") || lower.Contains("fence") || lower.Contains("floor") ||
 		       lower.Contains("ground") || lower.Contains("rock") || lower.Contains("mountain") ||
 		       lower.Contains("cliff") || lower.Contains("overlook") || lower.Contains("gate") ||
-		       lower.Contains("shed") || lower.Contains("cart");
+		       lower.Contains("shed") || lower.Contains("cart") || lower.Contains("wall") ||
+		       lower.Contains("chimney") || lower.Contains("well") || lower.Contains("trunk") ||
+		       lower.Contains("anvil") || lower.Contains("table") || lower.Contains("furnace");
 	}
 }

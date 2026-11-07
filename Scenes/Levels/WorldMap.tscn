@@ -33,16 +33,16 @@ tonemap_exposure = 1.0
 ssao_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_smith"]
-size = Vector3(6.0, 3.2, 5.2)
+size = Vector3(6.8, 3.4, 6.0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_alchemist"]
-size = Vector3(6.0, 3.2, 5.2)
+size = Vector3(6.8, 3.4, 6.0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_chef"]
-size = Vector3(5.4, 3.0, 4.8)
+size = Vector3(6.2, 3.2, 5.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_house"]
-size = Vector3(5.4, 3.0, 4.8)
+size = Vector3(6.2, 3.2, 5.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_void"]
 size = Vector3(400, 10, 400)
@@ -90,7 +90,7 @@ Target = NodePath("../Player")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -4)
 
 [node name="InteriorZone_Smith" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.4, 36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.6, 21)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Smith")]
 WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Smith_L"), NodePath("../VillageMesh/Wall_Front_Smith_R"), NodePath("../VillageMesh/Wall_Front_Smith_Top")]
@@ -107,7 +107,7 @@ light_energy = 2.2
 omni_range = 8.0
 
 [node name="InteriorZone_Alchemist" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.4, 36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.6, 21)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Alchemist")]
 WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Alchemist_L"), NodePath("../VillageMesh/Wall_Front_Alchemist_R"), NodePath("../VillageMesh/Wall_Front_Alchemist_Top")]
@@ -124,7 +124,7 @@ light_energy = 2.0
 omni_range = 8.0
 
 [node name="InteriorZone_Chef" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.3, 24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, 7.5)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_Chef")]
 WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Chef_L"), NodePath("../VillageMesh/Wall_Front_Chef_R"), NodePath("../VillageMesh/Wall_Front_Chef_Top")]
@@ -141,7 +141,7 @@ light_energy = 2.0
 omni_range = 8.0
 
 [node name="InteriorZone_House" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.3, 24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.5, 28.5)
 script = ExtResource("9_interior")
 RoofPaths = [NodePath("../VillageMesh/Roof_House")]
 WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_House_L"), NodePath("../VillageMesh/Wall_Front_House_R"), NodePath("../VillageMesh/Wall_Front_House_Top")]
@@ -160,49 +160,49 @@ omni_range = 8.0
 [node name="Village_NPCs" type="Node3D" parent="."]
 
 [node name="Npc_Guard" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.5)
 NpcName = "Aegis"
 Profession = 7
 CurrentState = 0
 
 [node name="Npc_Farmer" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0, 8.5)
 NpcName = "George"
 Profession = 3
 CurrentState = 1
 
 [node name="Npc_Chef" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 7.5)
 NpcName = "Gusteau"
 Profession = 2
 CurrentState = 1
 
 [node name="Npc_Fisherman" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 27)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 15)
 NpcName = "Finn"
 Profession = 4
 CurrentState = 1
 
 [node name="Npc_Blacksmith" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0, 35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 0, 20)
 NpcName = "Vulcan"
 Profession = 0
 CurrentState = 1
 
 [node name="Npc_Alchemist" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 21)
 NpcName = "Aria"
 Profession = 1
 CurrentState = 1
 
 [node name="Npc_Lumberjack" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 43.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 36.5)
 NpcName = "Grover"
 Profession = 6
 CurrentState = 1
 
 [node name="Npc_Miner" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 42.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 36.5)
 NpcName = "Brock"
 Profession = 5
 CurrentState = 1
