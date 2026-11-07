@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://cb5setmenu801"]
+
+[ext_resource type="Script" path="res://Scripts/UI/SettingsMenu.cs" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
+bg_color = Color(0.12, 0.14, 0.18, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.1, 0.12, 0.16, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.55, 0.85, 0.9)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 10
+
+[node name="SettingsMenu" type="CanvasLayer"]
+layer = 95
+script = ExtResource("1_menu")
+
+[node name="HudSettingsButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -140.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 54.0
+grow_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_hud")
+text = "⚙ Cài Đặt (ESC)"
+
+[node name="MainPanel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -200.0
+offset_right = 240.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "⚙ CÀI ĐẶT ĐỒ HỌA & MÀN HÌNH"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="MainPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="LblRes" type="Label" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Độ Phân Giải:"
+
+[node name="ResolutionOption" type="OptionButton" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblMode" type="Label" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Chế Độ Cửa Sổ:"
+
+[node name="WindowModeOption" type="OptionButton" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblFps" type="Label" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Giới Hạn FPS:"
+
+[node name="FpsOption" type="OptionButton" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblVsync" type="Label" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Đồng Bộ Dọc (VSync):"
+
+[node name="VsyncOption" type="OptionButton" parent="MainPanel/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusLabel" type="Label" parent="MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="ActionsBox" type="HBoxContainer" parent="MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="ApplyBtn" type="Button" parent="MainPanel/Margin/VBox/ActionsBox"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+text = "💾 Lưu Cấu Hình"
+
+[node name="CloseBtn" type="Button" parent="MainPanel/Margin/VBox/ActionsBox"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "✖ Đóng (ESC)"

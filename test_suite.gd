@@ -92,24 +92,30 @@ func _process(delta: float) -> bool:
 			var dialog = test_map.find_child("NpcInteractionDialog", true, false)
 			if dialog:
 				dialog.CloseDialog()
-			# Prepare for Phase 4: Open DevOverlay
+			# Prepare for Phase 4: Open DevOverlay & SettingsMenu
 			var dev = test_map.find_child("DevOverlay", true, false)
 			if dev:
 				dev.SetDevModeVisible(true)
 				var tabs = dev.get("Tabs")
 				if tabs != null:
 					tabs.current_tab = 5 # DevGraphicsTab
+			var settings = test_map.find_child("SettingsMenu", true, false)
+			if settings:
+				settings.SetMenuOpen(true)
 			test_phase = 4
 			phase_frame = 0
 		return false
 
-	# Phase 4: 4_devtools_ui.png (Dev HUD & Đồ họa)
+	# Phase 4: 4_devtools_ui.png (Dev HUD & Menu Cài Đặt)
 	elif test_phase == 4:
 		if phase_frame >= 15:
-			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Đồ Họa)")
+			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Menu Cài Đặt)")
 			var dev = test_map.find_child("DevOverlay", true, false)
 			if dev:
 				dev.SetDevModeVisible(false)
+			var settings = test_map.find_child("SettingsMenu", true, false)
+			if settings:
+				settings.SetMenuOpen(false)
 			test_phase = 5
 			phase_frame = 0
 		return false
@@ -800,7 +806,14 @@ func test_village_map_and_gameplay():
 			"Floor_Smith", "Wall_North_Smith", "Floor_Alchemist", "Wall_North_Alchemist",
 			"Floor_Chef", "Wall_North_Chef", "Floor_House", "Wall_North_House",
 			"Well_Stone", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base",
-			"Pier_Dock_Deck", "Water_Fisher_Basin"
+			"Pier_Dock_Deck", "Water_Fisher_Basin",
+			"Blacksmith_Forge_Furnace", "Anvil_Heavy", "Chest_Scrap_Metal", "Chest_Charcoal",
+			"Quench_Tank", "Weapon_Rack_Wall", "Blacksmith_Workbench",
+			"Alchemist_Cauldron_Glowing", "Alchemy_Lab_Table", "Alchemy_Tall_Bookshelf",
+			"Potion_Shelves", "Hanging_Herbs",
+			"Bakery_Brick_Oven", "Bakery_Prep_Table", "Dining_Table_Long", "Dining_Bench_L",
+			"Dining_Bench_R", "Dish_Shelf", "Hanging_Sausages", "Wine_Barrel_Cask",
+			"House_Cozy_Bed", "House_Wardrobe_Tall", "House_Floor_Rug", "House_Side_Table"
 		]
 		for mesh_name in critical_meshes:
 			var m_node = vlg_mesh.find_child(mesh_name, true, false)
@@ -906,6 +919,29 @@ func test_village_map_and_gameplay():
 		assert_true(disp_mgr.CurrentVSync == DisplayServer.VSYNC_ENABLED, "DisplaySettingsManager VSync enabled")
 		disp_mgr.SaveSettings()
 		assert_true(FileAccess.file_exists("user://settings.cfg"), "Settings saved successfully to user://settings.cfg")
+
+	# 6. Automated Playtest: SettingsMenu (In-Game Display & Graphics Menu)
+	var settings = vlg.find_child("SettingsMenu", true, false)
+	assert_true(settings != null, "SettingsMenu canvas layer exists in WorldMap")
+	if settings != null:
+		assert_true(settings.get("ResolutionOption") != null, "SettingsMenu has ResolutionOption")
+		assert_true(settings.get("WindowModeOption") != null, "SettingsMenu has WindowModeOption")
+		assert_true(settings.get("FpsOption") != null, "SettingsMenu has FpsOption")
+		assert_true(settings.get("VsyncOption") != null, "SettingsMenu has VsyncOption")
+		assert_true(settings.get("ApplyButton") != null, "SettingsMenu has ApplyButton")
+		assert_true(settings.get("CloseButton") != null, "SettingsMenu has CloseButton")
+		assert_true(settings.get("HudSettingsButton") != null, "SettingsMenu has HudSettingsButton")
+
+		settings.SetMenuOpen(true)
+		assert_true(settings.IsMenuOpen == true, "SettingsMenu opened successfully")
+		settings.ApplyAndSaveSettings()
+		assert_true(FileAccess.file_exists("user://settings.cfg"), "SettingsMenu saved config to user://settings.cfg")
+		settings.SetMenuOpen(false)
+		assert_true(settings.IsMenuOpen == false, "SettingsMenu closed successfully")
+
+	# 7. Automated Playtest: BuildingInteriorManager
+	var bld_mgr = vlg.find_child("BuildingInteriorManager", true, false)
+	assert_true(bld_mgr != null, "BuildingInteriorManager node exists in WorldMap")
 
 
 

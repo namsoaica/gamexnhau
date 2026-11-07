@@ -13,6 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://b2v8npcbehav1" path="res://Scenes/Characters/VillageNpc.tscn" id="10_vlgnpc"]
 [ext_resource type="Script" path="res://Scripts/Core/DisplaySettingsManager.cs" id="11_display"]
 [ext_resource type="PackedScene" uid="uid://c3q8npcdialog1" path="res://Scenes/UI/NpcInteractionDialog.tscn" id="12_dialog"]
+[ext_resource type="PackedScene" uid="uid://cb5setmenu801" path="res://Scenes/UI/SettingsMenu.tscn" id="13_settings"]
+[ext_resource type="Script" path="res://Scripts/Core/BuildingInteriorManager.cs" id="14_interiormgr"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_world"]
 sky_top_color = Color(0.35, 0.62, 0.95, 1)
@@ -225,3 +227,8 @@ shape = SubResource("BoxShape3D_void")
 [node name="DevOverlay" parent="." instance=ExtResource("7_dev")]
 
 [node name="NpcInteractionDialog" parent="." instance=ExtResource("12_dialog")]
+
+[node name="BuildingInteriorManager" type="Node" parent="."]
+script = ExtResource("14_interiormgr")
+
+[node name="SettingsMenu" parent="." instance=ExtResource("13_settings")]

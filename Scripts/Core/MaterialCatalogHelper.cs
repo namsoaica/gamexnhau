@@ -66,6 +66,9 @@ public static class MaterialCatalogHelper
 		       lower.Contains("chimney") || lower.Contains("well") || lower.Contains("trunk") ||
 		       lower.Contains("anvil") || lower.Contains("table") || lower.Contains("furnace") ||
 		       lower.Contains("oven") || lower.Contains("wardrobe") || lower.Contains("chest") ||
-		       lower.Contains("barrel") || lower.Contains("crate") || lower.Contains("minecart");
+		       lower.Contains("barrel") || lower.Contains("crate") || lower.Contains("minecart") ||
+		       lower.Contains("cauldron") || lower.Contains("quench") || lower.Contains("bench") ||
+		       lower.Contains("bed") || lower.Contains("bookshelf") || lower.Contains("shelf") ||
+		       lower.Contains("rack") || lower.Contains("forge");
 	}
 }

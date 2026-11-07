@@ -82,14 +82,14 @@ public partial class InteriorZone : Area3D
 		SetInteriorState(false);
 	}
 
-	private void OnBodyEntered(Node3D body)
+	protected virtual void OnBodyEntered(Node3D body)
 	{
 		if (!body.IsInGroup("Player") && body.Name != "Player") return;
 		_isPlayerInside = true;
 		SetInteriorState(true);
 	}
 
-	private void OnBodyExited(Node3D body)
+	protected virtual void OnBodyExited(Node3D body)
 	{
 		if (!body.IsInGroup("Player") && body.Name != "Player") return;
 		_isPlayerInside = false;

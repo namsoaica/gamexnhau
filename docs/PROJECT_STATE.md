@@ -28,12 +28,15 @@
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), hỗ trợ chuyển đổi tâm nhìn và zoom cho chuyển đổi nội thất (`SetInteriorFocus`, `ResetInteriorFocus`), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), an toàn bộ nhớ trong `_ExitTree()`. |
 | `Scripts/Core/InteriorZone.cs` | (C# Script) | Vùng chuyển đổi nội thất liền mạch (Seamless Interior Transition): Tự động ẩn mái nhà, tường trước và collider khi Player bước vào trong nhà, bật đèn ấm nội thất `OmniLight3D`, kích hoạt zoom gần và tâm ngắm của camera nội thất. |
+| `Scripts/Core/BuildingInteriorArea.cs` | (C# Script) | Vùng chuyển đổi nội thất cho từng công trình trong làng, kế thừa `InteriorZone`, cung cấp zoom 9.5f và góc nhìn diorama cắt vách không bị che khuất. |
+| `Scripts/Core/BuildingInteriorManager.cs` | (C# Script) | Quản lý tập trung hệ thống chuyển đổi góc nhìn nội thất liền mạch trong làng, quản lý và thông báo sự kiện chuyển đổi. |
 | `Scripts/Core/DisplaySettingsManager.cs` | (C# Script) | Singleton quản lý cấu hình hiển thị, độ phân giải đa màn hình (720p đến 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), Target FPS (30, 60, 120, 144, Unlimited), VSync, lưu trữ bền vững tại `user://settings.cfg`. |
 | `Scripts/NPC/NpcProfession.cs` | (C# Script) | Enum định nghĩa 8 nghề nghiệp dân làng (`Blacksmith`, `Alchemist`, `Chef`, `Farmer`, `Fisherman`, `Miner`, `Lumberjack`, `Guard`) kèm các hàm mở rộng tiêu đề tiếng Việt và câu chào mặc định. |
 | `Scripts/NPC/NpcState.cs` | (C# Script) | Enum định nghĩa 4 trạng thái AI State Machine (`Idle`, `Working`, `Patrolling`, `Interacting`). |
 | `Scripts/NPC/NpcSpecialActionManager.cs` | (C# Script) | Quản lý danh mục tùy chọn tương tác đặc biệt cho 8 nghề nghiệp (cường hóa vũ khí, mua potion hồi máu/tăng tốc, thưởng thức bánh mì, đổi khoáng sản...). |
 | `Scripts/NPC/NpcBehavior.cs` | (C# Script) | Bộ điều khiển AI State Machine và tương tác chuyên biệt cho dân làng, kế thừa `CharacterBody3D`, implement `IInteractable`, procedural working animation, tuần tra waypoints, xoay mặt nhìn Player khi tương tác. |
 | `Scripts/UI/NpcInteractionDialog.cs` | (C# Script) | Giao diện Popup Dialog cho 8 dân làng: Hiển thị avatar/nghề nghiệp, lời chào, danh sách các nút hành động đặc biệt sinh động, mở khóa chuột và đóng sạch sẽ. |
+| `Scripts/UI/SettingsMenu.cs` | (C# Script) | Giao diện Menu Cài Đặt Game mở bằng phím ESC hoặc nút HUD "⚙ Cài Đặt (ESC)", điều chỉnh đa độ phân giải (720p - 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), FPS (30 - Unlimited), VSync, tự động lưu/nạp từ `user://settings.cfg`. |
 | `Scripts/UI/DevTeleportTab.cs` | (C# Script) | Tab dịch chuyển tức thời (Teleport) tới 8 phân khu làng và 4 phòng nội thất trên bản đồ. |
 | `Scripts/UI/DevNpcSystemTab.cs` | (C# Script) | Tab giám sát và điều khiển trạng thái 8 NPC trong làng: xem tọa độ/state, dịch chuyển đến cạnh NPC, triệu hồi NPC tới Player, ép đổi state AI. |
 | `Scripts/UI/DevGraphicsTab.cs` | (C# Script) | Tab tinh chỉnh cấu hình đồ họa, độ phân giải, FPS và VSync trực tiếp trên Dev HUD kèm nút lưu cấu hình. |
@@ -50,6 +53,7 @@
 | `Scenes/UI/DevOverlay.tscn` | `uid://b8d2y01devhud` | `CanvasLayer` (DevOverlay, layer 100) -> `PanelContainer` (StyleBoxFlat bán trong suốt bo góc) -> `VBoxContainer` -> HeaderBar -> `TabContainer` (`DevPlayerTab`, `DevNpcTab`, `DevWorldTab`, `DevTeleportTab`, `DevNpcSystemTab`, `DevGraphicsTab`). |
 | `Scenes/Characters/VillageNpc.tscn` | `uid://b2v8npcbehav1` | `CharacterBody3D` (NpcBehavior) -> `CollisionShape3D` (Capsule 0.4x1.8m) -> `VisualModel` (`character_25d.glb`) -> `InteractableArea` -> `OverheadLabel` (Label3D billboard). |
 | `Scenes/UI/NpcInteractionDialog.tscn` | `uid://c3q8npcdialog1` | `CanvasLayer` (NpcInteractionDialog, layer 90) -> `PanelContainer` -> VBox (Header Tên/Nghề -> MessageLabel -> Scroll/ActionsList -> CloseButton). |
+| `Scenes/UI/SettingsMenu.tscn` | `uid://cb5setmenu801` | `CanvasLayer` (SettingsMenu, layer 95) -> HudSettingsButton (nút bánh răng) & PanelContainer (chỉnh độ phân giải 720p - 4K, Window Mode, FPS 30-144-Unlimited, VSync, Nút Lưu và Nút Đóng ESC). |
 | `Scenes/Levels/WorldMap.tscn` | `uid://bu1mkq5a5sqce` | **Màn chơi thế giới mở duy nhất kết nối liền mạch (Seamless Connected World)**: Chứa toàn bộ Đảo Đá gốc (`map_25d.glb`), Cánh đồng cỏ bao quanh (`map_surroundings.glb`), Bản Đồ Làng Mới (`village_map.glb`) nối liền trực tiếp qua con đường đất từ chân dốc đảo đá vào Cổng Làng (`Z=0.2` tới `Z=45`), `Player` spawn tại giao lộ kết nối `(3.8, 0.5, 4.0)`, `IsometricCamera`, 4 vùng chuyển đổi nội thất `InteriorZone_*`, cụm 8 dân làng `Village_NPCs`, `VoidKillZone`, `DevOverlay`, `NpcInteractionDialog`, `DisplaySettingsManager`. |
 | `Scenes/Levels/VillageMap.tscn` | `uid://c8vlgmap72001` | **Bản sao đồng bộ hoàn hảo của WorldMap**: Chứa trọn vẹn 2 map nối liền nhau để khi mở tab trong Godot Editor hoặc ấn F6 đều hiển thị thế giới liền mạch, triệt tiêu 100% lỗi khối trắng chắn màn hình. |
 | `Scenes/Levels/Village/VillageMap.tscn` | `uid://c9vlgmap72002` | **Bản sao đồng bộ đường dẫn thư mục phụ**: Đảm bảo mở từ bất kỳ đường dẫn nào trong project đều tải được scene thế giới liền mạch hoàn chỉnh. |
@@ -701,3 +705,36 @@
 3. **Đồng Bộ Hóa Toàn Diện**:
    - Cập nhật đồng bộ vào `AGENTS.md` và `GEMINI.md`.
    - Xác thực `dotnet build` 0 lỗi 0 cảnh báo.
+
+
+### [2026-11-08] - Hoàn Thiện 4 Phòng Nội Thất Chuẩn Diorama Cắt Vách, Hệ Thống Seamless Interior Transition & Game Settings Menu (Village Interior & NPC System Lead)
+1. **Nội Thất 4 Phòng Diorama Cắt Vách Chi Tiết Theo `modelyeucau/map2/1.jpg`**:
+   - Nâng cấp `tools/build_village_map.py` và `Assets/Blender_Source/build_village_map.py`:
+     * **Nhà Rèn**: Lò rèn vòm đá cao bốc khói rực lửa cam đỏ (`Blacksmith_Forge_Furnace-col`, lửa phát quang), đe sắt lớn (`Anvil_Heavy-col`) đặt trên bục tròn trung tâm, rương sắt chứa phôi thép vụn (`Chest_Scrap_Metal-col`), rương gỗ chứa than củi (`Chest_Charcoal-col`), bể nước làm nguội tôi kim loại (`Quench_Tank-col`), giá vũ khí trên tường đá có kiếm, khiên tròn, áo giáp sắt treo (`Weapon_Rack_Wall-col`), bàn thợ nguội kèm kìm, búa, đe, ê tô (`Blacksmith_Workbench-col`).
+     * **Nhà Giả Kim**: Vạc đồng ma thuật phát quang cyan/ngọc bích đang sôi sục khói bốc lên (`Alchemist_Cauldron_Glowing-col`), bàn thí nghiệm mở cuốn sách ma thuật cổ, đèn cầy và ống nghiệm (`Alchemy_Lab_Table-col`), tủ sách cổ ma thuật cao kịch trần đầy sách cổ (`Alchemy_Tall_Bookshelf-col`), kệ chai lọ độc dược đủ sắc màu đỏ tím lục lam (`Potion_Shelves-col`), chùm thảo mộc khô treo lơ lửng từ xà nhà (`Hanging_Herbs-col`).
+     * **Quán Ăn / Nhà Bếp**: Lò nướng bánh mì gạch vòm đỏ than hồng (`Bakery_Brick_Oven-col`), bàn nhào bột lớn có cây cán bột, bột mì trắng và các ổ bánh mì baguette vàng ươm (`Bakery_Prep_Table-col`), bàn ăn gỗ dài kèm 2 hàng ghế băng gỗ (`Dining_Table_Long-col`, `Dining_Bench_L-col`, `Dining_Bench_R-col`), kệ để bát đĩa gốm sứ (`Dish_Shelf-col`), xâu xúc xích, giò hun khói treo trần (`Hanging_Sausages-col`), thùng rượu gỗ (`Wine_Barrel_Cask-col`).
+     * **Nhà Dân Cư**: Giường ngủ gỗ nệm đỏ gối trắng ấm cúng (`House_Cozy_Bed-col`), tủ quần áo 2 cánh cao lớn (`House_Wardrobe_Tall-col`), tấm thảm sàn dệt thổ cẩm sọc kẻ (`House_Floor_Rug-col`), bàn con bên cửa sổ có rèm vải xanh (`House_Side_Table-col`).
+   - Chạy Blender CLI: Xuất lại `Assets/Models/village_map.glb`, lưu file an toàn `Assets/Blender_Source/village_map.blend`, render ảnh mắt thần `Assets/Models/_preview_render.png`.
+2. **Hệ Thống Góc Nhìn Camera Seamless Interior Transition**:
+   - Xây dựng `Scripts/Core/BuildingInteriorArea.cs` và `Scripts/Core/BuildingInteriorManager.cs`.
+   - Khi người chơi bước qua cửa vào nhà: Camera mượt mà zoom cận cảnh (Interior Zoom level ~9.5), góc nghiêng vừa vặn để nhìn rõ toàn cảnh căn phòng lát cắt diorama.
+   - Mái nhà và các mảng tường phía trước (South/West) tự động ẩn mượt mà không che khuất góc nhìn. Đèn phòng bên trong bật sáng ấm áp hoặc huyền bí.
+   - Khi người chơi bước ra ngoài: Camera mượt mà khôi phục lại toàn cảnh làng (Exterior Zoom level ~17.5), mái và tường hiện lại.
+3. **Menu Cài Đặt Game (Game Settings Menu)**:
+   - Xây dựng giao diện Menu Cài Đặt hoàn chỉnh: `Scenes/UI/SettingsMenu.tscn` và `Scripts/UI/SettingsMenu.cs`.
+   - Mở được bằng phím `ESC` hoặc nút "⚙ Cài Đặt (ESC)" trên màn hình.
+   - Chỉnh độ phân giải màn hình: 1280x720, 1600x900, 1920x1080, 2560x1440, 3840x2160.
+   - Chế độ cửa sổ: Cửa sổ (Windowed), Không viền (Borderless), Toàn màn hình (Fullscreen).
+   - Giới hạn FPS: 30 FPS, 60 FPS, 120 FPS, 144 FPS, Không giới hạn (Unlimited).
+   - VSync: Bật / Tắt.
+   - Tự động lưu cấu hình và nạp lại từ `user://settings.cfg` qua `DisplaySettingsManager.cs`.
+   - Giao diện co giãn tự động bằng Container và Anchor theo Clean Code & UI Standards.
+4. **Kiểm Thử & Nghiệm Thu Thị Giác Thực Tế (Visual Playtest & Screenshot Inspection Loop)**:
+   - `dotnet build`: Build succeeded. 0 Warning(s), 0 Error(s).
+   - Chạy `test_suite.gd` trên Godot Mono Console Windowed (không dùng `--headless`): **463 / 463 Test cases PASSED (100% Tuyệt Đối, 0 Fail, 0 Error)**.
+   - Chụp 4 ảnh màn hình thực tế lưu vào `docs/test_screenshots/` và tự soi mắt thần đối chiếu song song với `modelyeucau/map2/1.jpg`:
+     * `1_map_overview.png`: Toàn cảnh giao lộ 2 map, Cổng Làng, 8 NPC và các cửa hàng.
+     * `2_interior_view.png`: Bên trong phòng Nhà Rèn lát cắt diorama nhìn rõ toàn bộ đe, lò rèn, giá vũ khí, rương than, rương sắt, bể nước, bàn thợ nguội.
+     * `3_npc_ui.png`: Hộp thoại tương tác NPC hiển thị Avatar HD của Vulcan và các tùy chọn hành động.
+     * `4_devtools_ui.png`: Menu Cài Đặt Game và Dev Overlay hiển thị các tùy chọn phân giải, FPS, VSync.
+

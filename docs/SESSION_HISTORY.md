@@ -1,5 +1,35 @@
 # LỊCH SỬ PHIÊN LÀM VIỆC (SESSION HISTORY)
 
+## Phiên làm việc: 2026-11-08 (Village Interior & NPC System Lead - Hoàn thiện 4 Căn Phòng Nội Thất Chuẩn Diorama Cắt Vách, Camera Seamless Transition & Game Settings Menu)
+- **Nội thất 4 phòng diorama chi tiết theo `modelyeucau/map2/1.jpg`**:
+  - Nâng cấp `tools/build_village_map.py` và `Assets/Blender_Source/build_village_map.py`:
+    * Nhà Rèn: Lò rèn vòm đá cao bốc khói rực lửa cam đỏ (`Blacksmith_Forge_Furnace-col`), đe sắt lớn (`Anvil_Heavy-col`) đặt trên bục tròn trung tâm, rương sắt chứa phôi thép vụn (`Chest_Scrap_Metal-col`), rương gỗ chứa than củi (`Chest_Charcoal-col`), bể nước làm nguội tôi kim loại (`Quench_Tank-col`), giá vũ khí trên tường đá có kiếm, khiên tròn, áo giáp sắt treo (`Weapon_Rack_Wall-col`), bàn thợ nguội kèm kìm, búa, đe, ê tô (`Blacksmith_Workbench-col`).
+    * Nhà Giả Kim: Vạc đồng ma thuật phát quang cyan/ngọc bích đang sôi sục khói bốc lên (`Alchemist_Cauldron_Glowing-col`), bàn thí nghiệm mở cuốn sách ma thuật cổ, đèn cầy và ống nghiệm (`Alchemy_Lab_Table-col`), tủ sách cổ ma thuật cao kịch trần đầy sách cổ (`Alchemy_Tall_Bookshelf-col`), kệ chai lọ độc dược đủ sắc màu đỏ tím lục lam (`Potion_Shelves-col`), chùm thảo mộc khô treo lơ lửng từ xà nhà (`Hanging_Herbs-col`).
+    * Quán Ăn / Nhà Bếp: Lò nướng bánh mì gạch vòm đỏ than hồng (`Bakery_Brick_Oven-col`), bàn nhào bột lớn có cây cán bột, bột mì trắng và các ổ bánh mì baguette vàng ươm (`Bakery_Prep_Table-col`), bàn ăn gỗ dài kèm 2 hàng ghế băng gỗ (`Dining_Table_Long-col`, `Dining_Bench_L-col`, `Dining_Bench_R-col`), kệ để bát đĩa gốm sứ (`Dish_Shelf-col`), xâu xúc xích, giò hun khói treo trần (`Hanging_Sausages-col`), thùng rượu gỗ (`Wine_Barrel_Cask-col`).
+    * Nhà Dân Cư: Giường ngủ gỗ nệm đỏ gối trắng ấm cúng (`House_Cozy_Bed-col`), tủ quần áo 2 cánh cao lớn (`House_Wardrobe_Tall-col`), tấm thảm sàn dệt thổ cẩm sọc kẻ (`House_Floor_Rug-col`), bàn con bên cửa sổ có rèm vải xanh (`House_Side_Table-col`).
+  - Chạy Blender CLI xuất lại `Assets/Models/village_map.glb`, `Assets/Blender_Source/village_map.blend`, và render `Assets/Models/_preview_render.png`.
+- **Hệ thống Góc Nhìn Camera Seamless Interior Transition**:
+  - Tạo `Scripts/Core/BuildingInteriorArea.cs` và `Scripts/Core/BuildingInteriorManager.cs`.
+  - Khi người chơi bước qua cửa vào nhà: Camera mượt mà zoom cận cảnh (Interior Zoom level ~9.5), góc nghiêng vừa vặn để nhìn rõ toàn cảnh căn phòng lát cắt diorama.
+  - Mái nhà và các mảng tường phía trước (South/West) tự động ẩn mượt mà không che khuất góc nhìn. Đèn phòng bên trong bật sáng ấm áp hoặc huyền bí.
+  - Khi người chơi bước ra ngoài: Camera mượt mà khôi phục lại toàn cảnh làng (Exterior Zoom level ~17.5), mái và tường hiện lại.
+- **Menu Cài Đặt Game (Game Settings Menu)**:
+  - Xây dựng giao diện Menu Cài Đặt hoàn chỉnh: `Scenes/UI/SettingsMenu.tscn` và `Scripts/UI/SettingsMenu.cs`.
+  - Mở được bằng phím `ESC` hoặc nút HUD "⚙ Cài Đặt (ESC)" trên màn hình.
+  - Chỉnh độ phân giải màn hình: 1280x720, 1600x900, 1920x1080, 2560x1440, 3840x2160.
+  - Chế độ cửa sổ: Cửa sổ (Windowed), Không viền (Borderless), Toàn màn hình (Fullscreen).
+  - Giới hạn FPS: 30 FPS, 60 FPS, 120 FPS, 144 FPS, Không giới hạn (Unlimited).
+  - VSync: Bật / Tắt.
+  - Tự động lưu cấu hình và nạp lại từ `user://settings.cfg` qua `DisplaySettingsManager.cs`.
+- **Kiểm định & Nghiệm thu thị giác thực tế**:
+  - `dotnet build`: Build succeeded. 0 Warning(s), 0 Error(s).
+  - Chạy `test_suite.gd` trên Godot Mono Console Windowed (không dùng `--headless`): **463 / 463 Test cases PASSED (100% Tuyệt Đối, 0 Fail, 0 Error)**.
+  - Chụp 4 ảnh màn hình thực tế lưu vào `docs/test_screenshots/` và tự soi mắt thần đối chiếu song song với `modelyeucau/map2/1.jpg`:
+    * `1_map_overview.png`: Toàn cảnh giao lộ 2 map, Cổng Làng, 8 NPC và các cửa hàng.
+    * `2_interior_view.png`: Bên trong phòng Nhà Rèn lát cắt diorama nhìn rõ toàn bộ đe, lò rèn, giá vũ khí, rương than, rương sắt, bể nước, bàn thợ nguội.
+    * `3_npc_ui.png`: Hộp thoại tương tác NPC hiển thị Avatar HD của Vulcan và các tùy chọn hành động.
+    * `4_devtools_ui.png`: Menu Cài Đặt Game và Dev Overlay hiển thị các tùy chọn phân giải, FPS, VSync.
+
 ## Phiên làm việc: 2026-11-08 (Hoàn thiện Đồ Họa 8 NPC, Bến Cảng Ngư Dân & Cổng Làng 2 Lính Canh theo modelyeucau/map2/1.jpg)
 - **Rà soát thực tế theo phản hồi người dùng & ảnh mẫu `1.jpg`**:
   - Nhận diện đúng điểm mấu chốt: Game trước đó vẫn dùng model người que `character_25d.glb` (trắng tím của Player) cắm nhãn chữ cho 8 NPC dân làng; thiếu Bến Cảng Ngư Dân; thiếu lính canh thứ 2 và thửa ruộng thứ 2 tại cổng làng; hộp thoại thiếu Avatar chân dung.

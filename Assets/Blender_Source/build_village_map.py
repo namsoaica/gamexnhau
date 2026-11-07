@@ -4,7 +4,7 @@ Sử dụng Thư Viện Procedural Chuẩn 'tools/blender_kit.py'.
 Tuân thủ:
 - Bắt buộc trải UV tự động (unwrap_mesh) cho MỌI mesh.
 - Gán vật liệu liên kết Texture Seamless (thớ gỗ, thớ đá, bạt sọc, vân đất, ngói đỏ, ngói teal).
-- Chi tiết nội thất 4 phòng theo đúng ảnh '1.jpg': Nhà Rèn, Nhà Giả Kim, Quán Ăn, Nhà Dân.
+- Chi tiết nội thất 4 phòng diorama cắt vách theo đúng ảnh '1.jpg': Nhà Rèn, Nhà Giả Kim, Quán Ăn, Nhà Dân.
 - Phụ kiện đạo cụ đặc trưng cho 8 NPC: Vulcan, Aria, Gusteau, George, Finn, Brock, Grover, Aegis.
 - Xuất 'Assets/Models/village_map.glb' và lưu an toàn 'Assets/Blender_Source/village_map.blend'.
 - Render ảnh mắt thần '_preview_render.png'.
@@ -15,9 +15,13 @@ import os
 import bpy
 import math
 
-workspace_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# Thiết lập đường dẫn workspace
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+workspace_dir = os.path.abspath(os.path.join(cur_dir, ".."))
 if workspace_dir not in sys.path:
     sys.path.insert(0, workspace_dir)
+if cur_dir not in sys.path:
+    sys.path.insert(0, cur_dir)
 
 from tools.blender_kit import (
     clean_scene,
@@ -140,16 +144,38 @@ def build_village():
     create_beveled_box("Wall_Front_Chef_Top", (0.3, 0.7, 1.8), (cf_cx - cf_w/2 + 0.15, cf_h - 0.35, cf_cz), bevel_width=0.03, material=mat_wall)
     build_detailed_roof_gabled("Roof_Chef", cf_w, cf_l, 1.6, (cf_cx, cf_h, cf_cz), overhang=0.3, ridge_along_x=False, material=mat_roof_red)
 
-    # Nội thất Nhà Bếp: Lò nướng vòm đá, lửa đỏ, bàn ăn dài, 2 ghế băng, kệ bát đĩa
-    create_beveled_cylinder("Oven_Chef_Base", 0.85, 1.4, (cf_cx + cf_w/2 - 1.2, 0.70, cf_cz - cf_l/2 + 1.2), bevel_width=0.04, vertices=12, material=mat_cobble)
-    build_chamfered_rock("Oven_Chef_Fire", (0.7, 0.55, 0.6), (cf_cx + cf_w/2 - 1.2, 0.50, cf_cz - cf_l/2 + 1.2), material=mat_lava_fire, seed_val=666)
-    create_beveled_box("Dining_Table_Chef", (1.2, 0.85, 2.6), (cf_cx, 0.42, cf_cz), bevel_width=0.03, material=mat_wood)
-    create_beveled_box("Dining_Bench_Chef_L", (0.35, 0.45, 2.6), (cf_cx - 0.9, 0.22, cf_cz), bevel_width=0.02, material=mat_wood)
-    create_beveled_box("Dining_Bench_Chef_R", (0.35, 0.45, 2.6), (cf_cx + 0.9, 0.22, cf_cz), bevel_width=0.02, material=mat_wood)
-    create_beveled_box("Chef_Counter_Shelves", (0.5, 1.6, 2.4), (cf_cx + 0.2, 0.8, cf_cz + cf_l/2 - 0.5), bevel_width=0.02, material=mat_wood_fence)
-    create_beveled_box("Chef_Bread_Basket", (0.5, 0.25, 0.7), (cf_cx - 0.2, 0.95, cf_cz - 0.4), bevel_width=0.02, material=mat_wood)
-    create_beveled_cylinder("Chef_Baguette_1", 0.08, 0.65, (cf_cx - 0.2, 1.15, cf_cz - 0.5), bevel_width=0.02, rotation=(0.4, 0, 0.5), material=mat_bread)
-    create_beveled_cylinder("Chef_Baguette_2", 0.08, 0.65, (cf_cx - 0.2, 1.15, cf_cz - 0.3), bevel_width=0.02, rotation=(-0.3, 0, 0.4), material=mat_bread)
+    # 4.A NỘI THẤT QUÁN ĂN / NHÀ BẾP (DIORAMA CẮT VÁCH CHUẨN ẢNH 1.JPG)
+    # Lò nướng bánh mì gạch vòm đỏ than hồng (Bakery_Brick_Oven-col)
+    create_beveled_cylinder("Bakery_Brick_Oven-col", 0.90, 1.7, (cf_cx + cf_w/2 - 1.2, 0.85, cf_cz - cf_l/2 + 1.2), bevel_width=0.04, vertices=16, material=mat_cobble)
+    build_chamfered_rock("Bakery_Brick_Oven_Fire", (0.75, 0.55, 0.65), (cf_cx + cf_w/2 - 1.2, 0.55, cf_cz - cf_l/2 + 1.2), material=mat_lava_fire, seed_val=666)
+    create_beveled_cylinder("Bakery_Oven_Flue", 0.25, 1.4, (cf_cx + cf_w/2 - 1.2, 2.0, cf_cz - cf_l/2 + 1.2), bevel_width=0.02, material=mat_cobble)
+
+    # Bàn nhào bột lớn có cây cán bột, bột mì trắng và các ổ bánh mì baguette (Bakery_Prep_Table-col)
+    create_beveled_box("Bakery_Prep_Table-col", (1.2, 0.88, 2.2), (cf_cx - 1.3, 0.44, cf_cz - 0.9), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("Bakery_Flour_Dust", (0.7, 0.02, 1.1), (cf_cx - 1.3, 0.89, cf_cz - 0.9), bevel_width=0.01, material=mat_wall)
+    create_beveled_cylinder("Bakery_Rolling_Pin", 0.04, 0.55, (cf_cx - 1.3, 0.93, cf_cz - 0.6), bevel_width=0.01, rotation=(0, 0, 1.57), material=mat_wood_fence)
+    create_beveled_cylinder("Bakery_Baguette_1", 0.08, 0.65, (cf_cx - 1.3, 0.95, cf_cz - 1.2), bevel_width=0.02, rotation=(0.3, 0, 0.4), material=mat_bread)
+    create_beveled_cylinder("Bakery_Baguette_2", 0.08, 0.65, (cf_cx - 1.3, 0.95, cf_cz - 1.0), bevel_width=0.02, rotation=(-0.2, 0, 0.3), material=mat_bread)
+
+    # Bàn ăn gỗ dài kèm 2 hàng ghế băng (Dining_Table_Long-col, Dining_Bench_L-col, Dining_Bench_R-col)
+    create_beveled_box("Dining_Table_Long-col", (1.2, 0.85, 2.6), (cf_cx + 0.3, 0.42, cf_cz + 0.7), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("Dining_Bench_L-col", (0.35, 0.45, 2.6), (cf_cx - 0.6, 0.22, cf_cz + 0.7), bevel_width=0.02, material=mat_wood)
+    create_beveled_box("Dining_Bench_R-col", (0.35, 0.45, 2.6), (cf_cx + 1.2, 0.22, cf_cz + 0.7), bevel_width=0.02, material=mat_wood)
+
+    # Kệ để bát đĩa gốm sứ (Dish_Shelf-col)
+    create_beveled_box("Dish_Shelf-col", (2.2, 0.85, 0.30), (cf_cx - 0.4, 1.85, cf_cz - cf_l/2 + 0.35), bevel_width=0.02, material=mat_wood_fence)
+    create_beveled_cylinder("Dish_Plate_1", 0.18, 0.04, (cf_cx - 0.9, 1.88, cf_cz - cf_l/2 + 0.42), bevel_width=0.01, vertices=12, material=mat_wall)
+    create_beveled_cylinder("Dish_Plate_2", 0.18, 0.04, (cf_cx - 0.4, 1.88, cf_cz - cf_l/2 + 0.42), bevel_width=0.01, vertices=12, material=mat_wall)
+    create_beveled_cylinder("Dish_Cup_1", 0.09, 0.18, (cf_cx + 0.2, 1.88, cf_cz - cf_l/2 + 0.42), bevel_width=0.01, vertices=10, material=mat_cobble)
+
+    # Xâu xúc xích, giò hun khói treo trần (Hanging_Sausages-col)
+    create_beveled_box("Hanging_Sausages-col", (2.0, 0.12, 0.12), (cf_cx, 2.50, cf_cz + 0.6), bevel_width=0.015, material=mat_wood_fence)
+    create_beveled_cylinder("Hanging_Sausage_Link_1", 0.06, 0.45, (cf_cx - 0.5, 2.15, cf_cz + 0.6), bevel_width=0.02, rotation=(0.1, 0, 0.1), material=mat_roof_red)
+    create_beveled_cylinder("Hanging_Sausage_Link_2", 0.07, 0.50, (cf_cx + 0.4, 2.12, cf_cz + 0.6), bevel_width=0.02, rotation=(-0.1, 0, 0.2), material=mat_roof_red)
+
+    # Thùng rượu gỗ (Wine_Barrel_Cask-col)
+    create_beveled_cylinder("Wine_Barrel_Cask-col", 0.45, 1.05, (cf_cx + cf_w/2 - 0.8, 0.52, cf_cz + cf_l/2 - 0.8), bevel_width=0.03, vertices=14, material=mat_wood_fence)
+    create_beveled_cylinder("Wine_Barrel_Cask_Small", 0.38, 0.85, (cf_cx + cf_w/2 - 1.6, 0.42, cf_cz + cf_l/2 - 0.8), bevel_width=0.03, vertices=12, material=mat_wood)
 
     # Đạo cụ Đầu Bếp Gusteau tại vị trí NPC (5.5, 0, 7.5)
     create_beveled_cylinder("NPC_Gusteau_Chef_Hat", 0.22, 0.35, (5.5, 1.2, 7.5), bevel_width=0.02, vertices=12, material=mat_wall)
@@ -207,8 +233,8 @@ def build_village():
     sm_cx, sm_cz = -11.0, 21.0
     sm_w, sm_l, sm_h = 6.4, 5.6, 3.2
     create_beveled_box("Floor_Smith", (sm_w, 0.15, sm_l), (sm_cx, 0.08, sm_cz), bevel_width=0.03, material=mat_stone)
-    create_beveled_box("Wall_North_Smith", (sm_w, sm_h, 0.3), (sm_cx, cf_h/2, sm_cz - sm_l/2 + 0.15), bevel_width=0.03, material=mat_wall)
-    create_beveled_box("Wall_South_Smith", (sm_w, sm_h, 0.3), (sm_cx, cf_h/2, sm_cz + sm_l/2 - 0.15), bevel_width=0.03, material=mat_wall)
+    create_beveled_box("Wall_North_Smith", (sm_w, sm_h, 0.3), (sm_cx, sm_h/2, sm_cz - sm_l/2 + 0.15), bevel_width=0.03, material=mat_wall)
+    create_beveled_box("Wall_South_Smith", (sm_w, sm_h, 0.3), (sm_cx, sm_h/2, sm_cz + sm_l/2 - 0.15), bevel_width=0.03, material=mat_wall)
     create_beveled_box("Wall_West_Smith", (0.3, sm_h, sm_l - 0.6), (sm_cx - sm_w/2 + 0.15, sm_h/2, sm_cz), bevel_width=0.03, material=mat_wall)
     create_beveled_box("Wall_Front_Smith_L", (0.3, sm_h, 1.9), (sm_cx + sm_w/2 - 0.15, sm_h/2, sm_cz - 1.8), bevel_width=0.03, material=mat_wall)
     create_beveled_box("Wall_Front_Smith_R", (0.3, sm_h, 1.9), (sm_cx + sm_w/2 - 0.15, sm_h/2, sm_cz + 1.8), bevel_width=0.03, material=mat_wall)
@@ -217,24 +243,41 @@ def build_village():
 
     # Ống khói đá lớn
     create_beveled_box("Chimney_Smith_Base", (1.2, 5.2, 1.2), (sm_cx - sm_w/2 + 0.7, 2.6, sm_cz - sm_l/2 + 0.7), bevel_width=0.04, material=mat_cobble)
-    # Lò rèn đỏ lửa trong nhà (khối đá than hồng bùng lửa)
-    create_beveled_box("Forge_Indoor_Base", (1.5, 0.9, 1.3), (sm_cx - 1.6, 0.45, sm_cz - 1.4), bevel_width=0.04, material=mat_cobble)
-    build_chamfered_rock("Forge_Indoor_Fire", (1.1, 0.45, 0.9), (sm_cx - 1.6, 0.95, sm_cz - 1.4), material=mat_lava_fire, seed_val=999)
-    # Đe sắt bục gỗ
-    create_beveled_cylinder("Anvil_Indoor_Log", 0.45, 0.7, (sm_cx, 0.35, sm_cz), bevel_width=0.03, material=mat_wood)
-    create_beveled_box("Anvil_Indoor_Iron", (0.5, 0.3, 0.8), (sm_cx, 0.8, sm_cz), bevel_width=0.03, material=mat_metal)
-    # Rương thép vụn & rương than củi
-    create_beveled_box("Smith_Scrap_Chest", (0.8, 0.5, 0.6), (sm_cx - 1.8, 0.25, sm_cz + 1.5), bevel_width=0.03, material=mat_wood_fence)
-    create_beveled_box("Smith_Scrap_Iron_Lump", (0.6, 0.2, 0.4), (sm_cx - 1.8, 0.55, sm_cz + 1.5), bevel_width=0.02, material=mat_metal)
-    create_beveled_box("Smith_Coal_Chest", (0.8, 0.5, 0.6), (sm_cx - 0.8, 0.25, sm_cz + 1.5), bevel_width=0.03, material=mat_wood_fence)
-    create_beveled_box("Smith_Coal_Lump", (0.6, 0.18, 0.4), (sm_cx - 0.8, 0.55, sm_cz + 1.5), bevel_width=0.02, material=mat_stone)
-    # Bể nước làm nguội sắt
-    create_beveled_box("Smith_Cooling_Trough", (1.4, 0.6, 0.7), (sm_cx + 1.2, 0.30, sm_cz - 1.6), bevel_width=0.03, material=mat_wood)
-    create_beveled_box("Smith_Cooling_Water", (1.2, 0.1, 0.5), (sm_cx + 1.2, 0.55, sm_cz - 1.6), bevel_width=0.01, material=mat_water)
-    # Giá treo vũ khí trên tường đá
-    create_beveled_box("Smith_Weapon_Rack", (2.4, 0.8, 0.15), (sm_cx + 0.5, 1.8, sm_cz - sm_l/2 + 0.35), bevel_width=0.02, material=mat_wood_fence)
-    create_beveled_cylinder("Smith_Wall_Sword", 0.04, 1.4, (sm_cx, 1.8, sm_cz - sm_l/2 + 0.45), bevel_width=0.01, rotation=(0, 0, 0.8), material=mat_metal)
-    create_beveled_cylinder("Smith_Wall_Shield", 0.35, 0.06, (sm_cx + 1.1, 1.8, sm_cz - sm_l/2 + 0.45), bevel_width=0.02, rotation=(1.57, 0, 0), material=mat_metal)
+
+    # 6.A NỘI THẤT NHÀ RÈN (DIORAMA CẮT VÁCH CHUẨN ẢNH 1.JPG)
+    # Lò rèn vòm đá gạch cao bốc khói rực lửa cam đỏ (Blacksmith_Forge_Furnace-col, lửa phát quang)
+    create_beveled_box("Blacksmith_Forge_Furnace-col", (1.7, 2.2, 1.5), (sm_cx - 1.6, 1.10, sm_cz - 1.5), bevel_width=0.04, material=mat_cobble)
+    build_chamfered_rock("Blacksmith_Forge_Fire", (1.2, 0.55, 1.0), (sm_cx - 1.6, 0.90, sm_cz - 1.5), material=mat_lava_fire, seed_val=999)
+    create_beveled_cylinder("Forge_Chimney_Flue", 0.35, 1.6, (sm_cx - 1.6, 2.4, sm_cz - 1.5), bevel_width=0.02, material=mat_cobble)
+
+    # Đe sắt lớn (Anvil_Heavy-col) đặt trên bục gỗ/đá trung tâm
+    create_beveled_cylinder("Anvil_Block_Center", 0.48, 0.72, (sm_cx, 0.36, sm_cz), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("Anvil_Heavy-col", (0.55, 0.35, 0.95), (sm_cx, 0.85, sm_cz), bevel_width=0.03, material=mat_metal)
+
+    # Rương sắt chứa phôi thép vụn (Chest_Scrap_Metal-col)
+    create_beveled_box("Chest_Scrap_Metal-col", (0.85, 0.55, 0.65), (sm_cx - 1.8, 0.28, sm_cz + 1.5), bevel_width=0.03, material=mat_metal)
+    create_beveled_box("Chest_Scrap_Lumps", (0.65, 0.22, 0.45), (sm_cx - 1.8, 0.60, sm_cz + 1.5), bevel_width=0.02, material=mat_metal)
+
+    # Rương gỗ chứa than củi (Chest_Charcoal-col)
+    create_beveled_box("Chest_Charcoal-col", (0.85, 0.55, 0.65), (sm_cx - 0.7, 0.28, sm_cz + 1.5), bevel_width=0.03, material=mat_wood_fence)
+    create_beveled_box("Chest_Charcoal_Lumps", (0.65, 0.20, 0.45), (sm_cx - 0.7, 0.58, sm_cz + 1.5), bevel_width=0.02, material=mat_stone)
+
+    # Bể nước làm nguội tôi kim loại (Quench_Tank-col)
+    create_beveled_box("Quench_Tank-col", (1.5, 0.65, 0.80), (sm_cx + 1.3, 0.33, sm_cz - 1.5), bevel_width=0.03, material=mat_wood_fence)
+    create_beveled_box("Quench_Tank_Water", (1.3, 0.12, 0.60), (sm_cx + 1.3, 0.58, sm_cz - 1.5), bevel_width=0.01, material=mat_water)
+
+    # Giá vũ khí trên tường đá có kiếm, khiên tròn, áo giáp sắt treo (Weapon_Rack_Wall-col)
+    create_beveled_box("Weapon_Rack_Wall-col", (2.6, 0.95, 0.16), (sm_cx + 0.4, 1.85, sm_cz - sm_l/2 + 0.35), bevel_width=0.02, material=mat_wood_fence)
+    create_beveled_cylinder("Weapon_Rack_Sword_1", 0.04, 1.4, (sm_cx - 0.2, 1.85, sm_cz - sm_l/2 + 0.45), bevel_width=0.01, rotation=(0, 0, 0.75), material=mat_metal)
+    create_beveled_cylinder("Weapon_Rack_Sword_2", 0.04, 1.4, (sm_cx + 0.3, 1.85, sm_cz - sm_l/2 + 0.45), bevel_width=0.01, rotation=(0, 0, -0.75), material=mat_metal)
+    create_beveled_cylinder("Weapon_Rack_Shield", 0.38, 0.06, (sm_cx + 1.1, 1.85, sm_cz - sm_l/2 + 0.45), bevel_width=0.02, rotation=(1.57, 0, 0), vertices=16, material=mat_metal)
+    create_beveled_box("Weapon_Rack_Armor_Plate", (0.45, 0.60, 0.12), (sm_cx - 0.7, 1.85, sm_cz - sm_l/2 + 0.45), bevel_width=0.02, material=mat_metal)
+
+    # Bàn thợ nguội và công cụ kìm búa đe (Blacksmith_Workbench-col)
+    create_beveled_box("Blacksmith_Workbench-col", (0.8, 0.88, 2.0), (sm_cx + 1.8, 0.44, sm_cz + 0.5), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("Smith_Vise_Tool", (0.22, 0.25, 0.25), (sm_cx + 1.8, 0.98, sm_cz - 0.2), bevel_width=0.01, material=mat_metal)
+    create_beveled_cylinder("Smith_Bench_Hammer", 0.03, 0.45, (sm_cx + 1.8, 0.90, sm_cz + 0.3), bevel_width=0.01, rotation=(0, 0, 1.57), material=mat_metal)
+    create_beveled_cylinder("Smith_Bench_Tongs", 0.025, 0.50, (sm_cx + 1.8, 0.90, sm_cz + 0.8), bevel_width=0.01, rotation=(0, 0, 1.2), material=mat_metal)
 
     # Đạo cụ Thợ Rèn Vulcan bên ngoài (-6.8, 0, 20.0)
     out_x, out_z = -6.8, 20.0
@@ -263,15 +306,46 @@ def build_village():
     build_chamfered_rock("Smoke_Alchemist_2", (1.4, 1.4, 1.4), (al_cx + al_w/2 - 0.5, 6.0, al_cz - al_l/2 + 0.6), material=mat_mystic_cyan, seed_val=222)
     build_chamfered_rock("Smoke_Alchemist_3", (1.8, 1.8, 1.8), (al_cx + al_w/2 - 0.2, 7.0, al_cz - al_l/2 + 0.4), material=mat_mystic_cyan, seed_val=333)
 
-    # Nội thất Nhà Giả Kim: Vạc thuốc phát sáng, kệ sách ma thuật, bàn thí nghiệm, chai lọ độc dược
-    create_beveled_cylinder("Cauldron_Base", 0.80, 0.80, (al_cx, 0.40, al_cz), bevel_width=0.03, vertices=16, material=mat_metal)
-    create_beveled_cylinder("Cauldron_Potion", 0.70, 0.12, (al_cx, 0.75, al_cz), bevel_width=0.01, material=mat_mystic_cyan)
-    create_beveled_cylinder("Cauldron_Fire", 0.60, 0.20, (al_cx, 0.10, al_cz), bevel_width=0.02, material=mat_mystic_purple)
-    create_beveled_box("Bookshelf_Alchemist", (3.8, 2.4, 0.5), (al_cx, 1.2, al_cz - al_l/2 + 0.4), bevel_width=0.03, material=mat_wood_fence)
-    create_beveled_box("Potion_Table", (0.8, 0.85, 2.6), (al_cx + al_w/2 - 0.6, 0.42, al_cz), bevel_width=0.03, material=mat_wood)
-    create_beveled_cylinder("Potion_Vials_Cyan", 0.10, 0.25, (al_cx + al_w/2 - 0.6, 0.98, al_cz - 0.6), bevel_width=0.01, material=mat_mystic_cyan)
-    create_beveled_cylinder("Potion_Vials_Purple", 0.10, 0.25, (al_cx + al_w/2 - 0.6, 0.98, al_cz), bevel_width=0.01, material=mat_mystic_purple)
-    create_beveled_cylinder("Potion_Vials_Red", 0.10, 0.25, (al_cx + al_w/2 - 0.6, 0.98, al_cz + 0.6), bevel_width=0.01, material=mat_lava_fire)
+    # 7.A NỘI THẤT NHÀ GIẢ KIM (DIORAMA CẮT VÁCH CHUẨN ẢNH 1.JPG)
+    # Vạc đồng ma thuật phát quang cyan/ngọc bích đang sôi sục khói bốc lên (Alchemist_Cauldron_Glowing-col)
+    create_beveled_cylinder("Cauldron_Hearth_Stand", 0.62, 0.35, (al_cx, 0.18, al_cz), bevel_width=0.03, vertices=16, material=mat_cobble)
+    create_beveled_cylinder("Cauldron_Magic_Fire", 0.55, 0.22, (al_cx, 0.12, al_cz), bevel_width=0.02, material=mat_mystic_purple)
+    create_beveled_cylinder("Alchemist_Cauldron_Glowing-col", 0.85, 0.90, (al_cx, 0.55, al_cz), bevel_width=0.03, vertices=16, material=mat_metal)
+    create_beveled_cylinder("Alchemist_Potion_Surface", 0.74, 0.12, (al_cx, 0.92, al_cz), bevel_width=0.01, material=mat_mystic_cyan)
+    build_chamfered_rock("Alchemist_Cauldron_Vapor", (0.7, 0.45, 0.7), (al_cx, 1.18, al_cz), material=mat_mystic_cyan, seed_val=777)
+
+    # Bàn thí nghiệm mở cuốn sách ma thuật cổ, đèn cầy và ống nghiệm (Alchemy_Lab_Table-col)
+    create_beveled_box("Alchemy_Lab_Table-col", (0.9, 0.88, 2.8), (al_cx + al_w/2 - 0.7, 0.44, al_cz), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("Spellbook_Open", (0.42, 0.08, 0.55), (al_cx + al_w/2 - 0.7, 0.92, al_cz - 0.7), bevel_width=0.015, material=mat_wheat)
+    create_beveled_box("Spellbook_Pages", (0.38, 0.06, 0.50), (al_cx + al_w/2 - 0.7, 0.96, al_cz - 0.7), bevel_width=0.01, material=mat_wall)
+    create_beveled_cylinder("Candle_Wax", 0.05, 0.20, (al_cx + al_w/2 - 0.7, 0.98, al_cz - 1.2), bevel_width=0.01, material=mat_wall)
+    create_beveled_cylinder("Candle_Flame", 0.025, 0.06, (al_cx + al_w/2 - 0.7, 1.11, al_cz - 1.2), bevel_width=0.005, material=mat_lava_fire)
+    create_beveled_box("Test_Tube_Rack", (0.18, 0.22, 0.55), (al_cx + al_w/2 - 0.7, 0.99, al_cz + 0.6), bevel_width=0.01, material=mat_wood_fence)
+    create_beveled_cylinder("Test_Tube_1", 0.03, 0.22, (al_cx + al_w/2 - 0.7, 1.05, al_cz + 0.45), bevel_width=0.005, material=mat_mystic_cyan)
+    create_beveled_cylinder("Test_Tube_2", 0.03, 0.22, (al_cx + al_w/2 - 0.7, 1.05, al_cz + 0.60), bevel_width=0.005, material=mat_mystic_purple)
+    create_beveled_cylinder("Test_Tube_3", 0.03, 0.22, (al_cx + al_w/2 - 0.7, 1.05, al_cz + 0.75), bevel_width=0.005, material=mat_lava_fire)
+
+    # Tủ sách cổ ma thuật cao kịch trần đầy sách cổ (Alchemy_Tall_Bookshelf-col)
+    create_beveled_box("Alchemy_Tall_Bookshelf-col", (4.2, 2.9, 0.55), (al_cx, 1.45, al_cz - al_l/2 + 0.45), bevel_width=0.03, material=mat_wood_fence)
+    # Hàng sách cổ màu sắc trên kệ
+    create_beveled_box("Bookshelf_Row_Teal", (3.6, 0.45, 0.40), (al_cx, 0.70, al_cz - al_l/2 + 0.50), bevel_width=0.02, material=mat_roof_teal)
+    create_beveled_box("Bookshelf_Row_Red", (3.6, 0.45, 0.40), (al_cx, 1.50, al_cz - al_l/2 + 0.50), bevel_width=0.02, material=mat_roof_red)
+    create_beveled_box("Bookshelf_Row_Gold", (3.6, 0.45, 0.40), (al_cx, 2.30, al_cz - al_l/2 + 0.50), bevel_width=0.02, material=mat_wheat)
+
+    # Vô số kệ và chai lọ độc dược đủ sắc màu đỏ tím lục lam (Potion_Shelves-col)
+    create_beveled_box("Potion_Shelves-col", (0.35, 1.6, 1.8), (al_cx + al_w/2 - 0.4, 1.80, al_cz + 1.2), bevel_width=0.02, material=mat_wood_fence)
+    create_beveled_cylinder("Potion_Bottle_Cyan", 0.10, 0.28, (al_cx + al_w/2 - 0.4, 1.35, al_cz + 0.7), bevel_width=0.01, material=mat_mystic_cyan)
+    create_beveled_cylinder("Potion_Bottle_Purple", 0.10, 0.28, (al_cx + al_w/2 - 0.4, 1.35, al_cz + 1.2), bevel_width=0.01, material=mat_mystic_purple)
+    create_beveled_cylinder("Potion_Bottle_Red", 0.10, 0.28, (al_cx + al_w/2 - 0.4, 1.35, al_cz + 1.7), bevel_width=0.01, material=mat_lava_fire)
+    create_beveled_cylinder("Potion_Bottle_Green", 0.09, 0.25, (al_cx + al_w/2 - 0.4, 2.05, al_cz + 0.9), bevel_width=0.01, material=mat_vegetable)
+    create_beveled_cylinder("Potion_Bottle_Teal", 0.09, 0.25, (al_cx + al_w/2 - 0.4, 2.05, al_cz + 1.5), bevel_width=0.01, material=mat_roof_teal)
+
+    # Chùm thảo mộc khô treo lơ lửng từ xà nhà (Hanging_Herbs-col)
+    create_beveled_box("Hanging_Herbs_Rafter", (al_w - 0.8, 0.16, 0.16), (al_cx, 2.85, al_cz), bevel_width=0.02, material=mat_wood)
+    create_beveled_cylinder("Hanging_Herbs-col", 0.18, 0.55, (al_cx - 1.0, 2.35, al_cz), bevel_width=0.02, rotation=(0.1, 0, 0.1), material=mat_vegetable)
+    create_beveled_cylinder("Hanging_Herbs_Bundle_2", 0.18, 0.55, (al_cx, 2.38, al_cz), bevel_width=0.02, rotation=(-0.1, 0, 0.1), material=mat_wheat)
+    create_beveled_cylinder("Hanging_Herbs_Bundle_3", 0.18, 0.55, (al_cx + 1.0, 2.32, al_cz), bevel_width=0.02, rotation=(0.1, 0, -0.1), material=mat_vegetable)
+
     # Vườn thảo mộc ngoài hiên
     create_beveled_box("Herb_Bed_1", (1.2, 0.35, 3.2), (al_cx - al_w/2 - 0.8, 0.18, al_cz + 1.2), bevel_width=0.02, material=mat_wood_fence)
     create_beveled_box("Herb_Soil_1", (1.0, 0.10, 3.0), (al_cx - al_w/2 - 0.8, 0.36, al_cz + 1.2), bevel_width=0.02, material=mat_vegetable)
@@ -293,14 +367,29 @@ def build_village():
     create_beveled_box("Wall_Front_House_Top", (0.3, 0.7, 1.8), (hs_cx + hs_w/2 - 0.15, hs_h - 0.35, hs_cz), bevel_width=0.03, material=mat_wall)
     build_detailed_roof_gabled("Roof_House", hs_w, hs_l, 1.6, (hs_cx, hs_h, hs_cz), overhang=0.3, ridge_along_x=False, material=mat_roof_red)
 
-    # Nội thất Nhà Dân: Giường ngủ nệm đỏ, tủ áo gỗ, thảm sọc, bàn ghế
-    create_beveled_box("Bed_Frame", (1.6, 0.45, 2.2), (hs_cx - hs_w/2 + 1.1, 0.22, hs_cz - hs_l/2 + 1.4), bevel_width=0.03, material=mat_wood)
-    create_beveled_box("Bed_Mattress", (1.4, 0.25, 2.0), (hs_cx - hs_w/2 + 1.1, 0.50, hs_cz - hs_l/2 + 1.4), bevel_width=0.03, material=mat_roof_red)
-    create_beveled_box("Bed_Pillow", (0.8, 0.15, 0.4), (hs_cx - hs_w/2 + 1.1, 0.68, hs_cz - hs_l/2 + 0.7), bevel_width=0.02, material=mat_wall)
-    create_beveled_box("Wardrobe", (1.2, 2.1, 0.6), (hs_cx - hs_w/2 + 0.8, 1.05, hs_cz + hs_l/2 - 0.6), bevel_width=0.03, material=mat_wood_fence)
-    create_beveled_box("House_Rug", (1.8, 0.02, 1.8), (hs_cx + 0.5, 0.09, hs_cz), bevel_width=0.01, material=mat_canopy_striped)
-    create_beveled_cylinder("House_Table", 0.5, 0.75, (hs_cx + 1.2, 0.38, hs_cz + 1.2), bevel_width=0.02, vertices=12, material=mat_wood)
-    create_beveled_cylinder("House_Stool", 0.25, 0.45, (hs_cx + 1.2, 0.22, hs_cz + 0.4), bevel_width=0.02, vertices=10, material=mat_wood)
+    # 8.A NỘI THẤT NHÀ DÂN (DIORAMA CẮT VÁCH CHUẨN ẢNH 1.JPG)
+    # Giường ngủ gỗ nệm đỏ gối trắng ấm cúng (House_Cozy_Bed-col)
+    create_beveled_box("House_Cozy_Bed-col", (1.7, 0.50, 2.3), (hs_cx - hs_w/2 + 1.2, 0.25, hs_cz - hs_l/2 + 1.5), bevel_width=0.03, material=mat_wood)
+    create_beveled_box("House_Bed_Mattress", (1.5, 0.25, 2.1), (hs_cx - hs_w/2 + 1.2, 0.55, hs_cz - hs_l/2 + 1.5), bevel_width=0.03, material=mat_roof_red)
+    create_beveled_box("House_Bed_Pillow", (0.9, 0.16, 0.45), (hs_cx - hs_w/2 + 1.2, 0.72, hs_cz - hs_l/2 + 0.7), bevel_width=0.02, material=mat_wall)
+
+    # Tủ quần áo 2 cánh cao lớn (House_Wardrobe_Tall-col)
+    create_beveled_box("House_Wardrobe_Tall-col", (1.3, 2.4, 0.70), (hs_cx - hs_w/2 + 0.85, 1.20, hs_cz + hs_l/2 - 0.7), bevel_width=0.03, material=mat_wood_fence)
+    create_beveled_box("House_Wardrobe_Door_L", (0.58, 2.1, 0.04), (hs_cx - hs_w/2 + 0.55, 1.20, hs_cz + hs_l/2 - 0.33), bevel_width=0.015, material=mat_wood)
+    create_beveled_box("House_Wardrobe_Door_R", (0.58, 2.1, 0.04), (hs_cx - hs_w/2 + 1.15, 1.20, hs_cz + hs_l/2 - 0.33), bevel_width=0.015, material=mat_wood)
+    create_beveled_cylinder("House_Wardrobe_Handle_L", 0.02, 0.12, (hs_cx - hs_w/2 + 0.80, 1.20, hs_cz + hs_l/2 - 0.30), bevel_width=0.005, material=mat_metal)
+    create_beveled_cylinder("House_Wardrobe_Handle_R", 0.02, 0.12, (hs_cx - hs_w/2 + 0.90, 1.20, hs_cz + hs_l/2 - 0.30), bevel_width=0.005, material=mat_metal)
+
+    # Tấm thảm sàn dệt thổ cẩm sọc kẻ (House_Floor_Rug-col)
+    create_beveled_box("House_Floor_Rug-col", (2.2, 0.02, 2.2), (hs_cx + 0.5, 0.09, hs_cz), bevel_width=0.01, material=mat_canopy_striped)
+
+    # Bàn con bên cửa sổ có rèm vải xanh (House_Side_Table-col)
+    create_beveled_cylinder("House_Side_Table-col", 0.52, 0.80, (hs_cx + 1.3, 0.40, hs_cz + 1.3), bevel_width=0.02, vertices=14, material=mat_wood)
+    create_beveled_cylinder("House_Side_Stool", 0.25, 0.45, (hs_cx + 1.3, 0.22, hs_cz + 0.5), bevel_width=0.02, vertices=10, material=mat_wood)
+    # Rèm cửa vải xanh trên tường South
+    create_beveled_box("House_Window_Frame", (1.4, 1.2, 0.08), (hs_cx + 1.3, 1.80, hs_cz + hs_l/2 - 0.25), bevel_width=0.02, material=mat_wood_fence)
+    create_beveled_box("House_Window_Curtain_L", (0.4, 1.1, 0.06), (hs_cx + 0.8, 1.80, hs_cz + hs_l/2 - 0.22), bevel_width=0.02, material=mat_roof_teal)
+    create_beveled_box("House_Window_Curtain_R", (0.4, 1.1, 0.06), (hs_cx + 1.8, 1.80, hs_cz + hs_l/2 - 0.22), bevel_width=0.02, material=mat_roof_teal)
 
     # 9. KHU LÂM NGHIỆP CỦA GROVER (TÂY BẮC: X = -14.0, Z = 38.0)
     lm_cx, lm_cz = -14.0, 38.0
@@ -358,7 +447,7 @@ def build_village():
     build_stylized_tree("Tree_Mine_East", (18.5, 0, 35.0), scale=1.5, mat_wood=mat_wood, mat_foliage=mat_foliage)
 
     # 12. XUẤT RA GLB & LƯU FILE BLEND AN TOÀN
-    out_glb = "Assets/Models/village_map.glb"
+    out_glb = os.path.join(workspace_dir, "Assets", "Models", "village_map.glb")
     print(f"Xuất mô hình sang: {out_glb}")
     bpy.ops.export_scene.gltf(
         filepath=out_glb,
@@ -367,12 +456,12 @@ def build_village():
         export_apply=True,
         export_materials='EXPORT'
     )
-    blend_path = "Assets/Blender_Source/village_map.blend"
+    blend_path = os.path.join(workspace_dir, "Assets", "Blender_Source", "village_map.blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend_path)
     print(f"Lưu file blend: {blend_path}")
 
     # 13. CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (VISUAL PREVIEW RENDER)
-    render_preview_path = "Assets/Models/_preview_render.png"
+    render_preview_path = os.path.join(workspace_dir, "Assets", "Models", "_preview_render.png")
     setup_preview_render(render_preview_path, resolution=(1280, 720), camera_pos=(-26, -34, 22), target_pos=(0, -18, 1))
     print("=== DỰNG BẢN ĐỒ LÀNG MỞ RỘNG HOÀN TẤT VỚI CHẤT LƯỢNG CAO ===")
 
