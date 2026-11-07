@@ -62,6 +62,22 @@ public partial class DevTeleportTab : VBoxContainer
 			btn.Pressed += () => TeleportPlayerTo(spot.Position);
 			_grid.AddChild(btn);
 		}
+
+		AddSceneChangeButton("🏝️ Sang Đảo Đá (WorldMap)", "res://Scenes/Levels/WorldMap.tscn");
+		AddSceneChangeButton("🏡 Sang Bản Đồ Làng (Village)", "res://Scenes/Levels/VillageMap.tscn");
+	}
+
+	private void AddSceneChangeButton(string text, string scenePath)
+	{
+		if (_grid == null) return;
+		Button btn = new()
+		{
+			Text = text,
+			CustomMinimumSize = new Vector2(160, 34),
+			SizeFlagsHorizontal = SizeFlags.ExpandFill
+		};
+		btn.Pressed += () => GetTree().ChangeSceneToFile(scenePath);
+		_grid.AddChild(btn);
 	}
 
 	private void TeleportPlayerTo(Vector3 target)
