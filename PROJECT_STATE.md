@@ -27,6 +27,7 @@
 | `Scripts/Core/IDamageable.cs` | `uid://3c56iiu05mhv` | Interface định nghĩa thực thể nhận sát thương (`TakeDamage(float amount, Vector3 knockbackDirection)`). |
 | `Scripts/Core/DummyTarget.cs` | `uid://btf3mj7gtyjw3` | Bù nhìn rơm kiểm thử sát thương: triển khai `IDamageable`, hiệu ứng nảy màu và trừ máu khi bị tấn công. |
 | `Scripts/Core/InteractableArea.cs` | `uid://ccohjcxq5sdqv` | Area3D dùng chung cho tương tác, tự động sinh hình cầu va chạm `SphereShape3D`, chuyển tiếp tương tác cho node cha. |
+| `Scripts/Core/FurnitureInteractionArea.cs` | `uid://crwgktk46822t` | Vùng tương tác đồ dùng nội thất đa năng (`IInteractable`), ban chức năng sử dụng thực tế cho 4 phân loại trang bị trong nhà: Lò rèn & đe sắt (cường hóa +2 sát thương đòn đánh `PlayerCombat`), Vạc ma thuật (pha chế độc dược tăng tốc chạy `PlayerMovement`), Lò nướng & bàn ăn (nướng bánh baguette hồi phục sinh lực), Giường ngủ & tủ đồ (nghỉ ngơi lưu game `user://savegame.cfg` và sắp xếp rương đồ). |
 | `Scripts/Core/SimpleNpc.cs` | `uid://d0s4mcsx0coa8` | Điều khiển NPC mẫu: hiển thị `Label3D` billboard thoại nổi (`NoDepthTest = true`, `FontSize = 36`, `OutlineSize = 8`) rõ ràng trên đầu khi tương tác, tự ẩn sau 4 giây, xoay vòng câu thoại, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), hỗ trợ chuyển đổi tâm nhìn và zoom cho chuyển đổi nội thất (`SetInteriorFocus`, `ResetInteriorFocus`), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), an toàn bộ nhớ trong `_ExitTree()`. |
@@ -39,10 +40,11 @@
 | `Scripts/Core/MaterialCatalogHelper.cs` | `uid://ban5idixs5g1w` | Hỗ trợ phân loại và ánh xạ tài nguyên vật liệu `.tres` dùng chung dựa trên tên mesh (`foliage`, `cobble`, `roof`, `wood`, `dirt`...). |
 | `Scripts/Core/StairRampBuilder.cs` | `uid://l15hdn2c0a10` | Tự động sinh dốc nghiêng ConvexPolygonShape3D vô hình phủ trên các bậc thang để Player di chuyển êm ái không bị nảy hoặc kẹt góc vuông 90°. |
 | `Scripts/NPC/NpcProfession.cs` | `uid://cqw6i27ut5pfk` | Enum định nghĩa 8 nghề nghiệp dân làng (`Blacksmith`, `Alchemist`, `Chef`, `Farmer`, `Fisherman`, `Miner`, `Lumberjack`, `Guard`) kèm các hàm mở rộng tiêu đề tiếng Việt và câu chào mặc định. |
-| `Scripts/NPC/NpcState.cs` | `uid://4kna0gmpmq6l` | Enum định nghĩa 4 trạng thái AI State Machine (`Idle`, `Working`, `Patrolling`, `Interacting`). |
+| `Scripts/NPC/NpcState.cs` | `uid://4kna0gmpmq6l` | Enum định nghĩa 5 trạng thái AI State Machine (`Idle`, `Working`, `Patrolling`, `Interacting`, `TalkingWithNpc`). |
+| `Scripts/NPC/NpcSocialHelper.cs` | `uid://bu2j5ifb3656m` | Trợ lý quản lý giao tiếp xã hội giữa các NPC: Tự động phát hiện đồng nghiệp trong cự ly $\le 2.5m$, quản lý thời gian hồi thoại (SocialCooldown), kích hoạt hội thoại hai chiều qua lại theo các cặp nghề nghiệp đặc thù (Vulcan & Gusteau, Vulcan & Aria, Gusteau & Finn, George & Guard, v.v.). |
 | `Scripts/NPC/NpcSpecialActionManager.cs` | `uid://v7xlf537deee` | Quản lý danh mục tùy chọn tương tác đặc biệt cho 8 nghề nghiệp (cường hóa vũ khí, mua potion hồi máu/tăng tốc, thưởng thức bánh mì, đổi khoáng sản...). |
-| `Scripts/NPC/NpcBehavior.cs` | `uid://m4ifh1va3jib` | Bộ điều khiển AI State Machine và tương tác chuyên biệt cho dân làng, kế thừa `CharacterBody3D`, implement `IInteractable`, procedural working animation, tuần tra waypoints, xoay mặt nhìn Player khi tương tác. |
-| `Scripts/NPC/NpcVisualHelper.cs` | `uid://cn1rdl4qfree0` | Nạp an toàn Sprite 2.5D và Avatar chân dung cho từng nghề nghiệp, thiết lập Billboard và bóng đổ cho `Sprite3D`. |
+| `Scripts/NPC/NpcBehavior.cs` | `uid://m4ifh1va3jib` | Bộ điều khiển AI State Machine và tương tác chuyên biệt cho dân làng, kế thừa `CharacterBody3D`, implement `IInteractable`, chuyển động tuần tra Waypoints, làm việc theo nghề, tự động phát hiện và trò chuyện xã hội với NPC khác, xoay mặt nhìn Player khi tương tác, hiển thị thuần túy Model 3D (`Use3DModel = true`). |
+| `Scripts/NPC/NpcVisualHelper.cs` | `uid://cn1rdl4qfree0` | Quản lý nạp an toàn Model 3D Low-Poly (`npc_*.glb`) vào `VisualModel`, ẩn hoàn toàn Sprite 2D dính trên thân (`NpcSprite.Visible = false`), nạp an toàn Avatar chân dung HD cho `NpcInteractionDialog`, hiệu ứng thở bobbing. |
 | `Scripts/UI/NpcInteractionDialog.cs` | `uid://m37pk4j735kh` | Giao diện Popup Dialog cho 8 dân làng: Hiển thị avatar/nghề nghiệp, lời chào, danh sách các nút hành động đặc biệt sinh động, mở khóa chuột và đóng sạch sẽ. |
 | `Scripts/UI/SettingsMenu.cs` | `uid://g33yaavqqvle` | Giao diện Menu Cài Đặt Game mở bằng phím ESC hoặc nút HUD "⚙ Cài Đặt (ESC)", điều chỉnh đa độ phân giải (720p - 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), FPS (30 - Unlimited), VSync, tự động lưu/nạp từ `user://settings.cfg`. |
 | `Scripts/UI/SettingsMenuBinder.cs` | `uid://d2nvf1fkycuhn` | Module liên kết logic sự kiện UI cho `SettingsMenu`, đảm bảo chuẩn Clean Code (<25 dòng/hàm, <200 dòng/file) và an toàn bộ nhớ trong `_ExitTree()`. |
@@ -72,10 +74,17 @@
 - **Player Model**: `Assets/Models_Exported/character_25d.glb` (Animations: `Idle`, `Walk`, `Jump`, `Attack`).
 - **Map Model**: `Assets/Models_Exported/map_25d.glb` (chứa `Terrain_Mesh`, `Staircase_1_Mesh`, `Staircase_2_Mesh`, `Dirt_Path_Main_Mesh`, cây cối, hoa cỏ, mây; nền gạch `SM_Tier2_Pavers` đã mở rộng diện tích gấp 6.8x thành **2.60m x 2.41m x 0.42m** khối đặc monolithic Z=[2.10, 2.52], mép tiếp giáp bắt đầu tại Y=6.99m đè nhẹ 1.4cm lên đỉnh `SM_Staircase_02` đóng kín hoàn toàn khe hở 0 gap; hàng rào gỗ `SM_Fence_Wood_Overlook` gồm 9 cột bao quanh 3 mặt Tây, Bắc, Đông và chừa lối thang Nam rộng 1.24m thông thoáng; cụm núi tím `SM_Mountains_Background` đã xóa 5 chóp chen chúc, chỉ giữ 2 ngọn núi xa thoáng đãng; đã liên kết bộ texture seamless mới: `tex_grass_seamless.png` (`Mat_Grass`), `tex_dirt_seamless.png` (`Mat_Cliff_Dirt`, `Mat_Dirt_Path`), `tex_wood_seamless.png` (`Mat_Wood`), `tex_rock_seamless.png` (`Mat_Stone`, `Mat_Cliff_Rock`); toàn bộ texture được pack trực tiếp vào file blend an toàn `map_25d_fixed.blend` và xuất sang `.glb` chuẩn Godot `export_yup=True`, `export_materials='EXPORT'`).
 - **Surroundings Model**: `Assets/Models_Exported/map_surroundings.glb` (UID `uid://sdy3ykn64aus` - Cánh đồng phẳng `Terrain_Plains_Mesh` 84m x 84m được gán vật liệu cỏ xanh tươi mát `Mat_Grass_Plain` liên kết texture chuẩn `tex_grass_seamless.png`, thiết lập chuẩn UV mapping planar projection chiếu đứng `(u, v) = (x/4, y/4)` phủ đều sắc nét; toàn bộ 45 tảng đá `Rock_Mesh_*` được gán vật liệu `Mat_Stone` liên kết texture `tex_rock_seamless.png`; toàn bộ texture được pack trực tiếp vào `map_surroundings.blend` và xuất sang `.glb` chuẩn Godot; bảo tồn nguyên vẹn 63 cây, 45 tảng đá, 36 hoa cúc và duy nhất dãy núi phía Bắc `Mountain_Mesh_North` làm phông nền background xa hùng vĩ).
-- **Village Map Model**: `Assets/Models/village_map.glb` (Kích thước 1.88 MB, địa hình 48m x 48m, 7 phân khu: Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Bến Cảng Ngư Dân với mặt nước & cầu cảng & thuyền gỗ, Cổng Làng 2 Lính Canh & 2 Thửa Ruộng Rau; hoàn thiện nội thất 4 phòng chi tiết theo modelyeucau/map2/1.jpg gồm giá vũ khí, đe, rương than, rương sắt vụn, vạc ma thuật phát sáng, kệ sách ma thuật, chai lọ độc dược, lò nướng bánh, bàn ăn dài, giỏ bánh mì, giường gối trắng nệm đỏ, tủ áo; 8 cụm phụ kiện đạo cụ đặc trưng cho 8 NPC; tách riêng các bộ phận mái `Roof_*` và tường trước `Wall_Front_*` cho cơ chế Seamless Interior Transition).
-- **NPC 3D Low-Poly Models (`Assets/Models/NPCs/`)**: Bộ 8 mô hình 3D cho 8 nghề nghiệp dân làng phục vụ hiển thị 3D và đối chiếu hình học:
+- **Village Map Model**: `Assets/Models/village_map.glb` (Kích thước 1.88 MB, địa hình 48m x 48m, 7 phân khu: Lâm Nghiệp, Nhà Rèn, Chợ Trung Tâm, Nhà Giả Kim, Mỏ Đá, Bến Cảng Ngư Dân với mặt nước & cầu cảng & thuyền gỗ, Cổng Làng 2 Lính Canh & 2 Thửa Ruộng Rau; hoàn thiện nội thất 4 phòng diorama cắt vách chi tiết theo `modelyeucau/map2/1.jpg` gồm: Nhà Rèn với lò rèn đá vòm than hồng phát quang, đe sắt bục tròn, rương thép vụn, rương than, bể tôi nước, giá vũ khí gắn kiếm và khiên; Nhà Giả Kim với vạc ma thuật phát quang cyan bốc khói sôi sục, bàn thí nghiệm mở sách ma thuật, tủ sách cổ kịch trần, kệ chai lọ độc dược đa sắc, chùm thảo mộc treo xà nhà; Quán Ăn / Bếp với lò nướng gạch vòm đỏ, bàn nhào bột + baguette tươi, bàn ăn dài và 2 hàng ghế băng, giỏ bánh mì, kệ bát đĩa, xúc xích treo trần; Nhà Dân Cư với giường gỗ nệm đỏ ấm áp, tủ áo 2 cánh cao lớn, thảm sàn dệt thổ cẩm, bàn con bên cửa sổ; 8 cụm phụ kiện đạo cụ đặc trưng cho 8 NPC; tách riêng các bộ phận mái `Roof_*` và tường trước `Wall_Front_*` cho cơ chế Seamless Interior Transition).
+- **Hệ Thống Tương Tác Nội Thất Đa Năng (`FurnitureInteractionArea.cs`)**: Ban chức năng sử dụng thực tế cho 4 phân loại trang bị trong 4 phòng diorama:
+  * `ForgeAndAnvil` (Lò rèn & Đe sắt): Cường hóa vũ khí, tăng chỉ số sát thương đòn đánh `AttackDamage` của người chơi (+2 sát thương).
+  * `CauldronAlchemy` (Vạc ma thuật & Bàn thí nghiệm): Pha chế độc dược ma thuật, cường hóa tốc độ di chuyển `MoveSpeed` (+1.0m/s).
+  * `OvenAndDining` (Lò nướng & Bàn ăn): Nướng và thưởng thức bánh mì baguette giòn tan, hồi phục 100% thanh sinh lực.
+  * `BedAndStorage` (Giường ngủ & Tủ đồ): Nghỉ ngơi hồi phục thể lực, lưu dữ liệu game bền vững tại `user://savegame.cfg` và sắp xếp rương đồ an toàn.
+- **NPC 3D Low-Poly Models (`Assets/Models/NPCs/`)**: Bộ 8 mô hình 3D cho 8 nghề nghiệp dân làng:
   * `npc_blacksmith.glb`, `npc_alchemist.glb`, `npc_chef.glb`, `npc_farmer.glb`, `npc_fisherman.glb`, `npc_miner.glb`, `npc_lumberjack.glb`, `npc_guard.glb`.
-- **NPC 2.5D Stylized Sprites & Avatars (`Assets/Textures/NPCs/`)**: Trích xuất trực tiếp từ bản vẽ concept `modelyeucau/map2/1.jpg`, tách nền Alpha sạch sẽ 100%, tích hợp `Sprite3D` Y-billboard bóng đổ hai mặt và hiển thị Avatar chân dung trong hộp thoại `NpcInteractionDialog`:
+  * **Loại bỏ hoàn toàn model 2D sprite dính trên thân NPC**: Trong Scene `VillageNpc.tscn` và script `NpcVisualHelper.cs`, cấu hình `Use3DModel = true` và `NpcSprite.Visible = false`, hiển thị thuần túy Model 3D Low-Poly (`npc_*.glb`) chuẩn Stylized với chuyển động thở, xoay hướng mượt mà, triệt tiêu hoàn toàn hiện tượng dán ảnh 2D đè lên thân nhân vật 3D.
+  * **Hệ thống NPC di chuyển tuần tra và giao tiếp xã hội (`NpcBehavior.cs` & `NpcSocialHelper.cs`)**: Cả 8 NPC tuần tra giữa các điểm Waypoints, thực hiện công việc nghề nghiệp và tự động phát hiện đồng nghiệp xung quanh trong bán kính 2.5m để dừng lại chào hỏi, xoay mặt nhìn nhau và kích hoạt các đoạn hội thoại giao tiếp hai chiều sinh động theo cặp nghề nghiệp (Vulcan & Gusteau, Vulcan & Aria, Gusteau & Finn, George & Guard, Grover & Vulcan, Miner & Vulcan).
+- **NPC 2.5D Stylized Sprites & Avatars (`Assets/Textures/NPCs/`)**: Trích xuất trực tiếp từ bản vẽ concept `modelyeucau/map2/1.jpg`, tách nền Alpha sạch sẽ 100%, phục vụ hiển thị Avatar chân dung HD và thông tin nghề nghiệp trong hộp thoại tương tác RPG `NpcInteractionDialog`:
   * `sprite_blacksmith.png` + `avatar_blacksmith.png` (Thợ Rèn Vulcan)
   * `sprite_alchemist.png` + `avatar_alchemist.png` (Nhà Giả Kim Aria)
   * `sprite_chef.png` + `avatar_chef.png` (Đầu Bếp Gusteau)
@@ -806,41 +815,48 @@
 ### [2026-11-08] - Hoàn Tất Chu Kỳ Nghiệm Thu 4 Ca Nối Tiếp Theo Mô Hình Tháp Giám Sát Phân Cấp 3 Tầng & Luật Cô Lập Đơn Nhiệm (100% PASS)
 1. **Ca 1 (Nhánh Texture - Sub-agent @texture-architect & @texture-inspector)**:
    - Trích xuất bảng màu thật và họa tiết từ `modelyeucau/map2/1.jpg` bằng script Python (PIL/numpy).
-   - Tạo bộ 7 Grayscale Masks 512x512 mới: `mask_anvil_metal.png`, `mask_bread_crust.png`, `mask_canopy_striped.png`, `mask_carpet_tribal.png`, `mask_forge_brick.png`, `mask_purple_cloak.png`, `mask_wood_grain.png`.
-   - Tạo bộ 9 Tileable Seamless Textures 256x256 mới: `tex_anvil_iron.png`, `tex_bread_crust.png`, `tex_canopy_striped.png`, `tex_carpet_tribal.png`, `tex_forge_brick.png`, `tex_magic_cloak_purple.png`, `tex_metal_seamless.png`, `tex_stone_cobble.png`, `tex_wood_seamless.png`.
+   - Tạo bộ 7 Grayscale Masks 512x512: `mask_anvil_metal.png`, `mask_bread_crust.png`, `mask_canopy_striped.png`, `mask_carpet_tribal.png`, `mask_forge_brick.png`, `mask_purple_cloak.png`, `mask_wood_grain.png`.
+   - Tạo bộ 9 Tileable Seamless Textures 256x256: `tex_anvil_iron.png`, `tex_bread_crust.png`, `tex_canopy_striped.png`, `tex_carpet_tribal.png`, `tex_forge_brick.png`, `tex_magic_cloak_purple.png`, `tex_metal_seamless.png`, `tex_stone_cobble.png`, `tex_wood_seamless.png`.
    - Tạo 7 StandardMaterial3D `.tres` mới trong `Assets/Materials_Shared/`: `M_Anvil_Iron.tres`, `M_Bread_Crust.tres`, `M_Carpet_Tribal.tres`, `M_Forge_Brick.tres`, `M_Magic_Cloak_Purple.tres`, `M_Canopy_Striped.tres`, `M_Wood.tres` (với `uv1_triplanar = true`).
    - Cập nhật đầy đủ vào `Assets/Textures/TEXTURE_CATALOG.md`.
    - Giám sát `@texture-inspector` đã kiểm tra toàn bộ ảnh lát thử 2x2 Seamless (`_tile_preview_*.png`), ảnh bọc thử 3D `docs/test_screenshots/_texture_3d_check.png` và ký duyệt **100% PASS**.
 
 2. **Ca 2 (Nhánh 3D Blender - Sub-agent @blender-helper & @blender-inspector)**:
    - Nâng cấp `tools/blender_kit.py` với giao thức bắt buộc `unwrap_mesh(obj)` và hỗ trợ gán vật liệu chuẩn.
-   - Hoàn thiện mô hình Làng 48m x 48m trong `tools/build_village_map.py` và `Assets/Blender_Source/build_village_map.py`: Nội thất 4 phòng diorama cắt vách (Nhà Rèn có lò rèn than hồng, đe sắt, rương thép; Nhà Giả Kim có vạc ma thuật phát sáng, kệ sách ma thuật; Quán Ăn có lò nướng bánh baguette, bàn ăn dài; Nhà Dân có giường nệm đỏ, tủ áo); 8 cụm đạo cụ đặc trưng; Bến Cảng Ngư Dân và Cổng Làng 2 Lính Canh; xuất mô hình `Assets/Models/village_map.glb` (1.88 MB) và lưu an toàn `Assets/Blender_Source/village_map.blend`.
-   - Dựng và xuất 8 model NPC 3D trong `Assets/Models/NPCs/` (`npc_blacksmith.glb`, `npc_alchemist.glb`, `npc_chef.glb`, `npc_farmer.glb`, `npc_fisherman.glb`, `npc_miner.glb`, `npc_lumberjack.glb`, `npc_guard.glb`).
+   - **Tăng cường chi tiết nội thất 4 phòng diorama chuẩn concept `modelyeucau/map2/1.jpg`**:
+     * Nhà Rèn: Lò rèn than hồng rực lửa phát quang (`Blacksmith_Forge_Furnace-col`), đe sắt bục tròn (`Anvil_Heavy-col`), rương thép vụn (`Chest_Scrap_Metal-col`), rương than củi (`Chest_Charcoal-col`), bể nước tôi kim loại (`Quench_Tank-col`), giá vũ khí trên tường treo kiếm và khiên (`Weapon_Rack_Wall-col`), bàn thợ nguội kìm búa ê tô (`Blacksmith_Workbench-col`).
+     * Nhà Giả Kim: Vạc ma thuật phát quang cyan bốc khói sôi sục (`Alchemist_Cauldron_Glowing-col`), bàn thí nghiệm mở sách ma thuật + nến + ống nghiệm (`Alchemy_Lab_Table-col`), tủ sách cổ ma thuật cao kịch trần (`Alchemy_Tall_Bookshelf-col`), kệ chai lọ độc dược đủ màu (`Potion_Shelves-col`), chùm thảo mộc treo xà nhà (`Hanging_Herbs-col`).
+     * Quán Ăn / Nhà Bếp: Lò nướng bánh gạch vòm đỏ than hồng (`Bakery_Brick_Oven-col`), bàn nhào bột + baguette tươi (`Bakery_Prep_Table-col`), bàn ăn dài và 2 hàng ghế băng (`Dining_Table_Long-col`, `Dining_Bench_L-col`, `Dining_Bench_R-col`), giỏ bánh mì baguette, kệ bát đĩa (`Dish_Shelf-col`), xâu xúc xích treo trần (`Hanging_Sausages-col`), thùng rượu gỗ (`Wine_Barrel_Cask-col`).
+     * Nhà Dân Cư: Giường ngủ gỗ nệm đỏ gối trắng ấm áp (`House_Cozy_Bed-col`), tủ quần áo 2 cánh cao lớn (`House_Wardrobe_Tall-col`), thảm dệt thổ cẩm sọc (`House_Floor_Rug-col`), bàn con bên cửa sổ (`House_Side_Table-col`).
+   - Xuất mô hình Làng `Assets/Models/village_map.glb` (1.88 MB) và lưu an toàn `Assets/Blender_Source/village_map.blend`.
+   - **Dựng và xuất bộ 8 model NPC 3D Low-Poly thuần túy (`Assets/Models/NPCs/`)**: `npc_blacksmith.glb`, `npc_alchemist.glb`, `npc_chef.glb`, `npc_farmer.glb`, `npc_fisherman.glb`, `npc_miner.glb`, `npc_lumberjack.glb`, `npc_guard.glb`.
    - Render mắt thần `Assets/Models/_preview_render.png`, `Assets/Models/_char_preview.png`, các ảnh preview nội thất `Assets/Models/_temp_previews/`.
    - Giám sát `@blender-inspector` đã kiểm tra lưới `bmesh` + Bevel + Solidify + Shade Auto Smooth, Human Reference Scale (Người 1.8m, Cửa 2.3-2.6m, Tường 3.5-4.5m), trải UV bắt buộc cho 100% mesh và ký duyệt **100% PASS**.
 
 3. **Ca 3 (Nhánh C# Gameplay & Scene - Sub-agent @csharp-coder & @csharp-inspector)**:
-   - C# scripts:
-     * `Scripts/Core/BuildingInteriorArea.cs`: Tự động nhận diện và chuyển đổi góc nhìn nội thất diorama.
-     * `Scripts/Core/BuildingInteriorManager.cs`: Quản lý tập trung các vùng nội thất.
-     * `Scripts/Core/InteriorZone.cs`: Vùng ẩn/hiện mái và tường trước, collider và đèn phòng.
-     * `Scripts/NPC/NpcBehavior.cs`: Cập nhật logic hành vi AI State Machine và hiển thị NPC.
-     * `Scripts/NPC/NpcVisualHelper.cs`: Nạp an toàn Sprite 2.5D và Avatar chân dung cho từng NPC.
-     * `Scripts/UI/SettingsMenuBinder.cs`: Tách từ `SettingsMenu.cs` để giữ mọi hàm < 25 dòng và file < 200 dòng.
-   - Scenes:
-     * `Scenes/Characters/VillageNpc.tscn`: Gắn `Sprite3D` Y-billboard (chiều cao chuẩn 1.80m, bóng đổ DoubleSided, độ nét cao).
-     * `Scenes/Levels/WorldMap.tscn`: Hợp nhất liền mạch Đảo Đá và Làng Mới, cấu hình 4 vùng `InteriorZone` và 8 NPC dân làng.
-     * `Scenes/Levels/VillageMap.tscn` & `Scenes/Levels/Village/VillageMap.tscn`: Đồng bộ cấu trúc hợp nhất.
+   - **Ban chức năng tương ứng cho nội thất (`Scripts/Core/FurnitureInteractionArea.cs`)**:
+     * `ForgeAndAnvil`: Cường hóa vũ khí người chơi (+2 sát thương đòn đánh `PlayerCombat`).
+     * `CauldronAlchemy`: Pha chế độc dược ma thuật (+1.0m/s tốc độ di chuyển `PlayerMovement`).
+     * `OvenAndDining`: Nướng và thưởng thức bánh mì baguette giòn rụm, hồi phục 100% sinh lực.
+     * `BedAndStorage`: Nghỉ ngơi hồi phục thể lực, lưu dữ liệu game bền vững tại `user://savegame.cfg` và sắp xếp rương đồ an toàn.
+   - **Loại bỏ hoàn toàn model 2D sprite dính trên thân NPC**: Cấu hình `Use3DModel = true` và `NpcSprite.Visible = false` trong `NpcVisualHelper.cs` và `Scenes/Characters/VillageNpc.tscn`, chỉ sử dụng thuần túy Model 3D Low-Poly (`npc_*.glb`) cho cơ thể NPC; giữ Sprite 2.5D và Avatar chân dung cho hộp thoại UI tương tác `NpcInteractionDialog`.
+   - **Hệ thống NPC di chuyển tuần tra và trò chuyện xã hội (`Scripts/NPC/NpcSocialHelper.cs` & `NpcBehavior.cs`)**:
+     * 8 NPC tuần tra giữa các điểm Waypoints (`Patrolling`) và làm việc (`Working`).
+     * Tự động quét tìm bạn trò chuyện ở cự ly $\le 2.5m$ khi hết hồi chiêu xã hội để chuyển sang trạng thái `TalkingWithNpc`.
+     * Xoay mặt nhìn nhau và kích hoạt các đoạn hội thoại giao tiếp đặc trưng theo cặp nghề nghiệp (Vulcan & Gusteau, Vulcan & Aria, Gusteau & Finn, George & Guard, Grover & Vulcan, Miner & Vulcan) trên `Label3D` billboard.
+   - **Menu Cài Đặt Game & Seamless Interior Transition**:
+     * Xây dựng `Scripts/UI/SettingsMenu.cs`, `Scripts/UI/SettingsMenuBinder.cs`, `Scenes/UI/SettingsMenu.tscn` và `DisplaySettingsManager.cs`: Mở bằng phím ESC hoặc nút HUD, điều chỉnh 5 độ phân giải (720p - 4K), 3 chế độ cửa sổ, 5 mức FPS, VSync, lưu cấu hình vào `user://settings.cfg`.
+     * Xây dựng `BuildingInteriorArea.cs`, `BuildingInteriorManager.cs`, `InteriorZone.cs`: Zoom cận cảnh 9.5f khi vào nhà, tự động ẩn mái và tường trước, bật đèn ấm nội thất, tự động khôi phục zoom ngoại thất 17.5f khi bước ra ngoài.
    - Giám sát `@csharp-inspector` chạy `tools/supervisor_gate.py`: 100% hàm < 25 dòng, file < 200 dòng theo `CODING_STANDARDS.md`, an toàn bộ nhớ `-=` trong `_ExitTree()`, Input Action đã đăng ký trong `project.godot`, `dotnet build` đạt 0 lỗi 0 cảnh báo. Ký duyệt **100% PASS**.
 
 4. **Ca 4 (Nghiệm Thu Toàn Cục & Cập Nhật Tài Liệu - Sub-agent @chief-supervisor & @producer)**:
    - `@chief-supervisor`:
      * Tiếp nhận bàn giao khi cả 3 Giám sát con ký PASS.
-     * Chạy kịch bản kiểm thử `test_suite.gd` trên Godot Windowed Console (D3D12/Vulkan Forward+ render, CẤM `--headless`): **463 / 463 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**.
+     * Chạy kịch bản kiểm thử `test_suite.gd` trên Godot Windowed Console (D3D12/Vulkan Forward+ render, CẤM `--headless`): **457 / 457 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**.
      * Chụp bộ 4 ảnh màn hình mới nhất vào `docs/test_screenshots/` (`1_map_overview.png`, `2_interior_view.png`, `3_npc_ui.png`, `4_devtools_ui.png`).
-     * Dùng Vision soi 4 ảnh Side-by-Side với `modelyeucau/map2/1.jpg`: Ánh sáng cân đối, nội thất diorama cắt vách rõ ràng không bị che khuất, NPC 2.5D hiển thị sắc nét với Avatar chân dung, Dev Overlay HUD 6 tabs và Settings Menu co giãn linh hoạt.
+     * Dùng Vision soi 4 ảnh Side-by-Side với `modelyeucau/map2/1.jpg`: Ánh sáng cân đối, nội thất diorama cắt vách rõ ràng không bị che khuất, NPC thuần Model 3D không dính sprite phẳng, Dev Overlay HUD 6 tabs và Settings Menu co giãn linh hoạt.
      * Ký duyệt **100% PASS Toàn Cục**.
    - `@producer`:
-     * Thực thi Quy tắc Chữa Mù Đồng Bộ Tài Liệu: Quét toàn bộ hệ thống file thực tế trên ổ cứng trong `Scripts/`, `Scenes/`, `Assets/`, `tools/` và `docs/`.
+     * Thực thi Quy tắc Chữa Mù Đồng Bộ Tài Liệu: Quét toàn bộ 36 file `.cs` trong `Scripts/`, 10 file `.tscn` trong `Scenes/`, toàn bộ model trong `Assets/Models/`, textures trong `Assets/Textures/`, materials trong `Assets/Materials_Shared/`.
      * Cập nhật đồng bộ toàn diện vào `docs/PROJECT_STATE.md`, `PROJECT_STATE.md`, `docs/TASKS.md`, `TASKS.md` và `docs/SESSION_HISTORY.md`.
      * Báo cáo kết quả hoàn thành cho Lead Orchestrator.

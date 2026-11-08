@@ -88,35 +88,44 @@ public static class NpcVisualHelper
 		return ResourceLoader.Exists(path) ? GD.Load<PackedScene>(path) : null;
 	}
 
-	public static void SetupVisuals(NpcBehavior npc, NpcProfession profession, bool use3DModel)
+	public static void SetupVisuals(NpcBehavior npc, NpcProfession profession, bool use3DModel = true)
 	{
-		if (npc.VisualModel == null)
+		Ensure3DModelInstance(npc, profession);
+
+		if (npc.NpcSprite != null)
 		{
-			PackedScene? scene = LoadModel(profession);
-			if (scene != null)
-			{
-				Node3D instance = scene.Instantiate<Node3D>();
-				instance.Name = "VisualModel";
-				npc.AddChild(instance);
-				npc.VisualModel = instance;
-			}
+			ConfigureSprite(npc.NpcSprite, profession);
+			npc.NpcSprite.Visible = false;
 		}
 
-		if (npc.NpcSprite != null) ConfigureSprite(npc.NpcSprite, profession);
-		if (npc.VisualModel != null) npc.VisualModel.Visible = use3DModel;
-		if (npc.NpcSprite != null) npc.NpcSprite.Visible = !use3DModel;
+		if (npc.VisualModel != null)
+		{
+			npc.VisualModel.Visible = true;
+		}
+	}
+
+	private static void Ensure3DModelInstance(NpcBehavior npc, NpcProfession profession)
+	{
+		if (npc.VisualModel != null) return;
+		PackedScene? scene = LoadModel(profession);
+		if (scene == null) return;
+
+		Node3D instance = scene.Instantiate<Node3D>();
+		instance.Name = "VisualModel";
+		npc.AddChild(instance);
+		npc.VisualModel = instance;
 	}
 
 	public static void ApplyBobbing(Node3D? model, Sprite3D? sprite, float time)
 	{
 		float bob = Mathf.Sin(time * 4.0f) * 0.04f;
 		if (model != null) model.Position = new Vector3(model.Position.X, bob, model.Position.Z);
-		if (sprite != null) sprite.Position = new Vector3(0, 0.90f + bob, 0);
+		if (sprite != null) sprite.Visible = false;
 	}
 
 	public static void ResetBobbing(Node3D? model, Sprite3D? sprite)
 	{
 		if (model != null) model.Position = new Vector3(model.Position.X, 0, model.Position.Z);
-		if (sprite != null) sprite.Position = new Vector3(0, 0.90f, 0);
+		if (sprite != null) sprite.Visible = false;
 	}
 }

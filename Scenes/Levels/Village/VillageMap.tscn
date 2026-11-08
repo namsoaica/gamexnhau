@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c9vlgmap72002"]
+[gd_scene format=3 uid="uid://c8vlgmap72001"]
 
 [ext_resource type="Script" uid="uid://7j1cd1f4exa7" path="res://Scripts/Core/MapAutoCollision.cs" id="1_autocol"]
 [ext_resource type="PackedScene" uid="uid://ci1e6hoc2uacw" path="res://Assets/Models_Exported/map_25d.glb" id="2_mapglb"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://c3q8npcdialog1" path="res://Scenes/UI/NpcInteractionDialog.tscn" id="12_dialog"]
 [ext_resource type="PackedScene" uid="uid://cb5setmenu801" path="res://Scenes/UI/SettingsMenu.tscn" id="13_settings"]
 [ext_resource type="Script" path="res://Scripts/Core/BuildingInteriorManager.cs" id="14_interiormgr"]
+[ext_resource type="Script" path="res://Scripts/Core/FurnitureInteractionArea.cs" id="15_furniture"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_world"]
 sky_top_color = Color(0.35, 0.62, 0.95, 1)
@@ -174,54 +175,121 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 8.5)
 NpcName = "Aegis"
 Profession = 7
 CurrentState = 0
+Waypoints = [Vector3(-0.8, 0, 8.5), Vector3(-2.2, 0, 9.5), Vector3(0, 0, 10.5)]
 
 [node name="Npc_Guard_2" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 8.5)
 NpcName = "Phalanx"
 Profession = 7
 CurrentState = 0
+Waypoints = [Vector3(0.8, 0, 8.5), Vector3(2.2, 0, 9.5), Vector3(0, 0, 10.5)]
 
 [node name="Npc_Farmer" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0, 8.5)
 NpcName = "George"
 Profession = 3
 CurrentState = 1
+Waypoints = [Vector3(-5.2, 0, 8.5), Vector3(-3.5, 0, 10), Vector3(-1.5, 0, 9.5)]
 
 [node name="Npc_Chef" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 7.5)
 NpcName = "Gusteau"
 Profession = 2
 CurrentState = 1
+Waypoints = [Vector3(5.5, 0, 7.5), Vector3(3.5, 0, 9), Vector3(1.5, 0, 9.5)]
 
 [node name="Npc_Fisherman" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0.18, 7.5)
 NpcName = "Finn"
 Profession = 4
 CurrentState = 1
+Waypoints = [Vector3(13.5, 0.18, 7.5), Vector3(9, 0, 8), Vector3(5, 0, 8.5)]
 
 [node name="Npc_Blacksmith" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 0, 20)
 NpcName = "Vulcan"
 Profession = 0
 CurrentState = 1
+Waypoints = [Vector3(-6.8, 0, 20), Vector3(-4, 0, 18), Vector3(-1, 0, 16.5)]
 
 [node name="Npc_Alchemist" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 21)
 NpcName = "Aria"
 Profession = 1
 CurrentState = 1
+Waypoints = [Vector3(7.5, 0, 21), Vector3(4, 0, 18), Vector3(1, 0, 16.5)]
 
 [node name="Npc_Lumberjack" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 36.5)
 NpcName = "Grover"
 Profession = 6
 CurrentState = 1
+Waypoints = [Vector3(-13.5, 0, 36.5), Vector3(-8, 0, 30), Vector3(-4, 0, 26)]
 
 [node name="Npc_Miner" parent="Village_NPCs" groups=["VillageNPC"] instance=ExtResource("10_vlgnpc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 36.5)
 NpcName = "Brock"
 Profession = 5
 CurrentState = 1
+Waypoints = [Vector3(12.5, 0, 36.5), Vector3(8, 0, 30), Vector3(4, 0, 26)]
+
+[node name="Village_Furniture" type="Node3D" parent="."]
+
+[node name="Furniture_Forge" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.8, 0.8, 19.5)
+script = ExtResource("15_furniture")
+Type = 0
+FurnitureTitle = "Lò Rèn"
+CustomPrompt = "Nhấn E để Rèn & Cường hóa vũ khí"
+
+[node name="Furniture_Anvil" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.8, 21)
+script = ExtResource("15_furniture")
+Type = 0
+FurnitureTitle = "Đe Sắt"
+CustomPrompt = "Nhấn E để Cường hóa vũ khí"
+
+[node name="Furniture_Cauldron" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.7, 21)
+script = ExtResource("15_furniture")
+Type = 1
+FurnitureTitle = "Vạc Ma Thuật"
+CustomPrompt = "Nhấn E để Pha chế độc dược ma thuật"
+
+[node name="Furniture_AlchemyTable" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.9, 0.5, 19)
+script = ExtResource("15_furniture")
+Type = 1
+FurnitureTitle = "Bàn Thí Nghiệm Giả Kim"
+CustomPrompt = "Nhấn E để Luyện dược thảo mộc"
+
+[node name="Furniture_BrickOven" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 0.9, 6.05)
+script = ExtResource("15_furniture")
+Type = 2
+FurnitureTitle = "Lò Nướng Bánh"
+CustomPrompt = "Nhấn E để Nướng bánh mì"
+
+[node name="Furniture_DiningTable" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7, 0.5, 6.6)
+script = ExtResource("15_furniture")
+Type = 2
+FurnitureTitle = "Bàn Ăn & Quầy Bánh"
+CustomPrompt = "Nhấn E để Thưởng thức bánh mì baguette"
+
+[node name="Furniture_Bed" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.75, 0.5, 27.25)
+script = ExtResource("15_furniture")
+Type = 3
+FurnitureTitle = "Giường Ngủ"
+CustomPrompt = "Nhấn E để Nghỉ ngơi & Hồi phục"
+
+[node name="Furniture_Wardrobe" type="Area3D" parent="Village_Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 0.8, 30.2)
+script = ExtResource("15_furniture")
+Type = 3
+FurnitureTitle = "Tủ Đồ & Rương Chứa Đồ"
+CustomPrompt = "Nhấn E để Mở rương chứa đồ"
 
 [node name="VoidKillZone" type="Area3D" parent="." unique_id=981247120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15, 0)

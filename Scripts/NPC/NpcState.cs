@@ -5,8 +5,9 @@ namespace Game.NPC;
 /// </summary>
 public enum NpcState
 {
-	Idle,        // Đứng yên quan sát, nghỉ ngơi
-	Working,     // Thực hiện công việc nghề nghiệp
-	Patrolling,  // Đi tuần tra giữa các điểm Waypoints
-	Interacting  // Đang nói chuyện, tương tác với người chơi
+	Idle,          // Đứng yên quan sát, nghỉ ngơi
+	Working,       // Thực hiện công việc nghề nghiệp
+	Patrolling,    // Đi tuần tra giữa các điểm Waypoints
+	Interacting,   // Đang nói chuyện, tương tác với người chơi
+	TalkingWithNpc // Đang trò chuyện thân thiện với NPC khác
 }

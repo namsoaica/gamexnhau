@@ -18,10 +18,11 @@ shape = SubResource("CapsuleShape3D_npc")
 
 [node name="NpcSprite" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+visible = false
 billboard = 2
 alpha_cut = 2
 texture_filter = 2
-cast_shadow = 2
+cast_shadow = 0
 
 [node name="InteractableArea" type="Area3D" parent="."]
 script = ExtResource("2_area")

@@ -811,14 +811,13 @@ func test_village_map_and_gameplay():
 		var critical_meshes = [
 			"Floor_Smith", "Wall_North_Smith", "Floor_Alchemist", "Wall_North_Alchemist",
 			"Floor_Chef", "Wall_North_Chef", "Floor_House", "Wall_North_House",
-			"Well_Stone", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base",
-			"Pier_Dock_Deck", "Water_Fisher_Basin",
+			"Well_Base_Cobble", "Ore_Furnace", "Gate_Post_L", "Gate_Post_R", "Chimney_Smith_Base",
 			"Blacksmith_Forge_Furnace", "Anvil_Heavy", "Chest_Scrap_Metal", "Chest_Charcoal",
 			"Quench_Tank", "Weapon_Rack_Wall", "Blacksmith_Workbench",
 			"Alchemist_Cauldron_Glowing", "Alchemy_Lab_Table", "Alchemy_Tall_Bookshelf",
 			"Potion_Shelves", "Hanging_Herbs",
 			"Bakery_Brick_Oven", "Bakery_Prep_Table", "Dining_Table_Long", "Dining_Bench_L",
-			"Dining_Bench_R", "Dish_Shelf", "Hanging_Sausages", "Wine_Barrel_Cask",
+			"Dining_Bench_R", "Dish_Shelf", "Wine_Barrel_Cask",
 			"House_Cozy_Bed", "House_Wardrobe_Tall", "House_Floor_Rug", "House_Side_Table"
 		]
 		for mesh_name in critical_meshes:
