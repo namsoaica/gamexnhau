@@ -19,25 +19,36 @@
 | `mask_grass_detail.png` | `res://Assets/Textures/Grayscale_Masks/mask_grass_detail.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ vân cỏ cách điệu trắng đen**. Pha với `albedo_color` xanh làm cỏ non (`M_Grass`), vàng úa làm cỏ khô thu (`M_Grass_Dry`), tím/xanh ngọc cho thảo nguyên ma thuật. |
 | `mask_dirt_detail.png` | `res://Assets/Textures/Grayscale_Masks/mask_dirt_detail.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ sỏi đất hữu cơ**. Pha với màu nâu nhạt làm đường cát, đỏ nâu làm đất bazan mỏ đất sét (`M_Dirt_RedClay`), xám tối làm bùn lầy. |
 | `mask_rock_detail.png` | `res://Assets/Textures/Grayscale_Masks/mask_rock_detail.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ vách đá nứt rạn Stylized**. Pha màu tím tạo núi tím viễn cảnh (`M_Rock_Mountain_Purple`), pha xám tạo tảng đá tự nhiên, pha đỏ cam tạo ngói nhà (`M_Roof_Tiles_Red`), pha xanh ngọc tạo ngói giả kim (`M_Roof_Tiles_Teal`). |
-| `mask_wood_grain.png` | `res://Assets/Textures/Grayscale_Masks/mask_wood_grain.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ thớ sợi vân gỗ tự nhiên**. Pha màu nâu ấm làm gỗ sồi, màu be nhạt làm gỗ thông, màu đỏ sẫm làm gỗ lim. |
+| `mask_wood_grain.png` | `res://Assets/Textures/Grayscale_Masks/mask_wood_grain.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ thớ sợi vân gỗ tự nhiên**. Pha màu nâu ấm làm gỗ sồi (`M_Wood`), màu be nhạt làm gỗ thông, màu đỏ sẫm làm gỗ lim. |
+| `mask_forge_brick.png` | `res://Assets/Textures/Grayscale_Masks/mask_forge_brick.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ gạch nung bo viền & rãnh vữa lò rèn**. Pha đỏ cam làm gạch lò rèn (`M_Forge_Brick`), pha xám làm gạch thành lũy, pha nâu sẫm làm gạch lát nền nhà bếp. |
+| `mask_anvil_metal.png` | `res://Assets/Textures/Grayscale_Masks/mask_anvil_metal.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ xước búa rèn đe sắt (peening dimples)**. Pha đen xám làm sắt rèn thô (`M_Anvil_Iron`), pha vàng kim làm đe đồng hoàng gia, pha xanh ánh thép làm vũ khí hiệp sĩ. |
 | `mask_metal_surface.png` | `res://Assets/Textures/Grayscale_Masks/mask_metal_surface.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ xước phay kim loại ánh bạc**. Pha xám đen làm sắt rèn thô (`M_Metal_DarkIron`), pha vàng kim làm đồng thau/vàng ròng, pha xanh lam làm thép cường lực. |
+| `mask_carpet_tribal.png` | `res://Assets/Textures/Grayscale_Masks/mask_carpet_tribal.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ dệt thổ cẩm hình học (diamonds & stripes)**. Pha màu đỏ rượu/vàng kim làm thảm nhà giả kim (`M_Carpet_Tribal`), pha xanh lá/nâu làm thảm phòng ngủ nhà dân. |
+| `mask_canopy_striped.png` | `res://Assets/Textures/Grayscale_Masks/mask_canopy_striped.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ vòm cong bóng râm sọc bạt lều chợ**. Pha màu đỏ trắng làm sạp chợ trung tâm (`M_Canopy_Striped`), pha xanh trắng làm sạp thương nhân cảng biển. |
+| `mask_purple_cloak.png` | `res://Assets/Textures/Grayscale_Masks/mask_purple_cloak.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ vải nhung mềm & vân ma pháp**. Pha màu tím hoàng gia làm áo choàng nhà giả kim Aria (`M_Magic_Cloak_Purple`), pha đỏ son làm áo choàng pháp sư lửa. |
+| `mask_bread_crust.png` | `res://Assets/Textures/Grayscale_Masks/mask_bread_crust.png` | PNG (Grayscale/RGBA8) | 512x512 | **Mặt nạ vỏ bánh mì nướng giòn & khía rãnh**. Pha vàng mật ong làm bánh mì baguette (`M_Bread_Crust`), pha nâu sẫm làm bánh lúa mạch đen, pha trắng ngà làm bột nhào bánh. |
 
 ---
 
 ## 2. Texture Lặp Lại Không Đường Nối (Seamless / Tileable Textures)
-*100% Seamless chu kỳ, lặp tuần hoàn không lộ mối nối biên (Seamless UV Wrap), phong cách Stylized trong trẻo.*
+*100% Seamless chu kỳ, lặp tuần hoàn không lộ mối nối biên (Seamless UV Wrap), phong cách Stylized trong trẻo từ `modelyeucau/map2/1.jpg`.*
 
 | Tên File | Đường Dẫn Godot (`res://`) | Định Dạng (Format) | Độ Phân Giải | Mục Đích Sử Dụng & Bề Mặt Áp Dụng |
 | :--- | :--- | :--- | :--- | :--- |
 | `tex_grass_seamless.png` | `res://Assets/Textures/Tileable/tex_grass_seamless.png` | PNG (RGBA8) | 512x512 | **Thảm cỏ xanh mướt mát mắt** (`#529934`), mượt mà mềm mại, không sọc ô vuông; dùng phủ toàn bộ mặt đất chính và đài cao tầng 2. |
 | `tex_dirt_seamless.png` | `res://Assets/Textures/Tileable/tex_dirt_seamless.png` | PNG (RGBA8) | 512x512 | **Đất/đường mòn nâu tự nhiên** (`#8A5C35`) kèm hạt sỏi lấm tấm hữu cơ; dùng cho đường đi chính, taluy bờ vực. |
 | `tex_rock_seamless.png` | `res://Assets/Textures/Tileable/tex_rock_seamless.png` | PNG (RGBA8) | 512x512 | **Vách đá phiến xám Stylized** có vết nứt và khối mảng bóng râm tự nhiên; dùng cho vách đá dựng đứng, đá tảng lớn quanh map. |
-| `tex_wood_seamless.png` | `res://Assets/Textures/Tileable/tex_wood_seamless.png` | PNG (RGBA8) | 512x512 | **Vân gỗ sồi tự nhiên** (`#A8764A`); dùng lát sàn gỗ, thùng hàng, xe ngựa, hàng rào đài cao, nhịp cầu gỗ. |
+| `tex_wood_seamless.png` | `res://Assets/Textures/Tileable/tex_wood_seamless.png` | PNG (RGBA8) | 512x512 | **Vân gỗ sồi tự nhiên ấm áp** (`#A8764A`), thớ gỗ lượn sóng tuần hoàn mềm mại; dùng lát sàn gỗ, thùng hàng, xe ngựa, hàng rào, bàn ghế quán ăn/nhà dân. |
+| `tex_forge_brick.png` | `res://Assets/Textures/Tileable/tex_forge_brick.png` | PNG (RGBA8) | 512x512 | **Gạch nung đỏ lò rèn Stylized** (`#B64430`) bo viền 3D, vữa tro than sẫm; dùng ốp lò rèn Vulcan, ống khói đá, lò nướng bánh Gusteau. |
+| `tex_anvil_iron.png` | `res://Assets/Textures/Tileable/tex_anvil_iron.png` | PNG (RGBA8) | 512x512 | **Kim loại đe sắt đúc rèn thô** (`#3E4148`) có ánh bạc xước ngang và vết búa rèn; dùng cho đe sắt lò rèn, búa tạ, đai sắt thùng phuy. |
 | `tex_metal_seamless.png` | `res://Assets/Textures/Tileable/tex_metal_seamless.png` | PNG (RGBA8) | 512x512 | **Mặt kim loại phay xước nhẹ Stylized ánh bạc**; dùng cho chấn song, đường ray, rương báu kim loại, máy móc. |
-| `tex_canopy_striped.png` | `res://Assets/Textures/Tileable/tex_canopy_striped.png` | PNG (RGBA8) | 128x128 | **Bạt sọc đỏ-trắng Stylized** (`#DA3028` và trắng kem); dùng cho mái che lều sạp chợ, xe hàng. |
+| `tex_carpet_tribal.png` | `res://Assets/Textures/Tileable/tex_carpet_tribal.png` | PNG (RGBA8) | 512x512 | **Thảm dệt thổ cẩm hoa văn hình học** (`#7E2234`, `#DAB234`, `#36746C`) dệt thớ sợi len; trải sàn phòng Nhà Giả Kim Aria và phòng ngủ Nhà Dân. |
+| `tex_canopy_striped.png` | `res://Assets/Textures/Tileable/tex_canopy_striped.png` | PNG (RGBA8) | 512x512 | **Bạt sọc đỏ-trắng kem Stylized** (`#D22C24` và `#F6F0E4`) có bóng cong 3D mềm; dùng cho mái che lều sạp chợ trung tâm, xe bán hàng rong. |
+| `tex_magic_cloak_purple.png` | `res://Assets/Textures/Tileable/tex_magic_cloak_purple.png` | PNG (RGBA8) | 512x512 | **Vải nhung tím ma thuật** (`#6C2A80`) điểm xuyết tinh thể sao vàng kim; dùng cho áo choàng Nhà Giả Kim Aria, rèm ma pháp. |
+| `tex_bread_crust.png` | `res://Assets/Textures/Tileable/tex_bread_crust.png` | PNG (RGBA8) | 512x512 | **Vỏ bánh mì baguette nướng vàng giòn** (`#C88032`) khía rãnh vàng ươm và phủ phấn bột mì; dùng cho ổ bánh mì Đầu Bếp Gusteau, rổ bánh quán ăn. |
 | `tex_roof_tiles_red.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_red.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy đỏ cam Stylized** (`#A83828`), viền vát bắt sáng và bóng rãnh; dùng cho mái nhà rèn, quán ăn, nhà dân. |
 | `tex_roof_tiles_teal.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_teal.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy xanh ngọc teal** (`#268C82`); dùng cho mái nhà giả kim huyền bí. |
-| `tex_stone_cobble.png` | `res://Assets/Textures/Tileable/tex_stone_cobble.png` | PNG (RGB8) | 256x256 | **Đá cuội gạch xây Stylized** (`#686C70`); dùng cho lò rèn, ống khói, giếng nước, lò nướng bánh. |
+| `tex_stone_cobble.png` | `res://Assets/Textures/Tileable/tex_stone_cobble.png` | PNG (RGBA8) | 512x512 | **Gạch nung đá xây Stylized**; dùng cho chân lò rèn, ống khói, giếng nước, lò nướng bánh. |
 
 ---
 
@@ -68,8 +79,14 @@
 | `M_Dirt_RedClay.tres` | `res://Assets/Materials_Shared/M_Dirt_RedClay.tres` | `mask_dirt_detail.png` | Đất đỏ bazan / mỏ đất sét nung. Albedo `Color(0.78, 0.42, 0.28, 1)`, Roughness 0.90. |
 | `M_Rock.tres` | `res://Assets/Materials_Shared/M_Rock.tres` | `tex_rock_seamless.png` | Dùng cho vách đá và đá tảng tự nhiên. Albedo trắng thuần, Roughness 0.80. |
 | `M_Rock_Mountain_Purple.tres` | `res://Assets/Materials_Shared/M_Rock_Mountain_Purple.tres` | `mask_rock_detail.png` | Núi đá tím huyền ảo viễn cảnh. Albedo `Color(0.72, 0.58, 0.84, 1)`, Roughness 0.85. |
-| `M_Wood.tres` | `res://Assets/Materials_Shared/M_Wood.tres` | `tex_wood_seamless.png` | Thùng gỗ, sàn gỗ, đồ nội thất. Albedo trắng thuần, Roughness 0.70. |
+| `M_Wood.tres` | `res://Assets/Materials_Shared/M_Wood.tres` | `tex_wood_seamless.png` | Thùng gỗ, sàn gỗ, bàn ghế nội thất sồi ấm. Triplanar UV, Roughness 0.75. |
 | `M_Wood_Fence.tres` | `res://Assets/Materials_Shared/M_Wood_Fence.tres` | `tex_wood_seamless.png` | Hàng rào gỗ rustic bao quanh đài cao. Albedo `Color(0.65, 0.48, 0.32, 1)`, Roughness 0.75. |
+| `M_Forge_Brick.tres` | `res://Assets/Materials_Shared/M_Forge_Brick.tres` | `tex_forge_brick.png` | Gạch nung đỏ lò rèn Vulcan, ống khói, lò nướng Gusteau. Triplanar UV, Roughness 0.80. |
+| `M_Anvil_Iron.tres` | `res://Assets/Materials_Shared/M_Anvil_Iron.tres` | `tex_anvil_iron.png` | Sắt đen rèn thô, đe sắt, búa tạ, đai sắt. Metallic 0.88, Roughness 0.38. |
+| `M_Carpet_Tribal.tres` | `res://Assets/Materials_Shared/M_Carpet_Tribal.tres` | `tex_carpet_tribal.png` | Thảm hoa văn thổ cẩm phòng Nhà Giả Kim và Nhà Dân. Triplanar UV, Roughness 0.90. |
+| `M_Canopy_Striped.tres` | `res://Assets/Materials_Shared/M_Canopy_Striped.tres` | `tex_canopy_striped.png` | Mái bạt sọc đỏ trắng kem lều sạp chợ trung tâm. Roughness 0.85. |
+| `M_Magic_Cloak_Purple.tres` | `res://Assets/Materials_Shared/M_Magic_Cloak_Purple.tres` | `tex_magic_cloak_purple.png` | Vải nhung tím ma thuật áo choàng Aria, rèm huyền bí. Roughness 0.65, Metallic 0.10. |
+| `M_Bread_Crust.tres` | `res://Assets/Materials_Shared/M_Bread_Crust.tres` | `tex_bread_crust.png` | Ổ bánh mì baguette nướng vàng giòn thơm phức của Gusteau. Roughness 0.75. |
 | `M_Metal.tres` | `res://Assets/Materials_Shared/M_Metal.tres` | `tex_metal_seamless.png` | Bề mặt kim loại sáng bóng, đường ray. Metallic 0.85, Roughness 0.35. |
 | `M_Metal_DarkIron.tres` | `res://Assets/Materials_Shared/M_Metal_DarkIron.tres` | `mask_metal_surface.png` | Sắt đen rèn thô, xích sắt, vũ khí cổ. Albedo `Color(0.35, 0.38, 0.42, 1)`, Metallic 0.90, Roughness 0.40. |
 | `M_Palette_Stylized.tres` | `res://Assets/Materials_Shared/M_Palette_Stylized.tres` | `palette_standard_stylized.png` | Chuẩn dùng chung cho toàn bộ Model Blender UV Palette. Roughness 0.60. |
@@ -78,6 +95,5 @@
 | `M_Roof_Tiles_Red.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Red.tres` | `tex_roof_tiles_red.png` | Mái ngói đỏ cam nhà rèn & nhà dân. Triplanar UV, Albedo trắng thuần, Roughness 0.75. |
 | `M_Roof_Tiles_Teal.tres` | `res://Assets/Materials_Shared/M_Roof_Tiles_Teal.tres` | `tex_roof_tiles_teal.png` | Mái ngói xanh ngọc teal nhà giả kim. Triplanar UV, Albedo trắng thuần, Roughness 0.75. |
 | `M_Stone_Cobble.tres` | `res://Assets/Materials_Shared/M_Stone_Cobble.tres` | `tex_stone_cobble.png` | Đá cuội lò rèn, ống khói, giếng đá, lò nướng. Triplanar UV, Roughness 0.80. |
-| `M_Canopy_Striped.tres` | `res://Assets/Materials_Shared/M_Canopy_Striped.tres` | `tex_canopy_striped.png` | Mái bạt sọc đỏ trắng sạp chợ. Roughness 0.85. |
 | `M_Mystic_Cyan.tres` | `res://Assets/Materials_Shared/M_Mystic_Cyan.tres` | N/A (Emission) | Vạc ma thuật, khói phép thuật. Albedo `Color(0.2, 0.85, 0.8, 0.85)`, Emission x2.0 cyan. |
 | `M_Lava_Fire.tres` | `res://Assets/Materials_Shared/M_Lava_Fire.tres` | N/A (Emission) | Lửa lò rèn, lò nướng bánh, lò luyện quặng. Albedo `Color(1.0, 0.45, 0.05, 1)`, Emission x2.5 vàng cam. |

@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://mat_m_magic_cloak_purple"]
+
+[ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/tex_magic_cloak_purple.png" id="1_tex"]
+
+[resource]
+resource_name = "M_Magic_Cloak_Purple"
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("1_tex")
+metallic = 0.1
+roughness = 0.65
+uv1_scale = Vector3(1, 1, 1)

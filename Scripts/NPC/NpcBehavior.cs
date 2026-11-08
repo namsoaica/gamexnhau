@@ -16,6 +16,9 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 	[Export] public NpcProfession Profession { get; set; } = NpcProfession.Farmer;
 	[Export] public NpcState CurrentState { get; set; } = NpcState.Idle;
 
+	[ExportGroup("Hiển Thị & Đồ Họa")]
+	[Export] public bool Use3DModel { get; set; }
+
 	[ExportGroup("Di Chuyển & Tuần Tra")]
 	[Export] public float MoveSpeed { get; set; } = 2.0f;
 	[Export] public Godot.Collections.Array<Vector3> Waypoints { get; set; } = new();
@@ -25,22 +28,18 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 	[Export] public Sprite3D? NpcSprite { get; set; }
 	[Export] public Label3D? OverheadLabel { get; set; }
 
-	public string PromptText => $"Trò chuyện với {NpcName}";
+	public string PromptText => $"Nhấn E để nói chuyện với {NpcName}";
 
 	private NpcState _previousState = NpcState.Idle;
 	private int _currentWaypointIndex;
 	private float _stateTimer;
 	private float _animTime;
-	private Vector3 _initialPosition;
 
 	public override void _Ready()
 	{
-		_initialPosition = GlobalPosition;
 		VisualModel ??= GetNodeOrNull<Node3D>("VisualModel") ?? GetNodeOrNull<Node3D>("CharacterModel");
-		if (VisualModel != null) VisualModel.Visible = false;
-		
 		NpcSprite ??= GetNodeOrNull<Sprite3D>("NpcSprite");
-		if (NpcSprite != null) NpcVisualHelper.ConfigureSprite(NpcSprite, Profession);
+		NpcVisualHelper.SetupVisuals(this, Profession, Use3DModel);
 
 		OverheadLabel ??= GetNodeOrNull<Label3D>("OverheadLabel");
 		UpdateOverheadText();
@@ -81,17 +80,23 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 
 	public void OnFocusGained()
 	{
-		if (OverheadLabel != null) OverheadLabel.Modulate = new Color(1.0f, 0.9f, 0.3f);
+		if (OverheadLabel != null)
+		{
+			OverheadLabel.Modulate = new Color(1.0f, 0.9f, 0.3f);
+			OverheadLabel.Text = $"[{Profession.GetVietnameseTitle()}]\n{NpcName}\n(Nhấn E để nói chuyện)";
+		}
+		LookAtPlayerIfNearby();
 	}
 
 	public void OnFocusLost()
 	{
-		if (OverheadLabel != null) OverheadLabel.Modulate = Colors.White;
+		if (OverheadLabel != null)
+		{
+			OverheadLabel.Modulate = Colors.White;
+			UpdateOverheadText();
+		}
 	}
 
-	/// <summary>
-	/// Kết thúc trạng thái đối thoại và quay về hành vi chu kỳ trước đó.
-	/// </summary>
 	public void FinishInteraction()
 	{
 		SetState(_previousState == NpcState.Interacting ? NpcState.Idle : _previousState);
@@ -103,6 +108,18 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 		CurrentState = newState;
 		_stateTimer = 0.0f;
 		EmitSignal(SignalName.StateChanged, (int)newState);
+	}
+
+	public Texture2D? GetAvatarTexture() => NpcVisualHelper.LoadAvatar(Profession);
+
+	public void TurnTowards(Vector3 targetPos)
+	{
+		Vector3 look = targetPos;
+		look.Y = GlobalPosition.Y;
+		if (GlobalPosition.DistanceSquaredTo(look) > 0.01f)
+		{
+			LookAt(look, Vector3.Up);
+		}
 	}
 
 	private void ProcessIdleState(float dt)
@@ -119,10 +136,10 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 	{
 		Velocity = Vector3.Zero;
 		_stateTimer += dt;
-		ApplyProceduralWorkMotion();
+		NpcVisualHelper.ApplyBobbing(VisualModel, NpcSprite, _animTime);
 		if (_stateTimer > 6.0f)
 		{
-			ResetWorkMotion();
+			NpcVisualHelper.ResetBobbing(VisualModel, NpcSprite);
 			SetState(NpcState.Idle);
 		}
 	}
@@ -152,28 +169,12 @@ public partial class NpcBehavior : CharacterBody3D, IInteractable
 		TurnTowards(target);
 	}
 
-	public Texture2D? GetAvatarTexture() => NpcVisualHelper.LoadAvatar(Profession);
-
-	private void ApplyProceduralWorkMotion()
+	private void LookAtPlayerIfNearby()
 	{
-		float bob = Mathf.Sin(_animTime * 4.0f) * 0.04f;
-		if (VisualModel != null) VisualModel.Position = new Vector3(VisualModel.Position.X, bob, VisualModel.Position.Z);
-		if (NpcSprite != null) NpcSprite.Position = new Vector3(0, 0.90f + bob, 0);
-	}
-
-	private void ResetWorkMotion()
-	{
-		if (VisualModel != null) VisualModel.Position = new Vector3(VisualModel.Position.X, 0, VisualModel.Position.Z);
-		if (NpcSprite != null) NpcSprite.Position = new Vector3(0, 0.90f, 0);
-	}
-
-	private void TurnTowards(Vector3 targetPos)
-	{
-		Vector3 look = targetPos;
-		look.Y = GlobalPosition.Y;
-		if (GlobalPosition.DistanceSquaredTo(look) > 0.01f)
+		Node3D? player = (Node3D?)GetTree().GetFirstNodeInGroup("Player");
+		if (player != null && GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < 25.0f)
 		{
-			LookAt(look, Vector3.Up);
+			TurnTowards(player.GlobalPosition);
 		}
 	}
 

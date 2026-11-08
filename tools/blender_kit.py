@@ -340,7 +340,7 @@ def build_detailed_roof_gabled(name, width, length, height, center_pos, overhang
 # 6. CƠ CHẾ MẮT THẦN TỰ KIỂM TRA (VISUAL PREVIEW RENDER)
 # ==============================================================================
 
-def setup_preview_render(output_path, resolution=(1280, 720), camera_pos=(-24, -4, 24), target_pos=(0, -22, 1)):
+def setup_preview_render(output_path, resolution=(1280, 720), camera_pos=(-24, -4, 24), target_pos=(0, -22, 1), ortho_scale=46.0):
     """
     Thiết lập Camera Isometric + Ánh sáng mặt trời và render ảnh kiểm tra trực quan.
     Góc nhìn khớp chuẩn với Isometric Camera của Godot và ảnh mẫu modelyeucau/map2/1.jpg.
@@ -355,7 +355,7 @@ def setup_preview_render(output_path, resolution=(1280, 720), camera_pos=(-24, -
     
     cam_data = bpy.data.cameras.new(name="PreviewCamera")
     cam_data.type = 'ORTHO'
-    cam_data.ortho_scale = 46.0
+    cam_data.ortho_scale = ortho_scale
     cam_obj = bpy.data.objects.new(name="PreviewCamera", object_data=cam_data)
     bpy.context.collection.objects.link(cam_obj)
     cam_obj.location = camera_pos

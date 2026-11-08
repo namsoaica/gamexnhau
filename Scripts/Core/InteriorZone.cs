@@ -15,7 +15,8 @@ public partial class InteriorZone : Area3D
 
 	[ExportGroup("Ánh Sáng & Camera Nội Thất")]
 	[Export] public OmniLight3D? InteriorLight { get; set; }
-	[Export] public float InteriorCameraZoom { get; set; } = 12.5f;
+	[Export] public float InteriorCameraZoom { get; set; } = 9.5f;
+	[Export] public float ExteriorCameraZoom { get; set; } = 17.5f;
 	[Export] public Vector3 RoomCenterOffset { get; set; } = Vector3.Zero;
 
 	private readonly List<Node3D> _visualNodes = new();
@@ -128,6 +129,10 @@ public partial class InteriorZone : Area3D
 		else
 		{
 			CameraFollow.Instance.SetInteriorFocus(null, null);
+			if (ExteriorCameraZoom > 0f)
+			{
+				CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
+			}
 		}
 	}
 }

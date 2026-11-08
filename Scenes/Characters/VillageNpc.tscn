@@ -25,7 +25,7 @@ cast_shadow = 2
 
 [node name="InteractableArea" type="Area3D" parent="."]
 script = ExtResource("2_area")
-PromptText = "Trò chuyện (E)"
+PromptText = "Nhấn E để nói chuyện"
 InteractionRadius = 3.0
 
 [node name="OverheadLabel" type="Label3D" parent="."]

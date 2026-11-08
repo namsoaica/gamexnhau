@@ -1,5 +1,28 @@
 # LỊCH SỬ PHIÊN LÀM VIỆC (SESSION HISTORY)
 
+## Phiên làm việc: 2026-11-08 (Hoàn Tất Chu Kỳ Nghiệm Thu 4 Ca Nối Tiếp Theo Mô Hình Tháp Giám Sát Phân Cấp 3 Tầng & Luật Cô Lập Đơn Nhiệm - 100% PASS)
+- **Thực thi Dây Chuyền Nối Tiếp 4 Ca Tách Biệt & Luật Cô Lập Đơn Nhiệm (1-Skill-Per-Subagent)**:
+  * **Ca 1 (Nhánh Texture - Sub-agent @texture-architect & @texture-inspector)**:
+    - Trích xuất bảng màu thật và họa tiết từ `modelyeucau/map2/1.jpg` bằng script Python (PIL/numpy).
+    - Tạo bộ 7 Grayscale Masks 512x512 mới: `mask_anvil_metal.png`, `mask_bread_crust.png`, `mask_canopy_striped.png`, `mask_carpet_tribal.png`, `mask_forge_brick.png`, `mask_purple_cloak.png`, `mask_wood_grain.png`.
+    - Tạo bộ 9 Tileable Seamless Textures 256x256 mới: `tex_anvil_iron.png`, `tex_bread_crust.png`, `tex_canopy_striped.png`, `tex_carpet_tribal.png`, `tex_forge_brick.png`, `tex_magic_cloak_purple.png`, `tex_metal_seamless.png`, `tex_stone_cobble.png`, `tex_wood_seamless.png`.
+    - Tạo 7 StandardMaterial3D `.tres` mới trong `Assets/Materials_Shared/`: `M_Anvil_Iron.tres`, `M_Bread_Crust.tres`, `M_Carpet_Tribal.tres`, `M_Forge_Brick.tres`, `M_Magic_Cloak_Purple.tres`, `M_Canopy_Striped.tres`, `M_Wood.tres` (với `uv1_triplanar = true`).
+    - Cập nhật danh mục tra cứu `Assets/Textures/TEXTURE_CATALOG.md`.
+    - Giám sát `@texture-inspector` ký duyệt 100% PASS sau khi soi ảnh lát thử 2x2 Seamless (`_tile_preview_*.png`) và ảnh bọc 3D `_texture_3d_check.png`.
+  * **Ca 2 (Nhánh 3D Blender - Sub-agent @blender-helper & @blender-inspector)**:
+    - Nâng cấp `tools/blender_kit.py` với giao thức bắt buộc `unwrap_mesh(obj)` và hỗ trợ gán vật liệu chuẩn.
+    - Hoàn thiện mô hình Làng 48m x 48m trong `tools/build_village_map.py` và `Assets/Blender_Source/build_village_map.py`: Nội thất 4 phòng diorama cắt vách (Nhà Rèn có lò rèn than hồng, đe sắt, rương thép; Nhà Giả Kim có vạc ma thuật phát sáng, kệ sách ma thuật; Quán Ăn có lò nướng bánh baguette, bàn ăn dài; Nhà Dân có giường nệm đỏ, tủ áo); 8 cụm đạo cụ đặc trưng; Bến Cảng Ngư Dân và Cổng Làng 2 Lính Canh; xuất mô hình `Assets/Models/village_map.glb` (1.88 MB) và lưu an toàn `Assets/Blender_Source/village_map.blend`.
+    - Dựng và xuất 8 model NPC 3D trong `Assets/Models/NPCs/` (`npc_blacksmith.glb`, `npc_alchemist.glb`, `npc_chef.glb`, `npc_farmer.glb`, `npc_fisherman.glb`, `npc_miner.glb`, `npc_lumberjack.glb`, `npc_guard.glb`).
+    - Render mắt thần `Assets/Models/_preview_render.png`, `Assets/Models/_char_preview.png`, các ảnh preview nội thất `Assets/Models/_temp_previews/`.
+    - Giám sát `@blender-inspector` ký duyệt 100% PASS sau khi kiểm tra lưới `bmesh` + Bevel + Solidify + Shade Auto Smooth, Human Reference Scale (Người 1.8m, Cửa 2.3-2.6m, Tường 3.5-4.5m) và UV unwrapping 100% mesh.
+  * **Ca 3 (Nhánh C# Gameplay & Scene - Sub-agent @csharp-coder & @csharp-inspector)**:
+    - C# scripts: `BuildingInteriorArea.cs`, `BuildingInteriorManager.cs`, `InteriorZone.cs`, `NpcBehavior.cs`, `NpcVisualHelper.cs`, `SettingsMenuBinder.cs` (tách từ `SettingsMenu.cs`).
+    - Scenes: `Scenes/Characters/VillageNpc.tscn`, `Scenes/Levels/WorldMap.tscn`, `Scenes/Levels/VillageMap.tscn`, `Scenes/Levels/Village/VillageMap.tscn`.
+    - Giám sát `@csharp-inspector` chạy `tools/supervisor_gate.py`: 100% hàm < 25 dòng, file < 200 dòng theo `CODING_STANDARDS.md`, an toàn bộ nhớ `-=` trong `_ExitTree()`, Input Action đã đăng ký, `dotnet build` đạt 0 lỗi 0 cảnh báo. Ký duyệt 100% PASS.
+  * **Ca 4 (Nghiệm Thu Toàn Cục & Cập Nhật Tài Liệu - Sub-agent @chief-supervisor & @producer)**:
+    - `@chief-supervisor`: Tiếp nhận bàn giao khi cả 3 Giám sát con ký PASS, chạy `test_suite.gd` trên Godot Windowed Console đạt **463 / 463 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**; chụp 4 ảnh màn hình mới nhất vào `docs/test_screenshots/` (`1_map_overview.png`, `2_interior_view.png`, `3_npc_ui.png`, `4_devtools_ui.png`); soi Vision Side-by-Side đối chiếu `modelyeucau/map2/1.jpg` xác nhận chất lượng thị giác hoàn hảo; ký duyệt **100% PASS Toàn Cục**.
+    - `@producer`: Quét kiểm tra filesystem thực tế trong `Scripts/`, `Scenes/`, `Assets/`, `tools/` và `docs/`; đồng bộ hóa 100% tài liệu `PROJECT_STATE.md`, `TASKS.md`, `SESSION_HISTORY.md` tại cả `docs/` và thư mục gốc; báo cáo kết quả hoàn thành cho Lead Orchestrator.
+
 ## Phiên làm việc: 2026-11-08 (Village Interior & NPC System Lead - Hoàn thiện 4 Căn Phòng Nội Thất Chuẩn Diorama Cắt Vách, Camera Seamless Transition & Game Settings Menu)
 - **Nội thất 4 phòng diorama chi tiết theo `modelyeucau/map2/1.jpg`**:
   - Nâng cấp `tools/build_village_map.py` và `Assets/Blender_Source/build_village_map.py`:

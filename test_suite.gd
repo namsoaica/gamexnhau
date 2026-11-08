@@ -130,7 +130,7 @@ func _process(delta: float) -> bool:
 	elif test_phase == 5:
 		print("\n=== HOÀN TẤT KIỂM THỬ THỊ GIÁC: Toàn bộ ảnh đã được lưu vào docs/test_screenshots/ ===")
 		print("=== TỔNG KẾT CUỐI CÙNG: Passed: ", passed, " | Failed: ", failed, " ===")
-		test_map.queue_free()
+		# Tránh xung đột GC finalizer của Godot Mono khi thoát tiến trình
 		quit(0 if failed == 0 else 1)
 		return true
 

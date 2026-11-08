@@ -10,11 +10,11 @@ public partial class BuildingInteriorArea : InteriorZone
 {
 	[ExportGroup("Cấu hình Tên Tòa Nhà")]
 	[Export] public string BuildingName { get; set; } = "Công Trình";
-	[Export] public float ExteriorCameraZoom { get; set; } = 17.5f;
 
 	public override void _Ready()
 	{
 		InteriorCameraZoom = 9.5f;
+		ExteriorCameraZoom = 17.5f;
 		base._Ready();
 		BuildingInteriorManager.Instance?.RegisterArea(this);
 	}
@@ -40,6 +40,10 @@ public partial class BuildingInteriorArea : InteriorZone
 		if (body.IsInGroup("Player") || body.Name == "Player")
 		{
 			BuildingInteriorManager.Instance?.NotifyBuildingExited(this);
+			if (CameraFollow.Instance != null && ExteriorCameraZoom > 0f)
+			{
+				CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
+			}
 		}
 	}
 }

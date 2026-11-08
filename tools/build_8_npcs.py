@@ -255,7 +255,7 @@ def build_all_npcs():
             obj.location.x += x_pos
 
     preview_path = "Assets/Models/_char_preview.png"
-    setup_preview_render(preview_path, resolution=(1920, 1080), camera_pos=(0, -7.5, 2.2), target_pos=(0, 0, 1.1))
+    setup_preview_render(preview_path, resolution=(1920, 1080), camera_pos=(0, -7.5, 2.2), target_pos=(0, 0, 1.1), ortho_scale=13.5)
     print(f"-> Đã render ảnh mắt thần trưng bày 8 NPC: {preview_path}")
 
 if __name__ == '__main__':

@@ -21,6 +21,7 @@ public partial class BuildingInteriorManager : Node
 	public override void _Ready()
 	{
 		Instance = this;
+		ScanSceneForAreas();
 	}
 
 	public override void _ExitTree()
@@ -55,6 +56,27 @@ public partial class BuildingInteriorManager : Node
 		{
 			ActiveArea = null;
 			EmitSignal(SignalName.BuildingExited, area.BuildingName);
+		}
+	}
+
+	private void ScanSceneForAreas()
+	{
+		Node? root = GetTree().CurrentScene ?? GetParent();
+		if (root != null)
+		{
+			CollectAreasRecursive(root);
+		}
+	}
+
+	private void CollectAreasRecursive(Node parent)
+	{
+		if (parent is BuildingInteriorArea area)
+		{
+			RegisterArea(area);
+		}
+		foreach (Node child in parent.GetChildren())
+		{
+			CollectAreasRecursive(child);
 		}
 	}
 }

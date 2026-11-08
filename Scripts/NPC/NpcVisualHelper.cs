@@ -3,54 +3,49 @@ using Godot;
 namespace Game.NPC;
 
 /// <summary>
-/// Trợ lý quản lý đồ họa 2.5D, Sprite3D và Avatar chân dung cho 8 NPC.
-/// Hỗ trợ nạp an toàn cả khi chưa chạy Godot Editor Import (Direct Image Fallback).
+/// Trợ lý quản lý đồ họa 2.5D, mô hình 3D và Avatar chân dung cho 8 NPC.
 /// </summary>
 public static class NpcVisualHelper
 {
-	private const string BaseDir = "res://Assets/Textures/NPCs";
+	private const string BaseTexDir = "res://Assets/Textures/NPCs";
+	private const string BaseModelDir = "res://Assets/Models/NPCs";
 
-	/// <summary>
-	/// Trả về đường dẫn ảnh Sprite 2.5D toàn thân theo nghề nghiệp.
-	/// </summary>
-	public static string GetSpritePath(NpcProfession profession)
+	public static string GetSpritePath(NpcProfession profession) => profession switch
 	{
-		return profession switch
-		{
-			NpcProfession.Blacksmith => $"{BaseDir}/sprite_blacksmith.png",
-			NpcProfession.Alchemist => $"{BaseDir}/sprite_alchemist.png",
-			NpcProfession.Chef => $"{BaseDir}/sprite_chef.png",
-			NpcProfession.Farmer => $"{BaseDir}/sprite_farmer.png",
-			NpcProfession.Fisherman => $"{BaseDir}/sprite_fisherman.png",
-			NpcProfession.Miner => $"{BaseDir}/sprite_miner.png",
-			NpcProfession.Lumberjack => $"{BaseDir}/sprite_lumberjack.png",
-			NpcProfession.Guard => $"{BaseDir}/sprite_guard.png",
-			_ => $"{BaseDir}/sprite_guard.png"
-		};
-	}
+		NpcProfession.Blacksmith => $"{BaseTexDir}/sprite_blacksmith.png",
+		NpcProfession.Alchemist => $"{BaseTexDir}/sprite_alchemist.png",
+		NpcProfession.Chef => $"{BaseTexDir}/sprite_chef.png",
+		NpcProfession.Farmer => $"{BaseTexDir}/sprite_farmer.png",
+		NpcProfession.Fisherman => $"{BaseTexDir}/sprite_fisherman.png",
+		NpcProfession.Miner => $"{BaseTexDir}/sprite_miner.png",
+		NpcProfession.Lumberjack => $"{BaseTexDir}/sprite_lumberjack.png",
+		_ => $"{BaseTexDir}/sprite_guard.png"
+	};
 
-	/// <summary>
-	/// Trả về đường dẫn ảnh Avatar chân dung theo nghề nghiệp.
-	/// </summary>
-	public static string GetAvatarPath(NpcProfession profession)
+	public static string GetAvatarPath(NpcProfession profession) => profession switch
 	{
-		return profession switch
-		{
-			NpcProfession.Blacksmith => $"{BaseDir}/avatar_blacksmith.png",
-			NpcProfession.Alchemist => $"{BaseDir}/avatar_alchemist.png",
-			NpcProfession.Chef => $"{BaseDir}/avatar_chef.png",
-			NpcProfession.Farmer => $"{BaseDir}/avatar_farmer.png",
-			NpcProfession.Fisherman => $"{BaseDir}/avatar_fisherman.png",
-			NpcProfession.Miner => $"{BaseDir}/avatar_miner.png",
-			NpcProfession.Lumberjack => $"{BaseDir}/avatar_lumberjack.png",
-			NpcProfession.Guard => $"{BaseDir}/avatar_guard.png",
-			_ => $"{BaseDir}/avatar_guard.png"
-		};
-	}
+		NpcProfession.Blacksmith => $"{BaseTexDir}/avatar_blacksmith.png",
+		NpcProfession.Alchemist => $"{BaseTexDir}/avatar_alchemist.png",
+		NpcProfession.Chef => $"{BaseTexDir}/avatar_chef.png",
+		NpcProfession.Farmer => $"{BaseTexDir}/avatar_farmer.png",
+		NpcProfession.Fisherman => $"{BaseTexDir}/avatar_fisherman.png",
+		NpcProfession.Miner => $"{BaseTexDir}/avatar_miner.png",
+		NpcProfession.Lumberjack => $"{BaseTexDir}/avatar_lumberjack.png",
+		_ => $"{BaseTexDir}/avatar_guard.png"
+	};
 
-	/// <summary>
-	/// Nạp Texture an toàn (ưu tiên ResourceLoader, fallback Image.LoadFromFile).
-	/// </summary>
+	public static string GetModelPath(NpcProfession profession) => profession switch
+	{
+		NpcProfession.Blacksmith => $"{BaseModelDir}/npc_blacksmith.glb",
+		NpcProfession.Alchemist => $"{BaseModelDir}/npc_alchemist.glb",
+		NpcProfession.Chef => $"{BaseModelDir}/npc_chef.glb",
+		NpcProfession.Farmer => $"{BaseModelDir}/npc_farmer.glb",
+		NpcProfession.Fisherman => $"{BaseModelDir}/npc_fisherman.glb",
+		NpcProfession.Miner => $"{BaseModelDir}/npc_miner.glb",
+		NpcProfession.Lumberjack => $"{BaseModelDir}/npc_lumberjack.glb",
+		_ => $"{BaseModelDir}/npc_guard.glb"
+	};
+
 	public static Texture2D? LoadTextureSafe(string resPath)
 	{
 		if (ResourceLoader.Exists(resPath))
@@ -63,17 +58,11 @@ public static class NpcVisualHelper
 		if (System.IO.File.Exists(absPath))
 		{
 			var img = Image.LoadFromFile(absPath);
-			if (img != null)
-			{
-				return ImageTexture.CreateFromImage(img);
-			}
+			if (img != null) return ImageTexture.CreateFromImage(img);
 		}
 		return null;
 	}
 
-	/// <summary>
-	/// Cấu hình Sprite3D hiển thị chuẩn 2.5D Stylized cao 1.8m từ ảnh vẽ mẫu.
-	/// </summary>
 	public static void ConfigureSprite(Sprite3D sprite, NpcProfession profession)
 	{
 		string path = GetSpritePath(profession);
@@ -91,12 +80,43 @@ public static class NpcVisualHelper
 		sprite.Position = new Vector3(0, 0.90f, 0);
 	}
 
-	/// <summary>
-	/// Nạp Avatar chân dung của NPC.
-	/// </summary>
-	public static Texture2D? LoadAvatar(NpcProfession profession)
+	public static Texture2D? LoadAvatar(NpcProfession profession) => LoadTextureSafe(GetAvatarPath(profession));
+
+	public static PackedScene? LoadModel(NpcProfession profession)
 	{
-		string path = GetAvatarPath(profession);
-		return LoadTextureSafe(path);
+		string path = GetModelPath(profession);
+		return ResourceLoader.Exists(path) ? GD.Load<PackedScene>(path) : null;
+	}
+
+	public static void SetupVisuals(NpcBehavior npc, NpcProfession profession, bool use3DModel)
+	{
+		if (npc.VisualModel == null)
+		{
+			PackedScene? scene = LoadModel(profession);
+			if (scene != null)
+			{
+				Node3D instance = scene.Instantiate<Node3D>();
+				instance.Name = "VisualModel";
+				npc.AddChild(instance);
+				npc.VisualModel = instance;
+			}
+		}
+
+		if (npc.NpcSprite != null) ConfigureSprite(npc.NpcSprite, profession);
+		if (npc.VisualModel != null) npc.VisualModel.Visible = use3DModel;
+		if (npc.NpcSprite != null) npc.NpcSprite.Visible = !use3DModel;
+	}
+
+	public static void ApplyBobbing(Node3D? model, Sprite3D? sprite, float time)
+	{
+		float bob = Mathf.Sin(time * 4.0f) * 0.04f;
+		if (model != null) model.Position = new Vector3(model.Position.X, bob, model.Position.Z);
+		if (sprite != null) sprite.Position = new Vector3(0, 0.90f + bob, 0);
+	}
+
+	public static void ResetBobbing(Node3D? model, Sprite3D? sprite)
+	{
+		if (model != null) model.Position = new Vector3(model.Position.X, 0, model.Position.Z);
+		if (sprite != null) sprite.Position = new Vector3(0, 0.90f, 0);
 	}
 }
