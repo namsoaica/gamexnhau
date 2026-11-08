@@ -80,17 +80,35 @@ Mọi nhiệm vụ phức tạp BẮT BUỘC phải thực hiện tuần tự qu
 
 ---
 
-## 2. Công Cụ Giám Sát Tự Động: `tools/supervisor_gate.py`
-Công cụ này được tích hợp kiểm tra tự động 4 cổng cứng:
+## 2. Công Cụ Giám Sát Tự Động: `tools/supervisor_gate.py` (Chuẩn Hardcore Production & Chaos QA)
+Công cụ này được tích hợp kiểm tra tự động 6 cổng cứng:
 1. **Kiểm tra Luật Cô Lập Đơn Nhiệm & Ghép Cặp 1-kèm-1**:
    - Quét nhật ký transcript, nếu phát hiện Sub-agent đặt tên chung chung hoặc thiếu Giám sát riêng tương ứng $\rightarrow$ Báo lỗi `[FAIL - VI PHẠM LUẬT CẤM GỘP VAI]` ngay lập tức.
 2. **Kiểm tra Clean Code C#**: 100% hàm < 25 dòng, file < 200 dòng theo `docs/CODING_STANDARDS.md`.
 3. **Kiểm tra An Toàn Bộ Nhớ**: Mọi sự kiện `+=` bắt buộc có lệnh hủy `-=` trong `_ExitTree()`.
 4. **Kiểm tra Input & Build**: Mọi Action phải đăng ký trong `project.godot`, `dotnet build` đạt 0 lỗi 0 cảnh báo.
+5. **Đo lường toán học Pixel & Độ sáng ảnh chụp thực tế (PIL/numpy)**:
+   - 100% ảnh chụp trong `docs/test_screenshots/` và `_preview_render.png` được quét tự động.
+   - Chặn đứng mọi mảng trắng/xám đồng nhất $> 25\%$ (lỗi thiếu vật liệu), chặn ảnh quá tối ($<20$) hoặc quá chói ($>240$), chặn độ lệch chuẩn màu sắc $<15.0$ (bệt màu).
+6. **Kiểm định cấu trúc file GLB 3D**:
+   - Kiểm tra kích thước file $\ge 50\text{KB}$ (cho map) hoặc $\ge 10\text{KB}$ (cho prop) để loại trừ model khối hộp sơ sài.
+   - Đọc nhị phân header GLB xác thực 100% có kênh UV `TEXCOORD_0` (bắt buộc trải UV unwrapping).
 
 ---
 
-## 3. Quy Chuẩn Kỹ Thuật Dự Án (Reference Standards)
+## 3. Tiêu Chuẩn "Hardcore Production & Chaos QA" (5 Cơ Chế Bắt Buộc)
+1. **Kiểm thử động học & Tra tấn trong `test_suite.gd` (Chống Test Hình Thức)**:
+   - Dùng `PhysicsRayQueryParameters3D` bắn tia RayCast thực tế từ Camera tới Player trong 5 căn nhà, bắt lỗi che khuất `[FAIL - CAMERA OCCLUDED]`.
+   - Giả lập `Input.action_press` kiểm tra va chạm tường, cửa và ranh giới map thực tế.
+   - Chaos/Stress test: spam UI, đổi phân giải, spam NPC để kiểm tra bộ nhớ và FPS.
+2. **Cổng vật lý `supervisor_gate.py` đo lường đồ họa bằng toán học (Pixel & GLB Validation)**.
+3. **Chuẩn PBR cho `@texture-architect` & `@texture-inspector`**: Roughness, metallic, và Normal/Bump Depth (`normal_enabled = true`).
+4. **Chuẩn kiến trúc đa tầng cho `@blender-helper` & `@blender-inspector`**: Khung cột, gờ tường, ngói xếp lớp, Bevel 2-3 segments, UV 100%, proper pivots.
+5. **Chuẩn Game Feel & Cách ly Input cho `@csharp-coder` & `@csharp-inspector`**: Lerp, Tweening, đóng băng input khi UI mở, nút HUD không cướp focus bàn phím.
+
+---
+
+## 4. Quy Chuẩn Kỹ Thuật Dự Án (Reference Standards)
 - **Đường dẫn thư mục Godot**: `C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới`
 - **File dự án .csproj**: `C:\xnhaugame\MyGodotGame\dự-án-trò-chơi-mới\Dự án Trò chơi Mới.csproj`
 - **Quy chuẩn tỷ lệ Human Reference Scale**:

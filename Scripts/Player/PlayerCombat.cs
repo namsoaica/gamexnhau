@@ -65,7 +65,7 @@ public partial class PlayerCombat : Node
 	/// </summary>
 	public bool CanAttack()
 	{
-		if (_isAttacking || _cooldownTimer > 0.0f) return false;
+		if (_isAttacking || _cooldownTimer > 0.0f || PlayerUIBlocker.IsUIBlocking()) return false;
 		if (CameraFollow.Instance?.IsFreeCamActive == true) return false;
 		return true;
 	}

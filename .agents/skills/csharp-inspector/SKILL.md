@@ -47,6 +47,12 @@ Kỹ năng này hoạt động như một Cổng Giám Sát Chất Lượng Mã 
 - **Biên dịch**:
   - Lệnh `dotnet build "Dự án Trò chơi Mới.csproj"` bắt buộc đạt **0 Warning(s), 0 Error(s)**.
 
+### Cổng 5: Kiểm Định Game Feel & Cách Ly Input Giao Diện (Input Isolation Gate)
+- **Kiểm tra**:
+  - Mọi thao tác mở UI modal (Inventory, Dialog, Settings) phải khóa input vật lý của nhân vật (`PlayerMovement`), ngăn chặn tuyệt đối lỗi nhấn Gamepad A vừa dùng đồ vừa kích hoạt nhảy.
+  - Các nút HUD góc màn hình (như `HudSettingsButton`) bắt buộc có `focus_mode = 0` (None), cấm nhận focus tự động làm phím Spacebar mở nhầm Cài Đặt.
+  - Kiểm tra các chuyển động camera và giao diện có hiệu ứng Tween hoặc Lerp mượt mà.
+
 ---
 
 ## 3. Quy Trình Phê Duyệt & Vòng Lặp Ép Làm Lại Tại Chỗ

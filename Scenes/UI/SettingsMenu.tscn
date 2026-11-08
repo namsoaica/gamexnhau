@@ -32,6 +32,7 @@ layer = 95
 script = ExtResource("1_menu")
 
 [node name="HudSettingsButton" type="Button" parent="."]
+focus_mode = 0
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0

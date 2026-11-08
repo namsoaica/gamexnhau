@@ -38,6 +38,7 @@ public partial class PlayerMovement : CharacterBody3D
 
 	public override void _Ready()
 	{
+		MotionMode = MotionModeEnum.Grounded;
 		FloorSnapLength = DefaultFloorSnap;
 		FloorConstantSpeed = true;
 		FloorStopOnSlope = true;
@@ -58,7 +59,7 @@ public partial class PlayerMovement : CharacterBody3D
 		float dt = (float)delta;
 		UpdateTimers(dt);
 		ApplyGravity(dt);
-		if (IsFreeCamActive())
+		if (IsFreeCamActive() || PlayerUIBlocker.IsUIBlocking())
 		{
 			StopHorizontalMovement();
 			UpdateFloorSnap();
@@ -94,7 +95,7 @@ public partial class PlayerMovement : CharacterBody3D
 	/// </summary>
 	private void UpdateTimers(float delta)
 	{
-		if (IsFreeCamActive())
+		if (IsFreeCamActive() || PlayerUIBlocker.IsUIBlocking())
 		{
 			_jumpBufferTimer = 0.0f;
 			_coyoteTimer = (IsOnFloor() || InfiniteJump) ? CoyoteTime : _coyoteTimer - delta;
@@ -121,7 +122,9 @@ public partial class PlayerMovement : CharacterBody3D
 	/// <summary>
 	/// Đọc vector hướng di chuyển WASD / Phím mũi tên chuẩn hóa.
 	/// </summary>
-	private void ReadInput() => _inputVector = Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
+	private void ReadInput() => _inputVector = PlayerUIBlocker.IsUIBlocking()
+		? Vector2.Zero
+		: Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
 
 	/// <summary>
 	/// Kích hoạt nhảy khi thỏa mãn Jump Buffer và Coyote Time (tắt snap sàn tức thì).

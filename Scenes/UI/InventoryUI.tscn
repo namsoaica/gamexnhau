@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://ci7nvntryui01"]
+
+[ext_resource type="Script" path="res://Scripts/UI/InventoryUI.cs" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.09, 0.14, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.75, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="InventoryUI" type="CanvasLayer"]
+layer = 12
+script = ExtResource("1_script")
+
+[node name="MainPanel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -210.0
+offset_right = 340.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HBox" type="HBoxContainer" parent="MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LeftBox" type="VBoxContainer" parent="MainPanel/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MainPanel/Margin/HBox/LeftBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "🎒 HÀNH TRANG (INVENTORY)"
+
+[node name="SlotsGrid" type="GridContainer" parent="MainPanel/Margin/HBox/LeftBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="RightBox" type="VBoxContainer" parent="MainPanel/Margin/HBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderDetail" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "THÔNG TIN VẬT PHẨM"
+
+[node name="ItemNameLabel" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "Tên Vật Phẩm"
+
+[node name="ItemTypeLabel" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "[Loại Vật Phẩm]"
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+
+[node name="ItemDescLabel" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Chọn ô vật phẩm để xem chi tiết công dụng và hướng dẫn sử dụng."
+autowrap_mode = 3
+
+[node name="FeedbackLabel" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="HelpLabel" type="Label" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "🎮 [Enter / A] Dùng  |  [Esc / B / I] Đóng
+🕹️ [D-Pad / Cần Gạt] Chọn Ô"
+
+[node name="CloseBtn" type="Button" parent="MainPanel/Margin/HBox/RightBox"]
+layout_mode = 2
+text = "Đóng Túi Đồ [B]"

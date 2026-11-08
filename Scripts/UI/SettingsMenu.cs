@@ -42,14 +42,18 @@ public partial class SettingsMenu : CanvasLayer
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+		if (!IsMenuOpen) return;
+		if (@event.IsActionPressed("ui_cancel") || IsCancelTriggered(@event))
 		{
-			if (keyEvent.Keycode == Key.Escape)
-			{
-				ToggleMenu();
-				GetViewport().SetInputAsHandled();
-			}
+			ToggleMenu();
+			GetViewport().SetInputAsHandled();
 		}
+	}
+
+	private static bool IsCancelTriggered(InputEvent @event)
+	{
+		if (@event is InputEventKey key && key.Pressed && !key.Echo && key.Keycode == Key.Escape) return true;
+		return @event is InputEventJoypadButton joy && joy.Pressed && joy.ButtonIndex == JoyButton.B;
 	}
 
 	public void ToggleMenu() => SetMenuOpen(!IsMenuOpen);
@@ -61,6 +65,7 @@ public partial class SettingsMenu : CanvasLayer
 		{
 			SyncFromSettings();
 			Input.MouseMode = Input.MouseModeEnum.Visible;
+			(ResolutionOption ?? (Control?)CloseButton)?.GrabFocus();
 		}
 	}
 
@@ -78,6 +83,7 @@ public partial class SettingsMenu : CanvasLayer
 	{
 		MainPanel ??= GetNodeOrNull<PanelContainer>("MainPanel");
 		HudSettingsButton ??= GetNodeOrNull<Button>("HudSettingsButton");
+		if (HudSettingsButton != null) HudSettingsButton.FocusMode = Control.FocusModeEnum.None;
 		ResolutionOption ??= GetNodeOrNull<OptionButton>("MainPanel/Margin/VBox/Grid/ResolutionOption");
 		WindowModeOption ??= GetNodeOrNull<OptionButton>("MainPanel/Margin/VBox/Grid/WindowModeOption");
 		FpsOption ??= GetNodeOrNull<OptionButton>("MainPanel/Margin/VBox/Grid/FpsOption");

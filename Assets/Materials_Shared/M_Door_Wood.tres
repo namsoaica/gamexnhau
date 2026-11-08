@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://mat_m_door_wood"]
+
+[ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/tex_door_wood.png" id="1_tex"]
+[ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/norm_door_wood.png" id="2_norm"]
+
+[resource]
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource("2_norm")
+resource_name = "M_Door_Wood"
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("1_tex")
+metallic = 0.15
+roughness = 0.7
+uv1_scale = Vector3(1, 1, 1)

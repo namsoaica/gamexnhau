@@ -46,6 +46,13 @@ Kỹ năng này hoạt động như một Cổng Giám Sát Chất Lượng Đ�
   - File vật liệu `.tres` tương ứng phải được lưu tại `Assets/Materials_Shared/`.
   - Bảng tra cứu `TEXTURE_CATALOG.md` phải được cập nhật đầy đủ tên file, đường dẫn, kích thước và mục đích sử dụng.
 
+### Cổng 5: Kiểm Định Chiều Sâu & Chuẩn PBR (Physically-Based Rendering Gate)
+- **Kiểm tra file**: Mọi file `.tres` trong `Assets/Materials_Shared/`.
+- **Tiêu chuẩn bắt buộc**:
+  - Bắt buộc khai báo đầy đủ `roughness` và `metallic` phù hợp với tính chất vật lý của chất liệu.
+  - Các bề mặt kiến trúc (gạch, đá, gỗ, ngói, đe sắt) bắt buộc phải có `normal_enabled = true` và liên kết với Normal Map tương ứng `norm_*.png` (`normal_scale = 0.8 - 1.2`).
+  - Tuyệt đối từ chối nghiệm thu các vật liệu phẳng lỳ không có độ nổi khối phản xạ dưới ánh sáng.
+
 ---
 
 ## 3. Quy Trình Phê Duyệt & Vòng Lặp Ép Làm Lại Tại Chỗ

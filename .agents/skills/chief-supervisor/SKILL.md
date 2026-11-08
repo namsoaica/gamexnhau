@@ -56,6 +56,12 @@ flowchart TD
   - `3_npc_ui.png`: Hộp thoại tương tác NPC hiển thị Avatar HD, chức danh, câu thoại và các nút hành động.
   - `4_devtools_ui.png`: Menu Cài Đặt Game và Dev HUD co giãn, không bị đè chữ, tùy chọn phân giải, FPS, VSync.
 
+### Bước 1.B: Kiểm Thử Động Học, Raycast & Tra Tấn (Hardcore Physics & Chaos QA)
+- Bắt buộc thực thi kiểm thử động học trong `test_suite.gd`:
+  * **Raycast chống che khuất tầm nhìn (Anti-Occlusion Raycast)**: Dùng `PhysicsRayQueryParameters3D` bắn tia vật lý từ vị trí `Camera3D` tới `Player` khi đứng trong từng căn nhà (Smith, Alchemist, Chef, House, Elder). Nếu tia va chạm phải bất kỳ Mesh tường/mái nào chắn giữa Camera và Player $\rightarrow$ Báo lỗi `[FAIL - CAMERA OCCLUDED]` và dừng nghiệm thu ngay lập tức.
+  * **Kiểm tra va chạm chuyển động thực tế (Real Movement & Wall Collision)**: Giả lập nhấn phím di chuyển thật (`Input.action_press`) cho Player lao vào tường, cánh cửa và ranh giới map trong nhiều frame vật lý để chứng minh collider hoạt động thật và không xuyên tường hay rơi map.
+  * **Tra tấn hệ thống (Chaos / Stress QA)**: Tự động spam mở/đóng menu cài đặt, túi đồ, hội thoại NPC và đổi độ phân giải liên tục, xác nhận bộ nhớ không leak và FPS ổn định.
+
 ### Bước 2: Kiểm Tra Timestamp Ảnh Chụp Màn Hình
 - `@chief-supervisor` bắt buộc phải kiểm tra thời gian ghi đè (`LastWriteTime`) của 4 file ảnh trong `docs/test_screenshots/`:
   - Thời gian tạo ảnh phải **MỚI HƠN** thời điểm chỉnh sửa code/model gần nhất.

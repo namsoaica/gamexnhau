@@ -16,6 +16,10 @@
 [ext_resource type="PackedScene" uid="uid://cb5setmenu801" path="res://Scenes/UI/SettingsMenu.tscn" id="13_settings"]
 [ext_resource type="Script" path="res://Scripts/Core/BuildingInteriorManager.cs" id="14_interiormgr"]
 [ext_resource type="Script" path="res://Scripts/Core/FurnitureInteractionArea.cs" id="15_furniture"]
+[ext_resource type="Script" path="res://Scripts/Inventory/InventoryManager.cs" id="16_inventory"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/InventoryUI.tscn" id="17_inventoryui"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Door.tscn" id="18_door"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/ItemPickup.tscn" id="19_itempickup"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_world"]
 sky_top_color = Color(0.35, 0.62, 0.95, 1)
@@ -46,6 +50,9 @@ size = Vector3(6.2, 3.2, 5.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_house"]
 size = Vector3(6.2, 3.2, 5.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_elder"]
+size = Vector3(6.8, 3.4, 6.0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_void"]
 size = Vector3(400, 10, 400)
@@ -175,6 +182,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 light_color = Color(1, 0.9, 0.65, 1)
 light_energy = 1.8
 omni_range = 8.0
+
+[node name="InteriorZone_Elder" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 38)
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("9_interior")
+BuildingName = "Nhà Trưởng Làng"
+ExteriorCameraZoom = 17.5
+RoofPaths = [NodePath("../VillageMesh/Roof_Elder")]
+WallFrontPaths = [NodePath("../VillageMesh/Wall_Front_Elder_L"), NodePath("../VillageMesh/Wall_Front_Elder_R"), NodePath("../VillageMesh/Wall_Front_Elder_Top"), NodePath("../VillageMesh/Wall_North_Elder"), NodePath("../VillageMesh/Wall_South_Elder"), NodePath("../VillageMesh/Wall_East_Elder")]
+InteriorLight = NodePath("Light_Elder")
+InteriorCameraZoom = 9.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone_Elder"]
+shape = SubResource("BoxShape3D_elder")
+
+[node name="Light_Elder" type="OmniLight3D" parent="InteriorZone_Elder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(1, 0.88, 0.6, 1)
+light_energy = 2.2
+omni_range = 8.5
 
 [node name="Village_NPCs" type="Node3D" parent="."]
 
@@ -316,3 +344,57 @@ shape = SubResource("BoxShape3D_void")
 script = ExtResource("14_interiormgr")
 
 [node name="SettingsMenu" parent="." instance=ExtResource("13_settings")]
+
+[node name="InventoryManager" type="Node" parent="."]
+script = ExtResource("16_inventory")
+
+[node name="InventoryUI" parent="." instance=ExtResource("17_inventoryui")]
+
+[node name="Village_Doors" type="Node3D" parent="."]
+
+[node name="Door_Smith" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -7.91, 0.05, 20.4)
+
+[node name="Door_Alchemist" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.91, 0.05, 20.4)
+InvertOpenDirection = true
+
+[node name="Door_Chef" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.11, 0.05, 6.9)
+
+[node name="Door_House" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -7.21, 0.05, 27.9)
+
+[node name="Door_Elder" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 34.8)
+InvertOpenDirection = true
+
+[node name="Door_VillageGate" parent="Village_Doors" instance=ExtResource("18_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.05, 8.5)
+
+[node name="Village_Pickups" type="Node3D" parent="."]
+
+[node name="Pickup_Iron_1" parent="Village_Pickups" instance=ExtResource("19_itempickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.2, 35.5)
+ItemId = "iron_ore"
+Quantity = 2
+
+[node name="Pickup_Wood_1" parent="Village_Pickups" instance=ExtResource("19_itempickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0.2, 35.5)
+ItemId = "wood_log"
+Quantity = 3
+
+[node name="Pickup_Herb_1" parent="Village_Pickups" instance=ExtResource("19_itempickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.2, 20)
+ItemId = "herb"
+Quantity = 2
+
+[node name="Pickup_Fish_1" parent="Village_Pickups" instance=ExtResource("19_itempickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.2, 8.5)
+ItemId = "fish"
+Quantity = 1
+
+[node name="Pickup_Cabbage_1" parent="Village_Pickups" instance=ExtResource("19_itempickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.2, 8)
+ItemId = "cabbage"
+Quantity = 2

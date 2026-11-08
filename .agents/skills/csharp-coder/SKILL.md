@@ -83,6 +83,14 @@ Kỹ năng này chịu trách nhiệm tối cao về lập trình logic gameplay
     - HUD góc màn hình: `anchors_preset = 0` (Top-Left) hoặc `anchors_preset = 1` (Top-Right) với margins tương đối.
   * Đảm bảo giao diện hiển thị hoàn hảo, không bị đè chữ, không vỡ khung ở mọi độ phân giải từ 720p, 1080p đến 4K.
 
+### Quy Tắc 5: GAME FEEL (JUICE), CHUYỂN ĐỘNG MƯỢT & CÔ LẬP INPUT
+- **Chuyển động mượt mà (Smoothing & Juice)**:
+  * Camera và nhân vật phải dùng nội suy `Mathf.Lerp`, `Vector3.Lerp` hoặc `Tween` mượt mà (EaseOut, TransCubic).
+  * Chuyển cảnh, mở/đóng menu UI (SettingsMenu, InventoryUI, Dialogue) bắt buộc dùng `Tween` tạo hiệu ứng scale / fade mượt, cấm bật tắt thô cục bộ.
+- **Cô lập Input khi mở UI (Modal UI Input Isolation)**:
+  * Khi bất kỳ giao diện modal nào mở (`InventoryUI`, `NpcInteractionDialog`, `SettingsMenu`), hệ thống điều khiển gameplay (`PlayerMovement`, `PlayerCombat`, `PlayerInteractor`) BẮT BUỘC phải khóa di chuyển, triệt tiêu `_jumpBufferTimer`, không nhận phím nhảy hay tấn công.
+  * Nút HUD trên màn hình phải đặt `FocusMode = None` để tránh cướp focus bàn phím/phím Space của người chơi.
+
 ---
 
 ## 4. Thứ Tự Sắp Xếp Code Trong File `.cs`

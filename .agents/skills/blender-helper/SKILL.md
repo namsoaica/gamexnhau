@@ -106,6 +106,15 @@ Mọi script Python dựng hình Blender **BẮT BUỘC** phải lấy nhân v�
   - Vật thể bị bay lơ lửng hoặc đâm xuyên lệch vị trí.
 - AI **TUYỆT ĐỐI KHÔNG ĐƯỢC DỪNG LẠI**. Bắt buộc phải tự chỉnh sửa lại tham số trong script Python, render lại `_preview_render.png` và tự đánh giá lại liên tục cho đến khi hình dáng 3D sắc nét, thẩm mỹ, hài hòa mới được xuất file `.glb` vào Godot.
 
+### Quy Tắc 6: KIẾN TRÚC ĐA TẦNG & CHI TIẾT SÂU (Multi-Tier Architectural Detail)
+- **CẤM TUYỆT ĐỐI** tạo các mô hình nhìn giống khối hình học cơ bản ghép tạm (placeholder primitive blocks).
+- Mọi công trình và nội thất bắt buộc phải có:
+  * Khung cột chịu lực, gờ chân tường (baseboard/skirting) và gờ mí mái.
+  * Ngói xếp lớp có riềm vát (overhang $\ge 0.30\text{m}$) tạo bóng đổ chân thực.
+  * Vát cạnh Bevel 2-3 segments ($width = 0.02 - 0.04\text{m}$) cho mọi góc cạnh để bắt sáng mềm mại dưới ánh sáng mặt trời.
+  * Trải UV tự động 100% không để sót bất kỳ mesh nào bệt màu.
+  * Tâm xoay (Pivot) chuẩn xác cho các đối tượng động: cánh cửa xoay quanh trục bản lề mép biên $X=0$, nắp rương xoay quanh bản lề lưng.
+
 ---
 
 ## 4. Quy Chuẩn Dựng Nhân Vật 3D & Animation (Character & Rigging Pipeline)

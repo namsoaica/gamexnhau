@@ -1,8 +1,12 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://mat_m_anvil_iron"]
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://mat_m_anvil_iron"]
 
 [ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/tex_anvil_iron.png" id="1_tex"]
+[ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/norm_anvil_iron.png" id="2_norm"]
 
 [resource]
+normal_enabled = true
+normal_scale = 0.9
+normal_texture = ExtResource("2_norm")
 resource_name = "M_Anvil_Iron"
 albedo_color = Color(1, 1, 1, 1)
 albedo_texture = ExtResource("1_tex")

@@ -55,6 +55,13 @@ Kỹ năng này hoạt động như một Cổng Giám Sát Kỹ Thuật & Thẩ
   * Các mesh vật cản phải có hậu tố `-col` để Godot tự sinh StaticBody3D + CollisionShape3D.
   * Xuất GLB với cờ chuẩn Godot: `export_yup=True`, `export_apply=True`.
 
+### Cổng 5: Kiểm Định Kiến Trúc Đa Tầng & Chặn Khối Hộp Ghép Tạm
+- **Tiêu chuẩn bác bỏ ngay lập tức**:
+  * Bác bỏ và ép làm lại tại chỗ mọi mô hình nhìn giống khối hộp sơ sài đặt tạm.
+  * Mọi công trình phải có khung cột chịu lực, gờ chân tường, ngói vát riềm chìa $\ge 0.30\text{m}$.
+  * Mọi góc cạnh phải có Bevel modifier $2 - 3$ segments.
+  * Kiểm tra kênh UV `TEXCOORD_0` và kích thước file `.glb` $\ge 50\text{KB}$ (cho map) hoặc $\ge 10\text{KB}$ (cho prop).
+
 ---
 
 ## 3. Quy Trình Phê Duyệt & Vòng Lặp Ép Làm Lại Tại Chỗ

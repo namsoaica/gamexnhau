@@ -6,6 +6,7 @@ namespace Game.Core;
 /// <summary>
 /// Vùng chuyển đổi nội thất liền mạch (Seamless Interior Transition).
 /// Tự động ẩn mái nhà, tường trước và điều chỉnh camera khi người chơi bước vào trong nhà.
+/// Cấm triệt để tắt collider tường chu vi để ngăn chặn lỗi xuyên tường ra ngoài.
 /// </summary>
 public partial class InteriorZone : Area3D
 {
@@ -20,7 +21,7 @@ public partial class InteriorZone : Area3D
 	[Export] public Vector3 RoomCenterOffset { get; set; } = Vector3.Zero;
 
 	private readonly List<Node3D> _visualNodes = new();
-	private readonly List<CollisionShape3D> _colliders = new();
+	private readonly List<CollisionShape3D> _roofColliders = new();
 	private bool _isPlayerInside;
 
 	public override void _Ready()
@@ -39,47 +40,64 @@ public partial class InteriorZone : Area3D
 	{
 		BodyEntered -= OnBodyEntered;
 		BodyExited -= OnBodyExited;
+		_visualNodes.Clear();
+		_roofColliders.Clear();
 	}
 
 	private void CollectArchitectureNodes()
 	{
-		CollectNodesFromPaths(RoofPaths);
-		CollectNodesFromPaths(WallFrontPaths);
+		CollectVisualAndColliders(RoofPaths, allowDisableCollider: true);
+		CollectVisualAndColliders(WallFrontPaths, allowDisableCollider: false);
 	}
 
-	private void CollectNodesFromPaths(Godot.Collections.Array<NodePath> paths)
+	private void CollectVisualAndColliders(Godot.Collections.Array<NodePath> paths, bool allowDisableCollider)
 	{
 		foreach (NodePath path in paths)
 		{
 			if (path.IsEmpty) continue;
-			Node? node = GetNodeOrNull(path);
-			if (node is Node3D node3D)
-			{
-				_visualNodes.Add(node3D);
-				FindChildColliders(node3D);
-			}
+			Node? node = ResolveArchNode(path);
+			if (node is not Node3D node3D) continue;
+
+			_visualNodes.Add(node3D);
+			if (allowDisableCollider) FindRoofColliders(node3D);
+			else EnsureWallCollidersActive(node3D);
 		}
 	}
 
-	private void FindChildColliders(Node parent)
+	private Node? ResolveArchNode(NodePath path)
+	{
+		Node? node = GetNodeOrNull(path);
+		if (node != null) return node;
+		string s = path.ToString();
+		return GetNodeOrNull(s + "-col") ?? GetNodeOrNull(s + "_col");
+	}
+
+	private void FindRoofColliders(Node parent)
+	{
+		if (IsPerimeterWall(parent.Name)) return;
+
+		if (parent is CollisionShape3D col) _roofColliders.Add(col);
+		foreach (Node child in parent.GetChildren()) FindRoofColliders(child);
+	}
+
+	private static void EnsureWallCollidersActive(Node parent)
 	{
 		if (parent is CollisionShape3D col)
 		{
-			_colliders.Add(col);
+			col.SetDeferred(CollisionShape3D.PropertyName.Disabled, false);
 		}
+		foreach (Node child in parent.GetChildren()) EnsureWallCollidersActive(child);
+	}
 
-		foreach (Node child in parent.GetChildren())
-		{
-			FindChildColliders(child);
-		}
+	private static bool IsPerimeterWall(string nodeName)
+	{
+		string lower = nodeName.ToLower();
+		return lower.Contains("wall") || lower.Contains("tuong");
 	}
 
 	private void ConfigureInitialState()
 	{
-		if (InteriorLight != null)
-		{
-			InteriorLight.Visible = false;
-		}
+		if (InteriorLight != null) InteriorLight.Visible = false;
 		SetInteriorState(false);
 	}
 
@@ -99,23 +117,19 @@ public partial class InteriorZone : Area3D
 
 	protected static bool IsPlayerBody(Node3D body) => body.IsInGroup("Player") || body.Name == "Player";
 
-	private void SetInteriorState(bool inside)
+	public void SetInteriorState(bool inside)
 	{
 		foreach (Node3D visual in _visualNodes)
 		{
 			visual.Visible = !inside;
 		}
 
-		foreach (CollisionShape3D col in _colliders)
+		foreach (CollisionShape3D col in _roofColliders)
 		{
 			col.SetDeferred(CollisionShape3D.PropertyName.Disabled, inside);
 		}
 
-		if (InteriorLight != null)
-		{
-			InteriorLight.Visible = inside;
-		}
-
+		if (InteriorLight != null) InteriorLight.Visible = inside;
 		ApplyCameraFocus(inside);
 	}
 
@@ -131,10 +145,7 @@ public partial class InteriorZone : Area3D
 		else
 		{
 			CameraFollow.Instance.SetInteriorFocus(null, null);
-			if (ExteriorCameraZoom > 0f)
-			{
-				CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
-			}
+			if (ExteriorCameraZoom > 0f) CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
 		}
 	}
 }

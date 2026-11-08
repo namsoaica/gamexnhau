@@ -81,6 +81,14 @@ Kỹ năng này chịu trách nhiệm tối cao về kiến trúc bề mặt, t�
   3. *Chống lỗi mất vật liệu (No Missing/Unlit Material)*: Tuyệt đối không để sót bất kỳ vật thể nào bị màu trắng xóa unlit do thiếu material slot.
 - Nếu chưa đạt, AI phải tự động tinh chỉnh lại Texture và vật liệu cho đến khi độ tương đồng thị giác đạt yêu cầu cao nhất.
 
+### Quy Tắc 5: CHUẨN ĐỒ HỌA PBR & CHIỀU SÂU BỀ MẶT (Physically-Based Rendering & Bump / Normal Depth)
+- **CẤM TUYỆT ĐỐI** chỉ tạo ảnh Albedo màu phẳng trơn đơn điệu.
+- Mọi vật liệu `.tres` trong `Assets/Materials_Shared/` bắt buộc phải cấu hình:
+  * `roughness` chuẩn vật lý: Gỗ ($0.60 - 0.65$), Đá ($0.80 - 0.85$), Ngói ($0.65 - 0.70$), Kim loại ($0.35 - 0.45$).
+  * `metallic` chính xác: Kim loại ($0.75 - 0.85$), Phi kim ($0.0 - 0.15$).
+  * `normal_enabled = true` kết hợp bản đồ pháp tuyến Tangent-space `norm_*.png` hoặc bump map (`normal_scale = 0.8 - 1.2`) để các bề mặt kiến trúc (gạch, đá, gỗ, mái ngói) có độ nổi khối phản xạ ánh sáng chân thực khi bắt ánh sáng mặt trời hay đèn lồng.
+  * Sinh bản đồ pháp tuyến chuẩn tangent bằng thuật toán lọc Sobel tuần hoàn (seamless gradient) từ ảnh Albedo gốc.
+
 ---
 
 ## 3. Cây Quyết Định 3 Bước Tối Ưu Hóa (VRAM Optimization Decision Tree)

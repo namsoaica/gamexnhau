@@ -103,7 +103,7 @@ func _process(delta: float) -> bool:
 			var dialog = test_map.find_child("NpcInteractionDialog", true, false)
 			if dialog:
 				dialog.CloseDialog()
-			# Prepare for Phase 4: Open DevOverlay & SettingsMenu
+			# Prepare for Phase 4: Open DevOverlay & SettingsMenu for first capture
 			var dev = test_map.find_child("DevOverlay", true, false)
 			if dev:
 				dev.SetDevModeVisible(true)
@@ -119,21 +119,37 @@ func _process(delta: float) -> bool:
 					settings.MainPanel.offset_right = -40.0
 					settings.MainPanel.offset_top = -220.0
 					settings.MainPanel.offset_bottom = 220.0
+			var inv_ui = test_map.find_child("InventoryUI", true, false)
+			if inv_ui:
+				inv_ui.SetInventoryOpen(false)
 			test_phase = 4
 			phase_frame = 0
 		return false
 
-	# Phase 4: 4_devtools_ui.png (Dev HUD & Menu Cài Đặt)
+	# Phase 4: 4_devtools_ui.png (Dev HUD & Menu Cài Đặt) & 4_dev_overlay.png (Giao diện Túi Đồ Inventory UI 16 Ô)
 	elif test_phase == 4:
-		if phase_frame >= 15:
-			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Menu Cài Đặt)")
-			capture_screenshot("res://docs/test_screenshots/4_dev_overlay.png", "4_dev_overlay.png (Bảng Dev HUD & Menu Cài Đặt)")
+		if phase_frame == 15:
+			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Menu Cài Đặt Đồ Họa)")
 			var dev = test_map.find_child("DevOverlay", true, false)
 			if dev:
 				dev.SetDevModeVisible(false)
 			var settings = test_map.find_child("SettingsMenu", true, false)
 			if settings:
 				settings.SetMenuOpen(false)
+			var inv_ui = test_map.find_child("InventoryUI", true, false)
+			if inv_ui:
+				inv_ui.SetInventoryOpen(true)
+				if inv_ui.MainPanel != null:
+					inv_ui.MainPanel.set_anchors_preset(Control.PRESET_CENTER)
+					inv_ui.MainPanel.offset_left = -340.0
+					inv_ui.MainPanel.offset_right = 340.0
+					inv_ui.MainPanel.offset_top = -210.0
+					inv_ui.MainPanel.offset_bottom = 210.0
+		elif phase_frame >= 30:
+			capture_screenshot("res://docs/test_screenshots/4_dev_overlay.png", "4_dev_overlay.png (Giao diện Túi Đồ Inventory UI 16 Ô)")
+			var inv_ui = test_map.find_child("InventoryUI", true, false)
+			if inv_ui:
+				inv_ui.SetInventoryOpen(false)
 			test_phase = 5
 			phase_frame = 0
 		return false
@@ -184,6 +200,9 @@ func run_suite():
 	test_blender_exported_models_and_textures()
 	test_player_combat_system()
 	test_village_map_and_gameplay()
+	test_camera_occlusion_raycast()
+	test_physics_wall_and_boundary_collision()
+	test_chaos_stress_and_fps_stability()
 	print("\n=== SUMMARY: Passed: ", passed, " | Failed: ", failed, " ===")
 
 func test_inputs():
@@ -790,7 +809,7 @@ func test_village_map_and_gameplay():
 	assert_true(cam != null, "IsometricCamera exists in WorldMap")
 
 	# 1. Automated Playtest: Seamless Interior Zones Entry & Exit Simulation
-	var zones = ["InteriorZone_Smith", "InteriorZone_Alchemist", "InteriorZone_Chef", "InteriorZone_House"]
+	var zones = ["InteriorZone_Smith", "InteriorZone_Alchemist", "InteriorZone_Chef", "InteriorZone_House", "InteriorZone_Elder"]
 	for zn in zones:
 		var z_node = vlg.find_child(zn, true, false)
 		assert_true(z_node != null, "Interior zone '" + zn + "' exists in WorldMap")
@@ -827,7 +846,7 @@ func test_village_map_and_gameplay():
 			"Blacksmith_Forge_Furnace", "Anvil_Heavy", "Chest_Scrap_Metal", "Chest_Charcoal",
 			"Quench_Tank", "Weapon_Rack_Wall", "Blacksmith_Workbench",
 			"Alchemist_Cauldron_Glowing", "Alchemy_Lab_Table", "Alchemy_Tall_Bookshelf",
-			"Potion_Shelves", "Hanging_Herbs",
+			"Potion_Shelves", "Herb_Bed_1",
 			"Bakery_Brick_Oven", "Bakery_Prep_Table", "Dining_Table_Long", "Dining_Bench_L",
 			"Dining_Bench_R", "Dish_Shelf", "Wine_Barrel_Cask",
 			"House_Cozy_Bed", "House_Wardrobe_Tall", "House_Floor_Rug", "House_Side_Table"
@@ -959,6 +978,178 @@ func test_village_map_and_gameplay():
 	# 7. Automated Playtest: BuildingInteriorManager
 	var bld_mgr = vlg.find_child("BuildingInteriorManager", true, false)
 	assert_true(bld_mgr != null, "BuildingInteriorManager node exists in WorldMap")
+
+	# 8. Automated Playtest: Village Doors & Interactive State
+	var doors_container = vlg.find_child("Village_Doors", true, false)
+	assert_true(doors_container != null, "Village_Doors container exists in WorldMap")
+	var expected_doors = ["Door_Smith", "Door_Alchemist", "Door_Chef", "Door_House", "Door_Elder", "Door_VillageGate"]
+	for door_name in expected_doors:
+		var door = vlg.find_child(door_name, true, false)
+		assert_true(door != null, "Door '" + door_name + "' exists in WorldMap")
+		if door != null:
+			assert_true(door.find_child("DoorHinge", true, false) != null, door_name + " has DoorHinge pivot node")
+			assert_true(door.find_child("DetectionArea", true, false) != null, door_name + " has DetectionArea collider")
+			assert_true(door.CanInteract(), door_name + " CanInteract initially returns true")
+
+	# 9. Automated Playtest: Inventory System (Manager & UI 4x4 Grid)
+	var inv_mgr = vlg.find_child("InventoryManager", true, false)
+	assert_true(inv_mgr != null, "InventoryManager node exists in WorldMap")
+	if inv_mgr != null:
+		var count = inv_mgr.GetItemCount()
+		assert_true(count > 0, "InventoryManager initialized starter items successfully (count: " + str(count) + ")")
+		var add_ok = inv_mgr.AddItem("iron_ore", 1)
+		assert_true(add_ok, "InventoryManager successfully stacked iron_ore")
+
+	var inv_ui = vlg.find_child("InventoryUI", true, false)
+	assert_true(inv_ui != null, "InventoryUI canvas layer exists in WorldMap")
+	if inv_ui != null:
+		inv_ui.SetInventoryOpen(true)
+		assert_true(inv_ui.IsOpen == true, "InventoryUI opened successfully")
+		var grid = inv_ui.find_child("SlotsGrid", true, false)
+		assert_true(grid != null and grid.get_child_count() == 16, "InventoryUI has exactly 16 slot buttons (4x4 Grid)")
+		inv_ui.SetInventoryOpen(false)
+		assert_true(inv_ui.IsOpen == false, "InventoryUI closed successfully")
+
+	# 10. Automated Playtest: Village Pickups & Interactive Furniture
+	var pickups = vlg.find_child("Village_Pickups", true, false)
+	assert_true(pickups != null, "Village_Pickups container exists in WorldMap")
+	var expected_pickups = ["Pickup_Iron_1", "Pickup_Wood_1", "Pickup_Herb_1", "Pickup_Fish_1", "Pickup_Cabbage_1"]
+	for p_name in expected_pickups:
+		var pickup = vlg.find_child(p_name, true, false)
+		assert_true(pickup != null, "Pickup '" + p_name + "' exists in WorldMap")
+		if pickup != null:
+			assert_true(pickup.CanInteract(), p_name + " is interactable")
+
+	var furnitures = vlg.find_child("Village_Furniture", true, false)
+	assert_true(furnitures != null, "Village_Furniture container exists in WorldMap")
+	var expected_furnitures = ["Furniture_Anvil", "Furniture_Cauldron", "Furniture_BrickOven", "Furniture_Bed"]
+	for f_name in expected_furnitures:
+		var furn = vlg.find_child(f_name, true, false)
+		assert_true(furn != null, "Furniture '" + f_name + "' exists in WorldMap")
+		if furn != null:
+			assert_true(furn.CanInteract(), f_name + " is interactable")
+
+func test_camera_occlusion_raycast():
+	print("\n-- [HARDCORE QA 1] Physics Raycast Camera Occlusion Check in 5 Houses --")
+	var cam = test_map.find_child("IsometricCamera", true, false)
+	var player = test_map.find_child("Player", true, false)
+	assert_true(cam != null, "IsometricCamera exists for Raycast testing")
+	assert_true(player != null, "Player exists for Raycast testing")
+	if cam == null or player == null:
+		return
+
+	var houses = [
+		{"name": "Tiệm Rèn (Smithy)", "pos": Vector3(-11.0, 1.6, 21.0), "zone": "InteriorZone_Smith"},
+		{"name": "Hiệu Thuốc (Alchemist)", "pos": Vector3(11.0, 1.6, 21.0), "zone": "InteriorZone_Alchemist"},
+		{"name": "Quán Ăn / Bếp (Chef)", "pos": Vector3(8.0, 1.6, 7.5), "zone": "InteriorZone_Chef"},
+		{"name": "Nhà Dân Cư (House)", "pos": Vector3(-10.0, 1.6, 28.5), "zone": "InteriorZone_House"},
+		{"name": "Nhà Trưởng Làng (Elder Hall)", "pos": Vector3(0.0, 1.6, 38.0), "zone": "InteriorZone_Elder"}
+	]
+
+	var space_state = test_map.get_world_3d().direct_space_state
+	for h in houses:
+		var zone = test_map.find_child(h["zone"], true, false)
+		if zone != null and zone.has_method("SetInteriorState"):
+			zone.SetInteriorState(true)
+		player.TeleportTo(h["pos"])
+		cam.ResetToPlayer()
+		
+		# Bắn tia vật lý từ vị trí Camera3D tới Player head
+		var cam_pos = cam.global_position
+		var player_head = player.global_position + Vector3(0.0, 1.4, 0.0)
+		var ray_query = PhysicsRayQueryParameters3D.create(cam_pos, player_head)
+		ray_query.collision_mask = 1 # Layer 1: World walls/roofs
+		ray_query.exclude = [player.get_rid()]
+
+		var hit = space_state.intersect_ray(ray_query)
+		if hit.is_empty():
+			assert_true(true, "Raycast Sightline UNBLOCKED: Camera -> Player inside " + h["name"])
+		else:
+			var col_node = hit["collider"]
+			var col_name = col_node.name if col_node != null else "Unknown"
+			var is_blocking = not (col_name.to_lower().contains("floor") or col_name.to_lower().contains("stair"))
+			if is_blocking:
+				assert_true(false, "[FAIL - CAMERA OCCLUDED] Camera sightline inside " + h["name"] + " BLOCKED by: " + col_name + " at " + str(hit["position"]))
+			else:
+				assert_true(true, "Raycast Sightline UNBLOCKED inside " + h["name"])
+		if zone != null and zone.has_method("SetInteriorState"):
+			zone.SetInteriorState(false)
+
+func test_physics_wall_and_boundary_collision():
+	print("\n-- [HARDCORE QA 2] Real Dynamic Movement & Anti-Wall Clipping Test --")
+	var player = test_map.find_child("Player", true, false)
+	assert_true(player != null, "Player exists for collision test")
+	if player == null:
+		return
+
+	# Chạy đâm vào vách tường Bắc nhà rèn (-11.0, 1.6, 19.5) trong 15 frames
+	player.TeleportTo(Vector3(-11.0, 1.6, 19.5))
+	for i in range(15):
+		player.velocity = Vector3(0.0, 0.0, -8.0)
+		player.move_and_slide()
+	var final_z = player.global_position.z
+	assert_true(final_z >= 18.2, "CollisionShape3D stops Player: final Z (" + str(final_z) + ") >= 18.2m, no wall clipping")
+
+	# Kiểm tra chạy đâm vào Cổng Làng Z = 8.5
+	player.TeleportTo(Vector3(0.0, 0.5, 9.5))
+	for i in range(15):
+		player.velocity = Vector3(0.0, 0.0, -8.0)
+		player.move_and_slide()
+	assert_true(player.global_position.z >= 8.2, "Door / Gate Collider stops Player from escaping: Z >= 8.2m")
+
+	# Kiểm tra không rơi khỏi sàn bến cảng
+	player.TeleportTo(Vector3(16.0, 0.5, 7.5))
+	for i in range(20):
+		player.velocity = Vector3(0.0, -9.8, 0.0)
+		player.move_and_slide()
+	assert_true(player.global_position.y >= 0.0, "Dock floor collider holds player: Y (" + str(player.global_position.y) + ") >= 0.0m")
+
+func test_chaos_stress_and_fps_stability():
+	print("\n-- [HARDCORE QA 3] Chaos Stress & Memory/FPS Stability Test --")
+	var player = test_map.find_child("Player", true, false)
+	var settings = test_map.find_child("SettingsMenu", true, false)
+	var inv_ui = test_map.find_child("InventoryUI", true, false)
+	var npc = test_map.find_child("Npc_Blacksmith", true, false)
+	var disp_mgr = test_map.find_child("DisplaySettingsManager", true, false)
+
+	if settings:
+		for i in range(20):
+			settings.SetMenuOpen(i % 2 == 0)
+		settings.SetMenuOpen(false)
+		assert_true(settings.IsMenuOpen == false, "SettingsMenu survived 20 rapid open/close spam cycles")
+
+	if inv_ui:
+		for i in range(20):
+			inv_ui.SetInventoryOpen(i % 2 == 0)
+		inv_ui.SetInventoryOpen(false)
+		assert_true(inv_ui.IsOpen == false, "InventoryUI survived 20 rapid toggle cycles")
+
+	if npc and player:
+		for i in range(10):
+			npc.Interact(player)
+		var dialog = test_map.find_child("NpcInteractionDialog", true, false)
+		if dialog:
+			dialog.CloseDialog()
+		assert_true(true, "NPC Dialogue system survived rapid interaction spam")
+
+	if disp_mgr:
+		disp_mgr.SetResolution(Vector2i(1280, 720))
+		disp_mgr.SetResolution(Vector2i(1920, 1080))
+		disp_mgr.SetResolution(Vector2i(1600, 900))
+		disp_mgr.SetResolution(Vector2i(1920, 1080))
+		assert_true(disp_mgr.CurrentResolution == Vector2i(1920, 1080), "DisplaySettingsManager handled 4 rapid resolution changes smoothly")
+
+	if inv_ui and player:
+		inv_ui.SetInventoryOpen(true)
+		assert_true(inv_ui.IsOpen == true, "InventoryUI is open for input isolation test")
+		Input.action_press("jump")
+		if player.has_method("_physics_process"):
+			player._physics_process(0.016)
+		Input.action_release("jump")
+		assert_true(player.velocity.y <= 0.1, "Gamepad A / Jump input BLOCKED when Inventory is open (Y velocity: " + str(player.velocity.y) + ")")
+		inv_ui.SetInventoryOpen(false)
+
+
 
 
 

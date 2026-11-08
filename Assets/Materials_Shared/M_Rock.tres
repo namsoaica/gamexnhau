@@ -1,8 +1,13 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3]
 
 [ext_resource type="Texture2D" uid="uid://u5lhns2a7ofk" path="res://Assets/Textures/Tileable/tex_rock_seamless.png" id="1_rock"]
+[ext_resource type="Texture2D" path="res://Assets/Textures/Tileable/norm_rock_seamless.png" id="2_norm"]
 
 [resource]
+normal_enabled = true
+normal_scale = 1.1
+normal_texture = ExtResource("2_norm")
+metallic = 0.0
 albedo_texture = ExtResource("1_rock")
 roughness = 0.8
 uv1_scale = Vector3(2, 2, 2)

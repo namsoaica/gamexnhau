@@ -17,8 +17,16 @@ import os
 import re
 import sys
 import json
+import struct
 import subprocess
 from pathlib import Path
+
+try:
+    import numpy as np
+    from PIL import Image
+    HAS_PIXEL_DEPS = True
+except ImportError:
+    HAS_PIXEL_DEPS = False
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = WORKSPACE_ROOT / "Scripts"
@@ -247,12 +255,111 @@ def check_dotnet_build():
     except Exception as e:
         return False, f"Lỗi chạy dotnet build: {e}"
 
+def inspect_pixel_mathematics():
+    """Phân tích pixel toán học bằng PIL và numpy để chặn đứng ảnh lỗi, thiếu vật liệu hoặc bệt màu."""
+    violations = []
+    if not HAS_PIXEL_DEPS:
+        violations.append("Thiếu thư viện PIL hoặc numpy để đo lường pixel toán học!")
+        return violations
+
+    target_images = list((WORKSPACE_ROOT / "docs" / "test_screenshots").glob("*.png"))
+    preview_img = WORKSPACE_ROOT / "Assets" / "Models" / "_preview_render.png"
+    if preview_img.exists():
+        target_images.append(preview_img)
+
+    if not target_images:
+        violations.append("Chưa có ảnh chụp thực tế nào trong docs/test_screenshots/ để phân tích!")
+        return violations
+
+    for img_path in target_images:
+        try:
+            with Image.open(img_path) as im:
+                rgb_im = im.convert("RGB")
+                arr = np.array(rgb_im, dtype=np.float32)
+
+            # [a] Kiểm tra độ sáng trung bình (Luminance)
+            lum = 0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]
+            mean_lum = float(np.mean(lum))
+            if mean_lum < 20.0:
+                violations.append(f"{img_path.name}: Ảnh quá tối (Luminance = {mean_lum:.1f} < 20.0)")
+            elif mean_lum > 240.0:
+                violations.append(f"{img_path.name}: Ảnh bị cháy sáng (Luminance = {mean_lum:.1f} > 240.0)")
+
+            # [b] Kiểm tra mảng trắng/xám đồng nhất > 25% (dấu hiệu khối mesh trắng thiếu vật liệu)
+            white_mask = (arr[:, :, 0] > 220) & (arr[:, :, 1] > 220) & (arr[:, :, 2] > 220) & \
+                         (np.abs(arr[:, :, 0] - arr[:, :, 1]) < 15) & (np.abs(arr[:, :, 1] - arr[:, :, 2]) < 15)
+            white_ratio = float(np.mean(white_mask))
+            if white_ratio > 0.25:
+                violations.append(f"{img_path.name}: Mảng trắng/xám đồng nhất chiếm {white_ratio*100:.1f}% > 25% (nguy cơ thiếu vật liệu)")
+
+            # [c] Kiểm tra độ lệch chuẩn màu sắc (Color Variance/Entropy)
+            std_col = float(np.std(arr))
+            if std_col < 15.0:
+                violations.append(f"{img_path.name}: Độ lệch chuẩn màu sắc quá thấp ({std_col:.1f} < 15.0) - ảnh bệt đơn sắc")
+
+        except Exception as e:
+            violations.append(f"{img_path.name}: Không thể phân tích pixel ({e})")
+
+    return violations
+
+def inspect_glb_structures():
+    """Kiểm định cấu trúc file GLB 3D (kích thước tối thiểu và xác thực kênh UV TEXCOORD_0)."""
+    violations = []
+    models_dir = WORKSPACE_ROOT / "Assets" / "Models"
+    if not models_dir.exists():
+        return violations
+
+    glb_files = list(models_dir.glob("*.glb"))
+    if not glb_files:
+        violations.append("Không tìm thấy file .glb nào trong Assets/Models/!")
+        return violations
+
+    for glb_path in glb_files:
+        size_kb = glb_path.stat().st_size / 1024.0
+        # Kiểm tra kích thước tối thiểu (trừ prop siêu nhỏ)
+        min_size = 50.0 if "map" in glb_path.name.lower() else 10.0
+        if size_kb < min_size:
+            violations.append(f"{glb_path.name}: Kích thước quá nhỏ ({size_kb:.1f} KB < {min_size} KB) - nghi vấn khối sơ sài")
+
+        # Kiểm tra binary header & JSON chunk chứa TEXCOORD_0
+        try:
+            with open(glb_path, "rb") as f:
+                header = f.read(12)
+                if len(header) < 12:
+                    violations.append(f"{glb_path.name}: File GLB lỗi header!")
+                    continue
+                magic, ver, length = struct.unpack("<4sII", header)
+                if magic != b"glTF":
+                    violations.append(f"{glb_path.name}: Định dạng không phải glTF hợp lệ!")
+                    continue
+
+                chunk_header = f.read(8)
+                if len(chunk_header) < 8:
+                    violations.append(f"{glb_path.name}: Thiếu chunk JSON!")
+                    continue
+                chunk_len, chunk_type = struct.unpack("<I4s", chunk_header)
+                json_bytes = f.read(chunk_len)
+                data = json.loads(json_bytes.decode("utf-8", errors="ignore"))
+
+                has_uv = any(
+                    "TEXCOORD_0" in prim.get("attributes", {})
+                    for mesh in data.get("meshes", [])
+                    for prim in mesh.get("primitives", [])
+                )
+                if not has_uv and len(data.get("meshes", [])) > 0:
+                    violations.append(f"{glb_path.name}: Không có kênh UV TEXCOORD_0 (chưa trải UV unwrapping)!")
+
+        except Exception as e:
+            violations.append(f"{glb_path.name}: Lỗi đọc cấu trúc nhị phân ({e})")
+
+    return violations
+
 def main():
-    print_header("RÀ SOÁT CHẤT LƯỢNG MÃ NGUỒN C# & LUẬT PHÂN VAI ĐƠN NHIỆM")
+    print_header("RÀ SOÁT TOÀN DIỆN PRODUCTION & CHAOS QA GATEKEEPER")
     all_passed = True
 
     # 1. Kiểm tra Luật Cô Lập Đơn Nhiệm & Ghép Cặp Giám Sát 1-kèm-1
-    print("\n[1/4] Kiểm tra Luật Cô Lập Đơn Nhiệm & Ghép Cặp 1-kèm-1...")
+    print("\n[1/6] Kiểm tra Luật Cô Lập Đơn Nhiệm & Ghép Cặp 1-kèm-1...")
     role_violations = inspect_role_isolation_and_pairing()
     if role_violations:
         all_passed = False
@@ -262,7 +369,7 @@ def main():
         print_pass("Đạt chuẩn: Mỗi Sub-agent đơn nhiệm, gắn đúng 1-1 với Skill và ghép cặp Giám sát riêng.")
 
     # 2. Static Clean Code Analysis
-    print("\n[2/4] Rà soát Clean Code (<25 dòng/hàm, <200 dòng/file, Memory Leak)...")
+    print("\n[2/6] Rà soát Clean Code (<25 dòng/hàm, <200 dòng/file, Memory Leak)...")
     code_violations = inspect_cs_files()
     if code_violations:
         all_passed = False
@@ -272,7 +379,7 @@ def main():
         print_pass("100% tệp C# < 200 dòng, hàm < 25 dòng, an toàn bộ nhớ.")
 
     # 3. Input Action Validation
-    print("\n[3/4] Kiểm tra đăng ký Input Action trong project.godot...")
+    print("\n[3/6] Kiểm tra đăng ký Input Action trong project.godot...")
     input_violations = inspect_input_actions()
     if input_violations:
         all_passed = False
@@ -282,7 +389,7 @@ def main():
         print_pass("Mọi Input Action gọi trong C# đều được đăng ký đầy đủ.")
 
     # 4. Dotnet Build
-    print("\n[4/4] Kiểm tra biên dịch dotnet build...")
+    print("\n[4/6] Kiểm tra biên dịch dotnet build...")
     build_ok, build_msg = check_dotnet_build()
     if not build_ok:
         all_passed = False
@@ -290,12 +397,32 @@ def main():
     else:
         print_pass("Biên dịch .NET 8 thành công: 0 Cảnh báo, 0 Lỗi.")
 
+    # 5. Pixel Mathematics & Lighting Analysis
+    print("\n[5/6] Đo lường toán học Pixel & Độ sáng ảnh chụp thực tế (PIL/numpy)...")
+    pixel_violations = inspect_pixel_mathematics()
+    if pixel_violations:
+        all_passed = False
+        for v in pixel_violations:
+            print_fail(v)
+    else:
+        print_pass("Đạt chuẩn: 100% ảnh chụp thực tế có độ tương phản, ánh sáng tự nhiên và không có mảng trắng thiếu vật liệu.")
+
+    # 6. GLB Structure & UV Unwrapping Validation
+    print("\n[6/6] Kiểm định cấu trúc file GLB 3D (Kích thước & Kênh UV TEXCOORD_0)...")
+    glb_violations = inspect_glb_structures()
+    if glb_violations:
+        all_passed = False
+        for v in glb_violations:
+            print_fail(v)
+    else:
+        print_pass("Đạt chuẩn: 100% mô hình GLB đạt kích thước chi tiết và có kênh UV TEXCOORD_0.")
+
     print_header("KẾT QUẢ NGHIỆM THU GATEKEEPER")
     if all_passed:
         print(f"{Colors.GREEN}>>> CHUẨN XÁC 100% - ĐỦ ĐIỀU KIỆN CHUYỂN GIAO LÊN @chief-supervisor <<<{Colors.RESET}\n")
         sys.exit(0)
     else:
-        print(f"{Colors.RED}>>> THẤT BẠI - BẮT BUỘC @csharp-coder PHẢI REFACTOR LẠI NGAY LẬP TỨC <<<{Colors.RESET}\n")
+        print(f"{Colors.RED}>>> THẤT BẠI - BẮT BUỘC REFACTOR LẠI NGAY LẬP TỨC <<<{Colors.RESET}\n")
         sys.exit(1)
 
 if __name__ == "__main__":

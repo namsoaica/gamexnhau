@@ -10,6 +10,7 @@ namespace Game.UI;
 public partial class NpcInteractionDialog : CanvasLayer
 {
 	public static NpcInteractionDialog? Instance { get; private set; }
+	public bool IsOpen => Visible && DialogPanel != null && DialogPanel.Visible;
 
 	[ExportGroup("Tham Chiếu Controls")]
 	[Export] public Control? DialogPanel { get; set; }
@@ -45,11 +46,17 @@ public partial class NpcInteractionDialog : CanvasLayer
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (!Visible || DialogPanel == null || !DialogPanel.Visible) return;
-		if (@event is InputEventKey key && key.Pressed && key.Keycode == Key.Escape)
+		if (@event.IsActionPressed("ui_cancel") || IsCancelTriggered(@event))
 		{
 			CloseDialog();
 			GetViewport().SetInputAsHandled();
 		}
+	}
+
+	private static bool IsCancelTriggered(InputEvent @event)
+	{
+		if (@event is InputEventKey key && key.Pressed && key.Keycode == Key.Escape) return true;
+		return @event is InputEventJoypadButton joy && joy.Pressed && joy.ButtonIndex == JoyButton.B;
 	}
 
 	/// <summary>
@@ -61,6 +68,19 @@ public partial class NpcInteractionDialog : CanvasLayer
 		PopulateNpcInfo(npc);
 		PopulateSpecialActions(npc.Profession);
 		SetDialogVisible(true);
+		FocusInitialControl();
+	}
+
+	private void FocusInitialControl()
+	{
+		if (ActionsContainer != null && ActionsContainer.GetChildCount() > 0)
+		{
+			if (ActionsContainer.GetChild(0) is Control firstBtn) firstBtn.GrabFocus();
+		}
+		else
+		{
+			CloseButton?.GrabFocus();
+		}
 	}
 
 	/// <summary>

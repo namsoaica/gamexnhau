@@ -1,5 +1,6 @@
 using Godot;
 using Game.Player;
+using Game.Inventory;
 
 namespace Game.Core;
 
@@ -95,26 +96,23 @@ public partial class FurnitureInteractionArea : Area3D, IInteractable
 	private string ExecuteForge(Node3D interactor)
 	{
 		PlayerCombat? combat = interactor.GetNodeOrNull<PlayerCombat>("PlayerCombat")
-			?? interactor.GetParent()?.GetNodeOrNull<PlayerCombat>("PlayerCombat")
 			?? (PlayerCombat?)GetTree().GetFirstNodeInGroup("Player")?.FindChild("PlayerCombat");
 
 		if (combat != null) combat.AttackDamage += 2.0f;
-		return "Đã cường hóa vũ khí! Sát thương tăng +2";
+		InventoryManager.Instance?.AddItem("iron_ore", 1);
+		return "Đã cường hóa vũ khí (+2 Công) và tôi luyện thêm 1 Quặng Sắt!";
 	}
 
 	private string ExecuteAlchemy(Node3D interactor)
 	{
-		PlayerMovement? player = interactor as PlayerMovement
-			?? interactor.GetParent() as PlayerMovement
-			?? (PlayerMovement?)GetTree().GetFirstNodeInGroup("Player");
-
-		if (player != null) player.MoveSpeed = Mathf.Min(player.MoveSpeed + 1.0f, 9.0f);
-		return "Đã pha chế độc dược ma thuật! Tốc độ di chuyển tăng tốc.";
+		InventoryManager.Instance?.AddItem("potion_health", 1);
+		return "Đã nấu thành công 1 Bình Máu Đỏ ma thuật bỏ vào túi đồ!";
 	}
 
 	private static string ExecuteCooking()
 	{
-		return "Đã nướng và thưởng thức bánh mì baguette giòn rụm! Hồi phục toàn bộ sinh lực.";
+		InventoryManager.Instance?.AddItem("baguette", 1);
+		return "Đã nướng xong 1 Ổ Bánh Mì Baguette giòn thơm và bỏ vào túi đồ!";
 	}
 
 	private static string ExecuteRest()

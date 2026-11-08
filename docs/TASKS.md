@@ -137,6 +137,20 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
 
 ---
 
+- [x] **[AI - Chu Kỳ 4 Ca Toàn Diện: @texture-architect, @blender-helper, @csharp-coder & @chief-supervisor]** Hoàn thiện gói tính năng Đột phá Gameplay & Môi trường cực hạn:
+  - (1) **Khắc phục triệt để lỗi xuyên tường**: Vách tường dày $\ge 0.42m$ chuẩn Human Reference Scale có hậu tố `-col`, thuật toán `InteriorZone.cs` bảo tồn nguyên vẹn 100% collider tường chu vi khi bước vào nhà (chỉ ẩn visual mesh mái `Roof_*` và tường trước `Wall_Front_*`).
+  - (2) **Hệ thống Cửa đóng mở xoay Tween thông minh**: `Door.cs`, `Scenes/Objects/Door.tscn`, `Assets/Models/door_wooden.glb` với 3 chế độ (`Manual`, `Automatic`, `Hybrid`), hiệu ứng xoay góc 90° bằng Tween quanh Pivot mép bản lề $X=0$, tự động bật/tắt collider chắn lối, trang bị tại 5 công trình và Cổng Làng.
+  - (3) **Hoàn thiện chế độ chơi Gamepad 100%**: Đăng ký Input Action `inventory` (phím I, Tab, Gamepad Y, D-pad Up, Select), D-Pad/LeftStick điều hướng menu, tự động `GrabFocus()` ô đầu tiên khi mở túi, phím Gamepad B / `ui_cancel` đóng giao diện mượt mà.
+  - (4) **Mở rộng bản đồ làng cực hạn**: `Assets/Models/village_map.glb` bổ sung công trình thứ 5 (Nhà Trưởng Làng & Kho lương thực với vòm mái đỏ, rương báu, lò sưởi đá, bàn họp bản đồ), hệ thống 10 trụ đèn đường Lantern phát sáng `OmniLight3D` ấm áp, 5 phòng diorama cắt vách hoàn chỉnh.
+  - (5) **Hệ thống Túi Đồ (Inventory System) RPG**: `InventoryItem.cs`, `ItemDatabase.cs`, `InventoryManager.cs`, `InventorySlotBinder.cs`, `InventoryUI.cs`, `Scenes/UI/InventoryUI.tscn` (16 ô lưới 4x4, icon 64x64 nét căng, bảng chi tiết công dụng bên phải), `ItemPickup.cs` & `Scenes/Objects/ItemPickup.tscn` (nhặt quặng sắt tại mỏ đá, củi gỗ tại xưởng cưa, thảo mộc tại vườn dược liệu).
+  - (6) **Tăng cường chức năng NPC và đồ vật**: 8 NPC trao đổi/tặng quà vật tư theo nghề nghiệp, vùng chuyển đổi nội thất Nhà Trưởng Làng (`InteriorZone_Elder`).
+  - (7) **Kiểm định chất lượng 100% PASS Toàn Cục**:
+    * `python tools/supervisor_gate.py`: 100% Clean Code (<25 dòng/hàm, <200 dòng/file), an toàn bộ nhớ `-=` trong `_ExitTree()`, Input Action hợp lệ, `dotnet build` đạt 0 Lỗi 0 Cảnh báo.
+    * `test_suite.gd` trên Godot Windowed Console: **524 / 524 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**.
+    * Bộ 4 ảnh chụp màn hình đạt chuẩn thẩm mỹ cao trong `docs/test_screenshots/`.
+
+---
+
 ## 🎯 Việc Cần Làm Tiếp Theo (Backlog / Next Steps)
 
 ### Phân Nhóm 1: Gameplay & Lập Trình (AI / Developer)

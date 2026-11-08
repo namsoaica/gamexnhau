@@ -164,6 +164,7 @@ public partial class PlayerInteractor : Area3D
 		if (currentFrame == _lastInteractFrame) return;
 		_lastInteractFrame = currentFrame;
 
+		if (PlayerUIBlocker.IsUIBlocking()) return;
 		if (_currentFocus == null || !_currentFocus.CanInteract()) return;
 		if (_currentFocus is Node3D targetNode) EmitSignal(SignalName.InteractionTriggered, targetNode);
 		_currentFocus.Interact(this);

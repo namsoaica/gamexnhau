@@ -9,6 +9,9 @@ namespace Game.UI;
 /// </summary>
 public partial class DevOverlay : CanvasLayer
 {
+	public static DevOverlay? Instance { get; private set; }
+	public bool IsDevModeVisible => MainPanel != null && MainPanel.Visible;
+
 	[ExportGroup("Cấu Hình Phím Tắt")]
 	[Export] public Key ToggleKeyPrimary { get; set; } = Key.F1;
 	[Export] public Key ToggleKeySecondary { get; set; } = Key.Quoteleft;
@@ -31,10 +34,16 @@ public partial class DevOverlay : CanvasLayer
 
 	public override void _Ready()
 	{
+		Instance = this;
 		FindControlsIfNull();
 		LocateGameTargets();
 		InitializeTabs();
 		SetDevModeVisible(false);
+	}
+
+	public override void _ExitTree()
+	{
+		if (Instance == this) Instance = null;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -45,10 +54,22 @@ public partial class DevOverlay : CanvasLayer
 			return;
 		}
 
-		if (MainPanel != null && MainPanel.Visible && HandleTabNavigationInput(@event))
+		if (MainPanel != null && MainPanel.Visible)
 		{
-			GetViewport().SetInputAsHandled();
+			if (HandleDevCancelInput(@event)) return;
+			if (HandleTabNavigationInput(@event)) GetViewport().SetInputAsHandled();
 		}
+	}
+
+	private bool HandleDevCancelInput(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel") || (@event is InputEventJoypadButton joy && joy.Pressed && joy.ButtonIndex == JoyButton.B))
+		{
+			SetDevModeVisible(false);
+			GetViewport().SetInputAsHandled();
+			return true;
+		}
+		return false;
 	}
 
 	public override void _Process(double delta)
@@ -62,7 +83,11 @@ public partial class DevOverlay : CanvasLayer
 	public void SetDevModeVisible(bool isVisible)
 	{
 		if (MainPanel != null) MainPanel.Visible = isVisible;
-		if (isVisible) Input.MouseMode = Input.MouseModeEnum.Visible;
+		if (isVisible)
+		{
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+			CloseBtn?.GrabFocus();
+		}
 	}
 
 	private bool HandleToggleInput(InputEvent @event)

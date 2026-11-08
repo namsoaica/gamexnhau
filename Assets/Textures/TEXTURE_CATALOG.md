@@ -49,6 +49,17 @@
 | `tex_roof_tiles_red.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_red.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy đỏ cam Stylized** (`#A83828`), viền vát bắt sáng và bóng rãnh; dùng cho mái nhà rèn, quán ăn, nhà dân. |
 | `tex_roof_tiles_teal.png` | `res://Assets/Textures/Tileable/tex_roof_tiles_teal.png` | PNG (RGB8) | 256x256 | **Mái ngói vảy xanh ngọc teal** (`#268C82`); dùng cho mái nhà giả kim huyền bí. |
 | `tex_stone_cobble.png` | `res://Assets/Textures/Tileable/tex_stone_cobble.png` | PNG (RGBA8) | 512x512 | **Gạch nung đá xây Stylized**; dùng cho chân lò rèn, ống khói, giếng nước, lò nướng bánh. |
+| `tex_door_wood.png` | `res://Assets/Textures/Tileable/tex_door_wood.png` | PNG (RGB8) | 256x256 | **Cửa gỗ Stylized nẹp sắt & đinh tán** (`#A26C42`, `#3A404C`), 4 ván gỗ sồi dầy dặn vân lượn sóng, 2 thanh nẹp sắt rèn đen có bóng đổ ambient occlusion, 8 đinh tán đúc nổi 3D có ánh kim bắt sáng; dùng cho mọi cánh cửa ra vào công trình nhà rèn, quán ăn, nhà dân, nhà giả kim. |
+| `norm_door_wood.png` | `res://Assets/Textures/Tileable/norm_door_wood.png` | PNG (RGB8) | 256x256 | **Bản đồ pháp tuyến PBR (Tangent-space Normal Map)** cho cửa gỗ nẹp sắt, tạo độ gồ ghề nổi khối đinh tán và thớ ván gỗ khi bắt sáng. |
+| `norm_forge_brick.png` | `res://Assets/Textures/Tileable/norm_forge_brick.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** cho gạch nung lò rèn, tạo chiều sâu rãnh vữa và bề mặt gạch sần. |
+| `norm_stone_cobble.png` | `res://Assets/Textures/Tileable/norm_stone_cobble.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** cho gạch đá lát nền và giếng nước. |
+| `norm_roof_tiles_red.png` | `res://Assets/Textures/Tileable/norm_roof_tiles_red.png` | PNG (RGB8) | 256x256 | **Bản đồ pháp tuyến PBR** tạo độ cong vẩy xếp lớp nổi khối cho ngói đỏ. |
+| `norm_roof_tiles_teal.png` | `res://Assets/Textures/Tileable/norm_roof_tiles_teal.png` | PNG (RGB8) | 256x256 | **Bản đồ pháp tuyến PBR** tạo độ cong vẩy xếp lớp nổi khối cho ngói xanh ngọc. |
+| `norm_wood_seamless.png` | `res://Assets/Textures/Tileable/norm_wood_seamless.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** tạo thớ vân gỗ nổi tự nhiên cho nội thất, sàn và hàng rào. |
+| `norm_rock_seamless.png` | `res://Assets/Textures/Tileable/norm_rock_seamless.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** tạo rãnh nứt vách đá sừng sững. |
+| `norm_dirt_seamless.png` | `res://Assets/Textures/Tileable/norm_dirt_seamless.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** tạo sỏi đá hữu cơ trên đường mòn. |
+| `norm_metal_seamless.png` | `res://Assets/Textures/Tileable/norm_metal_seamless.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** tạo phay xước vi mô kim loại. |
+| `norm_anvil_iron.png` | `res://Assets/Textures/Tileable/norm_anvil_iron.png` | PNG (RGB8) | 512x512 | **Bản đồ pháp tuyến PBR** tạo độ lõm búa rèn đe sắt. |
 
 ---
 
@@ -68,7 +79,24 @@
 
 ---
 
-## 4. Vật Liệu Godot Dùng Chung (`Assets/Materials_Shared/*.tres`)
+## 4. Hệ Thống Icon Vật Phẩm Túi Đồ RPG (`Assets/Textures/Items/`)
+*Bộ 9 icon vật phẩm 64x64 pixel nét căng chuẩn Stylized, tách nền Alpha trong suốt 100%, có viền khối rõ nét và ánh sáng bắt mắt cho giao diện Inventory / Quick Slot.*
+
+| Tên File Icon | Đường Dẫn Icon (`res://`) | Định Dạng (Format) | Độ Phân Giải | Ý Nghĩa, Nguồn Gốc & Đặc Điểm Nhận Diện |
+| :--- | :--- | :--- | :--- | :--- |
+| `icon_baguette.png` | `res://Assets/Textures/Items/icon_baguette.png` | PNG (RGBA8) | 64x64 | **Bánh Mì Baguette Nướng Vàng Giòn**: Ổ bánh mì mật ong nướng giòn với 4 khía rãnh vàng ươm, ruột bánh xốp mịn và phủ phấn bột mì trắng; sản phẩm của Đầu Bếp Gusteau. |
+| `icon_potion_speed.png` | `res://Assets/Textures/Items/icon_potion_speed.png` | PNG (RGBA8) | 64x64 | **Thuốc Tăng Tốc (Speed Potion)**: Bình thủy tinh bầu tròn nút bần chứa dung dịch ma thuật màu cyan phát quang rực rỡ, bọt khí nổi và vệt gió lốc tốc độ; pha chế bởi Nhà Giả Kim Aria. |
+| `icon_potion_health.png` | `res://Assets/Textures/Items/icon_potion_health.png` | PNG (RGBA8) | 64x64 | **Thuốc Hồi Máu (Health Potion)**: Bình thủy tinh bầu tròn buộc dây thừng nút bần, chứa thần dược màu đỏ cam ruby tỏa hào quang chữ thập chữa lành; dùng hồi phục thể lực cho nhân vật. |
+| `icon_iron_ore.png` | `res://Assets/Textures/Items/icon_iron_ore.png` | PNG (RGBA8) | 64x64 | **Quặng Sắt Thô (Iron Ore)**: Khối đá khoáng sản vát cạnh sắc nét, lộ các tinh thể kim loại bạc sáng lấp lánh; khai thác bởi Thợ Mỏ Brock dùng rèn trang bị tại lò rèn Vulcan. |
+| `icon_wood_log.png` | `res://Assets/Textures/Items/icon_wood_log.png` | PNG (RGBA8) | 64x64 | **Khúc Gỗ Sồi Nâu Ấm (Wood Log)**: Thân gỗ sồi nâu ấm chắc nịch, mặt cắt tròn lộ rõ vân vòng năm sinh trưởng và mầm lá sồi xanh tươi; khai thác bởi Tiều Phu Grover. |
+| `icon_herb.png` | `res://Assets/Textures/Items/icon_herb.png` | PNG (RGBA8) | 64x64 | **Bó Thảo Mộc Xanh Biếc (Herb Bundle)**: Bó lá dược thảo xanh mướt điểm xuyết hoa tím thảo mộc và giọt sương mai, cột nơ dây thừng vàng; nguyên liệu giả kim thuật của Aria. |
+| `icon_fish.png` | `res://Assets/Textures/Items/icon_fish.png` | PNG (RGBA8) | 64x64 | **Cá Tươi Bến Cảng (Fresh Fish)**: Cá biển tươi sống uốn mình bật nhảy, lưng xanh đại dương, bụng ánh bạc lấp lánh và vây cam san hô; câu bởi Ngư Dân Finn. |
+| `icon_cabbage.png` | `res://Assets/Textures/Items/icon_cabbage.png` | PNG (RGBA8) | 64x64 | **Bắp Cải Xanh Tươi (Fresh Cabbage)**: Bắp cải tròn mọng nước nhiều lớp lá xoăn xanh tươi vườn rau, gân lá trắng giòn và đọng sương; thu hoạch từ nông trại George. |
+| `icon_key.png` | `res://Assets/Textures/Items/icon_key.png` | PNG (RGBA8) | 64x64 | **Chìa Khóa Cổ Vàng Đồng (Antique Key)**: Chìa khóa đúc đồng thau chạm khắc hoa văn cổ điển, chuôi cỏ bốn lá và răng cưa tinh xảo; dùng mở rương báu và các cánh cửa bí mật trong làng. |
+
+---
+
+## 5. Vật Liệu Godot Dùng Chung (`Assets/Materials_Shared/*.tres`)
 *Vật liệu `StandardMaterial3D` chuẩn Godot 4, sẵn sàng kéo thả trực tiếp vào MeshInstance3D hoặc gán vào Scene.*
 
 | Tên Material | Đường Dẫn (`res://`) | Texture Gốc Sử Dụng | Mục Đích & Thuộc Tính (`Albedo`, `Roughness`, `Metallic`) |
@@ -81,6 +109,7 @@
 | `M_Rock_Mountain_Purple.tres` | `res://Assets/Materials_Shared/M_Rock_Mountain_Purple.tres` | `mask_rock_detail.png` | Núi đá tím huyền ảo viễn cảnh. Albedo `Color(0.72, 0.58, 0.84, 1)`, Roughness 0.85. |
 | `M_Wood.tres` | `res://Assets/Materials_Shared/M_Wood.tres` | `tex_wood_seamless.png` | Thùng gỗ, sàn gỗ, bàn ghế nội thất sồi ấm. Triplanar UV, Roughness 0.75. |
 | `M_Wood_Fence.tres` | `res://Assets/Materials_Shared/M_Wood_Fence.tres` | `tex_wood_seamless.png` | Hàng rào gỗ rustic bao quanh đài cao. Albedo `Color(0.65, 0.48, 0.32, 1)`, Roughness 0.75. |
+| `M_Door_Wood.tres` | `res://Assets/Materials_Shared/M_Door_Wood.tres` | `tex_door_wood.png` | Cửa gỗ dày có vân kèm nẹp sắt rèn và đinh tán 3D cho toàn bộ công trình. Albedo trắng thuần, Metallic 0.15, Roughness 0.70. |
 | `M_Forge_Brick.tres` | `res://Assets/Materials_Shared/M_Forge_Brick.tres` | `tex_forge_brick.png` | Gạch nung đỏ lò rèn Vulcan, ống khói, lò nướng Gusteau. Triplanar UV, Roughness 0.80. |
 | `M_Anvil_Iron.tres` | `res://Assets/Materials_Shared/M_Anvil_Iron.tres` | `tex_anvil_iron.png` | Sắt đen rèn thô, đe sắt, búa tạ, đai sắt. Metallic 0.88, Roughness 0.38. |
 | `M_Carpet_Tribal.tres` | `res://Assets/Materials_Shared/M_Carpet_Tribal.tres` | `tex_carpet_tribal.png` | Thảm hoa văn thổ cẩm phòng Nhà Giả Kim và Nhà Dân. Triplanar UV, Roughness 0.90. |
@@ -97,3 +126,4 @@
 | `M_Stone_Cobble.tres` | `res://Assets/Materials_Shared/M_Stone_Cobble.tres` | `tex_stone_cobble.png` | Đá cuội lò rèn, ống khói, giếng đá, lò nướng. Triplanar UV, Roughness 0.80. |
 | `M_Mystic_Cyan.tres` | `res://Assets/Materials_Shared/M_Mystic_Cyan.tres` | N/A (Emission) | Vạc ma thuật, khói phép thuật. Albedo `Color(0.2, 0.85, 0.8, 0.85)`, Emission x2.0 cyan. |
 | `M_Lava_Fire.tres` | `res://Assets/Materials_Shared/M_Lava_Fire.tres` | N/A (Emission) | Lửa lò rèn, lò nướng bánh, lò luyện quặng. Albedo `Color(1.0, 0.45, 0.05, 1)`, Emission x2.5 vàng cam. |
+| `M_Lantern_Glow.tres` | `res://Assets/Materials_Shared/M_Lantern_Glow.tres` | N/A (Emission) | Đèn lồng treo tường làng, đèn bến cảng, đèn bàn ấm áp. Albedo `Color(1.0, 0.85, 0.45, 0.95)`, Emission x3.0 vàng hổ phách, Roughness 0.20. |
