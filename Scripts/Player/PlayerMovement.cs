@@ -46,6 +46,8 @@ public partial class PlayerMovement : CharacterBody3D
 		SafeMargin = 0.08f;
 		MaxSlides = 6;
 		WallMinSlideAngle = Mathf.DegToRad(15.0f);
+		CollisionLayer = (1 << 0) | (1 << 1);
+		CollisionMask = 1 << 0;
 		if (!IsInGroup("Player")) AddToGroup("Player");
 		VisualNode ??= (Node3D?)FindChild("Character_Armature") ?? (Node3D?)FindChild("CharacterModel");
 		SpawnPosition = GlobalPosition;
@@ -113,7 +115,6 @@ public partial class PlayerMovement : CharacterBody3D
 			if (Velocity.Y < 0.0f) Velocity = new Vector3(Velocity.X, -0.1f, Velocity.Z);
 			return;
 		}
-
 		Velocity = new Vector3(Velocity.X, Velocity.Y - (Gravity * delta), Velocity.Z);
 	}
 
@@ -131,7 +132,6 @@ public partial class PlayerMovement : CharacterBody3D
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
 		FloorSnapLength = 0.0f;
-
 		Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
 		EmitSignal(SignalName.Jumped);
 	}

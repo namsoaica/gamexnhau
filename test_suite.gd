@@ -54,29 +54,39 @@ func _process(delta: float) -> bool:
 			capture_screenshot("res://docs/test_screenshots/1_map_overview.png", "1_map_overview.png (Giao lộ 2 Map liền kề)")
 			# Prepare for Phase 2: Interior view of Blacksmith
 			var player = test_map.find_child("Player", true, false)
-			var smith_zone = test_map.find_child("InteriorZone_Smith", true, false)
 			if player:
-				player.TeleportTo(Vector3(-11.5, 0.5, 20.5))
-			if smith_zone and player:
-				smith_zone.emit_signal("body_entered", player)
+				player.TeleportTo(Vector3(-11.0, 1.6, 21.0))
 			test_phase = 2
 			phase_frame = 0
 		return false
 
 	# Phase 2: 2_interior_view.png (Bên trong nhà Seamless Interior Transition)
 	elif test_phase == 2:
-		if phase_frame >= 20:
+		var player = test_map.find_child("Player", true, false)
+		var roof = test_map.find_child("Roof_Smith", true, false)
+		var cam = test_map.find_child("IsometricCamera", true, false)
+		var bld_mgr = test_map.find_child("BuildingInteriorManager", true, false)
+
+		if phase_frame == 10:
+			assert_true(roof != null and roof.visible == false, "Physics Transition: Roof_Smith hidden when player enters InteriorZone_Smith")
+			assert_true(cam != null and is_equal_approx(cam.TargetZoomSize, 9.5), "Physics Transition: Camera TargetZoomSize == 9.5f inside Blacksmith")
+			if cam:
+				cam.ResetToPlayer()
+				var target_focal = Vector3(-11.0, 1.6, 21.0) + cam.Offset
+				assert_true(cam.global_position.distance_to(target_focal) < 1.0, "Physics Transition: Camera focal point targets Blacksmith interior room center")
+			var toast_lbl = bld_mgr.find_child("*Label*", true, false) if bld_mgr else null
+			assert_true(toast_lbl != null and toast_lbl.text.contains("🏠 Đã bước vào Tiệm Rèn - Góc nhìn nội thất"), "Physics Transition: Toast banner displays '🏠 Đã bước vào Tiệm Rèn - Góc nhìn nội thất'")
+		elif phase_frame == 20:
 			capture_screenshot("res://docs/test_screenshots/2_interior_view.png", "2_interior_view.png (Nội thất Seamless Transition)")
-			# Reset interior
-			var player = test_map.find_child("Player", true, false)
-			var smith_zone = test_map.find_child("InteriorZone_Smith", true, false)
-			if smith_zone and player:
-				smith_zone.emit_signal("body_exited", player)
+			if player:
+				player.TeleportTo(Vector3(-11.0, 1.6, 12.0))
+		elif phase_frame == 28:
+			assert_true(roof != null and roof.visible == true, "Physics Transition: Roof_Smith restored visible when player exits")
+			assert_true(cam != null and is_equal_approx(cam.TargetZoomSize, 17.5), "Physics Transition: Camera TargetZoomSize restored to 17.5f upon exit")
 			# Prepare for Phase 3: Interact with NPC
 			var npc = test_map.find_child("Npc_Blacksmith", true, false)
 			if player and npc:
 				player.TeleportTo(npc.global_position + Vector3(0.0, 0.0, 1.8))
-				var cam = test_map.find_child("IsometricCamera", true, false)
 				if cam:
 					cam.ResetToPlayer()
 				npc.Interact(player)
@@ -88,6 +98,7 @@ func _process(delta: float) -> bool:
 	elif test_phase == 3:
 		if phase_frame >= 15:
 			capture_screenshot("res://docs/test_screenshots/3_npc_ui.png", "3_npc_ui.png (Hộp thoại tương tác NPC)")
+			capture_screenshot("res://docs/test_screenshots/3_npc_dialogue.png", "3_npc_dialogue.png (Hội thoại tương tác NPC)")
 			# Close dialog
 			var dialog = test_map.find_child("NpcInteractionDialog", true, false)
 			if dialog:
@@ -116,6 +127,7 @@ func _process(delta: float) -> bool:
 	elif test_phase == 4:
 		if phase_frame >= 15:
 			capture_screenshot("res://docs/test_screenshots/4_devtools_ui.png", "4_devtools_ui.png (Bảng Dev HUD & Menu Cài Đặt)")
+			capture_screenshot("res://docs/test_screenshots/4_dev_overlay.png", "4_dev_overlay.png (Bảng Dev HUD & Menu Cài Đặt)")
 			var dev = test_map.find_child("DevOverlay", true, false)
 			if dev:
 				dev.SetDevModeVisible(false)

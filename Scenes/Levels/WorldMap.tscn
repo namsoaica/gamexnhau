@@ -94,6 +94,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -4)
 
 [node name="InteriorZone_Smith" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.6, 21)
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("9_interior")
 BuildingName = "Tiệm Rèn"
 ExteriorCameraZoom = 17.5
@@ -113,6 +115,8 @@ omni_range = 8.0
 
 [node name="InteriorZone_Alchemist" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.6, 21)
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("9_interior")
 BuildingName = "Hiệu Thuốc"
 ExteriorCameraZoom = 17.5
@@ -132,6 +136,8 @@ omni_range = 8.0
 
 [node name="InteriorZone_Chef" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, 7.5)
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("9_interior")
 BuildingName = "Quán Rượu"
 ExteriorCameraZoom = 17.5
@@ -151,6 +157,8 @@ omni_range = 8.0
 
 [node name="InteriorZone_House" type="Area3D" parent="." node_paths=PackedStringArray("InteriorLight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.5, 28.5)
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("9_interior")
 BuildingName = "Nhà Dân"
 ExteriorCameraZoom = 17.5

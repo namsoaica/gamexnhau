@@ -19,7 +19,7 @@
 ### A. Scripts (`Scripts/`)
 | File Script | UID | Trách Nhiệm (Single Responsibility) |
 | :--- | :--- | :--- |
-| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, dịch chuyển tức thời `TeleportTo`, **tự động khóa đứng im hoàn toàn khi Chế Độ Camera Tự Do (Free Cam) đang bật**. |
+| `Scripts/Player/PlayerMovement.cs` | `uid://bat3uly7f4c8o` | Vật lý di chuyển, gia tốc, trọng lực, Coyote Time (0.15s), Jump Buffer (0.15s), xoay mặt theo góc nhìn Camera Isometric chuẩn hóa `Input.GetVector`, mặt quay chuẩn hướng di chuyển `+Z` với `Mathf.Atan2(horizontalVelocity.X, horizontalVelocity.Y)`, cấu hình `SafeMargin = 0.08f`, `MaxSlides = 6`, `WallMinSlideAngle = 15°` chống kẹt mép dốc, `FloorMaxAngle = 58°` hỗ trợ leo dốc/thang, `FloorSnapLength = 0.40f` bám dốc chống nảy, cấu hình `CollisionLayer = 3` ((1<<0) \| (1<<1)) đảm bảo Area3D luôn phát hiện Player, dịch chuyển tức thời `TeleportTo`, **tự động khóa đứng im hoàn toàn khi Chế Độ Camera Tự Do (Free Cam) đang bật**. |
 | `Scripts/Player/PlayerAnimation.cs` | `uid://dic3neyglppy0` | Đồng bộ hoạt ảnh (`Idle`, `Walk`, `Jump`); tự động nhận diện track AnimationPlayer, tự chuyển sang Procedural Lean/Bobbing khi chưa có clip, **giữ nguyên trạng thái `Idle` và triệt tiêu lean/bobbing khi Free Cam đang bật**. |
 | `Scripts/Player/PlayerCombat.cs` | `uid://bm2xb2wbrsbx4` | Quản lý hệ thống tấn công cơ bản của người chơi: kích hoạt hoạt ảnh Attack, Area3D hitbox gây sát thương lên các thực thể `IDamageable`, xử lý cooldown và an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Player/PlayerInteractor.cs` | `uid://dyarx2jkxgfyv` | Quản lý việc dò tìm và tương tác với các thực thể `IInteractable` gần nhất trong bán kính `ScanRadius`, phát signal cho UI, an toàn bộ nhớ trong `_ExitTree`. |
@@ -32,9 +32,9 @@
 | `Scripts/Core/VoidKillZone.cs` | `uid://dwpklcl7pp863` | Area3D vực sâu bao phủ bản đồ, tự ghi nhớ vị trí ban đầu và hồi sinh Player khi rơi ra ngoài, triệt tiêu vận tốc rơi, an toàn bộ nhớ trong `_ExitTree`. |
 | `Scripts/Core/CameraFollow.cs` | `uid://c7kqoh0ntwdus` | Camera điều khiển góc nhìn Isometric bám theo Player và hỗ trợ Chế Độ Tự Do (Free Cam 6-DOF), hỗ trợ chuyển đổi tâm nhìn và zoom cho chuyển đổi nội thất (`SetInteriorFocus`, `ResetInteriorFocus`), cung cấp static singleton `Instance`, tự chuyển đổi `Perspective`/`Orthogonal`, hỗ trợ thu phóng con lăn chuột mượt mà và zoom bằng cần gạt phải tay cầm (`MinZoomSize = 8`, `MaxZoomSize = 35`, `ZoomSpeed = 1.5`, `ZoomSmoothness = 10`), an toàn bộ nhớ trong `_ExitTree()`. |
 | `Scripts/Core/FreeCameraController.cs` | `uid://lkkgtwutvfgt` | Bộ điều khiển bay tự do 6-DOF cho camera chế độ debug/dev, điều khiển chuột xoay góc nhìn 360 độ và bàn phím bay tự do. |
-| `Scripts/Core/InteriorZone.cs` | `uid://hxqpxcpfv4oe` | Vùng chuyển đổi nội thất liền mạch (Seamless Interior Transition): Tự động ẩn mái nhà, tường trước và collider khi Player bước vào trong nhà, bật đèn ấm nội thất `OmniLight3D`, kích hoạt zoom gần và tâm ngắm của camera nội thất. |
-| `Scripts/Core/BuildingInteriorArea.cs` | `uid://dkubunity3oji` | Vùng chuyển đổi nội thất cho từng công trình trong làng, kế thừa `InteriorZone`, cung cấp zoom 9.5f và góc nhìn diorama cắt vách không bị che khuất. |
-| `Scripts/Core/BuildingInteriorManager.cs` | `uid://f4kh13ki1vav` | Quản lý tập trung hệ thống chuyển đổi góc nhìn nội thất liền mạch trong làng, quản lý và thông báo sự kiện chuyển đổi. |
+| `Scripts/Core/InteriorZone.cs` | `uid://hxqpxcpfv4oe` | Vùng chuyển đổi nội thất liền mạch (Seamless Interior Transition): Cấu hình `CollisionMask = 3` ((1<<0) \| (1<<1)), phương thức nhận diện an toàn `IsPlayerBody(body)`, tự động ẩn mái nhà, tường trước và collider khi Player bước vào trong nhà, bật đèn ấm nội thất `OmniLight3D`, kích hoạt zoom gần và tâm ngắm của camera nội thất. |
+| `Scripts/Core/BuildingInteriorArea.cs` | `uid://dkubunity3oji` | Vùng chuyển đổi nội thất cho từng công trình trong làng, kế thừa `InteriorZone`, trực tiếp cấu hình `CameraFollow.Instance?.SetInteriorFocus(roomCenter, InteriorCameraZoom)` ngay khi `OnBodyEntered`, cung cấp zoom 9.5f và góc nhìn diorama cắt vách không bị che khuất, phát thông báo cho `BuildingInteriorManager`. |
+| `Scripts/Core/BuildingInteriorManager.cs` | `uid://f4kh13ki1vav` | Quản lý tập trung hệ thống chuyển đổi góc nhìn nội thất liền mạch trong làng, quản lý và thông báo sự kiện chuyển đổi, tích hợp giao diện Toast Banner CanvasLayer (layer 15) với PanelContainer bo góc mờ và Tween thông báo ra vào nhà sinh động (vàng kim #FFE05A khi vào nhà, xanh ngọc dịu #73F299 khi ra ngoài). |
 | `Scripts/Core/DisplaySettingsManager.cs` | `uid://bf6cpcl5snmh6` | Singleton quản lý cấu hình hiển thị, độ phân giải đa màn hình (720p đến 4K), chế độ cửa sổ (Windowed, Borderless, Fullscreen), Target FPS (30, 60, 120, 144, Unlimited), VSync, lưu trữ bền vững tại `user://settings.cfg`. |
 | `Scripts/Core/MapAutoCollision.cs` | `uid://7j1cd1f4exa7` | Tự động phát hiện mesh địa hình, sinh `Trimesh Collision` hai mặt (`BackfaceCollision = true`), tự động gán vật liệu từ danh mục `TEXTURE_CATALOG.md` cho các phân khu bản đồ. |
 | `Scripts/Core/MaterialCatalogHelper.cs` | `uid://ban5idixs5g1w` | Hỗ trợ phân loại và ánh xạ tài nguyên vật liệu `.tres` dùng chung dựa trên tên mesh (`foliage`, `cobble`, `roof`, `wood`, `dirt`...). |
@@ -860,3 +860,31 @@
      * Thực thi Quy tắc Chữa Mù Đồng Bộ Tài Liệu: Quét toàn bộ 36 file `.cs` trong `Scripts/`, 10 file `.tscn` trong `Scenes/`, toàn bộ model trong `Assets/Models/`, textures trong `Assets/Textures/`, materials trong `Assets/Materials_Shared/`.
      * Cập nhật đồng bộ toàn diện vào `docs/PROJECT_STATE.md`, `PROJECT_STATE.md`, `docs/TASKS.md`, `TASKS.md` và `docs/SESSION_HISTORY.md`.
      * Báo cáo kết quả hoàn thành cho Lead Orchestrator.
+
+
+### [2026-11-08] - Khắc Phục Triệt Để Lỗi Seamless Interior Transition Camera Zoom & Focus, Chuẩn Hóa Physics Bitmask và Tích Hợp Toast Banner Hệ Thống
+1. **Nguyên Nhân Gốc Rễ Lỗi Chuyển Đổi Góc Nhìn & Camera Zoom**:
+   - Lệch Bitmask va chạm vật lý giữa nhân vật Player (`CharacterBody3D` ở layer 1) và các vùng chuyển đổi `InteriorZone` (`Area3D` có collision mask = 2), dẫn đến khi người chơi điều khiển Player bước vào cửa nhà trong gameplay thực tế, engine vật lý Godot không phát ra tín hiệu `BodyEntered`.
+   - Hệ quả: Mái nhà không ẩn, đèn phòng không bật, camera không chuyển tâm ngắm và không zoom cận cảnh vào phòng diorama.
+2. **Giải Pháp Chuẩn Hóa Bitmask Vật Lý & Khắc Phục Camera Focus**:
+   - Cập nhật `PlayerMovement.cs` và `Scenes/Characters/Player.tscn`: Thiết lập `CollisionLayer = (1 << 0) | (1 << 1)` (= 3, cả Layer 1 World và Layer 2 Player) và `CollisionMask = 1`.
+   - Cập nhật `InteriorZone.cs`, `BuildingInteriorArea.cs`, `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/WorldMap.tscn`: Thiết lập `CollisionMask = (1 << 0) | (1 << 1)` (= 3).
+   - Tối ưu hóa nhận diện Player qua hàm trợ lý tĩnh `IsPlayerBody(Node3D body) => body.IsInGroup("Player") || body.Name == "Player"`.
+   - Bổ sung lệnh thiết lập tiêu cự camera `CameraFollow.Instance?.SetInteriorFocus(roomCenter, InteriorCameraZoom)` trực tiếp trong `BuildingInteriorArea.OnBodyEntered`, đảm bảo chuyển góc nhìn cận cảnh diorama (~9.5f) mượt mà và khôi phục zoom toàn cảnh (~17.5f) khi bước ra ngoài.
+3. **Tích Hợp Toast Banner Hệ Thống Ra Vào Nhà Trong `BuildingInteriorManager.cs`**:
+   - Xây dựng hệ thống UI Toast Banner nhẹ, thanh lịch bằng Godot Containers & Anchors:
+     * `CanvasLayer` (Layer 15) đảm bảo hiển thị nổi trên màn chơi nhưng không che khuất Dev HUD.
+     * `PanelContainer` tự co giãn bo góc 8px với `StyleBoxFlat` màu nền đen huyền bí bán trong suốt `rgba(20, 23, 36, 0.88)` và viền màu điểm nhấn 2px.
+     * `Label` căn giữa với cỡ chữ 15pt rõ ràng.
+     * Hiệu ứng chuyển động mượt mà bằng `Tween`: Hiện dần `modulate:a` từ 0 lên 1 trong 0.25s, duy trì 2.2s, rồi mờ dần về 0 trong 0.45s.
+     * Khi bước vào nhà: `"Đã vào: {BuildingName}"` với viền vàng kim ấm áp `Color(1.0f, 0.85f, 0.35f)`.
+     * Khi bước ra ngoài: `"Đã ra ngoài - Góc nhìn toàn cảnh"` với viền xanh ngọc thanh thoát `Color(0.45f, 0.95f, 0.6f)`.
+4. **Kiểm Định Chất Lượng & Visual Playtest Nghiệm Thu Toàn Diện**:
+   - **Gatekeeper Clean Code & Build**: Sub-agent `@csharp-inspector` chạy `python tools/supervisor_gate.py` xác thực 100% tệp C# < 200 dòng, mọi hàm < 25 dòng, giải phóng sự kiện `-=` trong `_ExitTree()`, Input Action đã đăng ký, `dotnet build` đạt **0 Cảnh báo, 0 Lỗi (100% PASS)**.
+   - **Windowed Visual Playtest**: Sub-agent `@chief-supervisor` chạy `test_suite.gd` trên Godot Windowed Console (D3D12/Vulkan Forward+ render, CẤM `--headless`) đạt **465 / 465 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**.
+   - **Xác Thực Mắt Thần Bộ 4 Ảnh Chụp Màn Hình Mới Nhất**:
+     * `docs/test_screenshots/1_map_overview.png`: Toàn cảnh thế giới kết nối liền mạch, giao lộ 2 map, 8 NPC và cảnh quan làng.
+     * `docs/test_screenshots/2_interior_view.png`: Bên trong phòng Nhà Rèn lát cắt diorama, camera zoom cận cảnh 9.5f, mái và tường trước ẩn sạch sẽ, lò rèn than hồng và các trang bị nội thất hiển thị sắc nét.
+     * `docs/test_screenshots/3_npc_dialogue.png` (cùng `3_npc_ui.png`): Hộp thoại tương tác RPG hiển thị Avatar HD của NPC và danh sách tùy chọn hành động.
+     * `docs/test_screenshots/4_dev_overlay.png` (cùng `4_devtools_ui.png`): Menu Cài Đặt Game và Dev Overlay HUD 6 tabs co giãn linh hoạt.
+   - Cả hai Giám sát viên `@csharp-inspector` và `@chief-supervisor` đã ký duyệt **100% PASS Toàn Cục**.

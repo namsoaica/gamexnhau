@@ -125,6 +125,15 @@ Tài liệu này quản lý toàn bộ các đầu việc trong dự án, phân 
   - (4) **Ca 4 (Nghiệm Thu Toàn Cục & Cập Nhật Tài Liệu)**: `@chief-supervisor` & `@producer`:
     * `@chief-supervisor` chạy `test_suite.gd` trên Godot Windowed Console đạt **457 / 457 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**, chụp bộ 4 ảnh màn hình mới nhất vào `docs/test_screenshots/`, soi Vision Side-by-Side đối chiếu `modelyeucau/map2/1.jpg` xác nhận chất lượng thị giác hoàn hảo; ký duyệt **100% PASS Toàn Cục**.
     * `@producer` quét kiểm tra 36 script C#, 10 scenes, models, textures và đồng bộ hóa toàn diện tài liệu dự án theo Quy Tắc Chữa Mù Đồng Bộ Tài Liệu. Ký duyệt **100% PASS Toàn Cục**.
+- [x] **[AI - csharp-coder, csharp-inspector & chief-supervisor]** Khắc phục lỗi Seamless Interior Transition Camera Zoom & Focus, chuẩn hóa Bitmask va chạm vật lý và tích hợp Toast Banner thông báo:
+  - (1) **Nguyên nhân gốc rễ**: Lệch bitmask va chạm vật lý giữa Player (`CharacterBody3D` ở layer 1) và `InteriorZone` (`Area3D` có collision mask = 2), khiến engine vật lý Godot không kích hoạt tín hiệu `BodyEntered` khi Player bước vào trong nhà trong chế độ chơi thực tế.
+  - (2) **Sửa Bitmask vật lý CharacterBody3D vs Area3D**: Thiết lập `CollisionLayer = (1 << 0) | (1 << 1)` (= 3, cả Layer 1 World và Layer 2 Player) trong `PlayerMovement.cs` và `Player.tscn`; cấu hình `CollisionMask = (1 << 0) | (1 << 1)` (= 3) trong `InteriorZone.cs`, `BuildingInteriorArea.cs`, `VillageMap.tscn` và `WorldMap.tscn`. Đảm bảo Area3D luôn nhận diện chính xác 100% sự kiện bước vào/ra nhà của Player.
+  - (3) **Khắc phục lỗi Camera Zoom & Focus**: Bổ sung `SetInteriorFocus(roomCenter, InteriorCameraZoom)` trực tiếp trong `BuildingInteriorArea.OnBodyEntered`, mượt mà chuyển góc nhìn cận cảnh diorama (~9.5f) và khôi phục zoom toàn cảnh (~17.5f) khi bước ra ngoài.
+  - (4) **Tích hợp Toast Banner thông báo ra vào nhà**: Bổ sung giao diện thông báo động trong `BuildingInteriorManager.cs` (CanvasLayer layer 15, PanelContainer bo góc mờ với StyleBoxFlat viền màu điểm nhấn, chữ nổi 15pt căn giữa, Tween animate mượt mà hiện `modulate:a` 0 -> 1 -> 0). Khi vào nhà hiển thị: `"Đã vào: {BuildingName}"` (màu vàng kim #FFE05A), khi ra ngoài hiển thị: `"Đã ra ngoài - Góc nhìn toàn cảnh"` (màu xanh ngọc dịu #73F299).
+  - (5) **Kiểm định chất lượng Clean Code & Windowed Playtest**:
+    * `@csharp-inspector` chạy `tools/supervisor_gate.py`: 100% hàm < 25 dòng, file < 200 dòng, an toàn bộ nhớ `-=` trong `_ExitTree()`, Input Action đã đăng ký, `dotnet build` đạt 0 lỗi 0 cảnh báo. Ký duyệt **100% PASS**.
+    * `@chief-supervisor` cập nhật và thực thi `test_suite.gd` trên Godot Windowed Console đạt **465 / 465 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**.
+    * Chụp và tự soi bộ 4 ảnh màn hình mới nhất (`1_map_overview.png`, `2_interior_view.png`, `3_npc_dialogue.png`, `4_dev_overlay.png` cùng `3_npc_ui.png`, `4_devtools_ui.png`), xác nhận hiệu ứng Seamless Interior Transition hoạt động hoàn hảo trong gameplay thực tế; ký duyệt **100% PASS Toàn Cục**.
 
 ---
 

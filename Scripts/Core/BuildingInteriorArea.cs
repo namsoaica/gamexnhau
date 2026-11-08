@@ -28,22 +28,21 @@ public partial class BuildingInteriorArea : InteriorZone
 	protected override void OnBodyEntered(Node3D body)
 	{
 		base.OnBodyEntered(body);
-		if (body.IsInGroup("Player") || body.Name == "Player")
-		{
-			BuildingInteriorManager.Instance?.NotifyBuildingEntered(this);
-		}
+		if (!IsPlayerBody(body)) return;
+		Vector3 roomCenter = GlobalPosition + RoomCenterOffset;
+		CameraFollow.Instance?.SetInteriorFocus(roomCenter, InteriorCameraZoom);
+		BuildingInteriorManager.Instance?.NotifyBuildingEntered(this);
 	}
 
 	protected override void OnBodyExited(Node3D body)
 	{
 		base.OnBodyExited(body);
-		if (body.IsInGroup("Player") || body.Name == "Player")
+		if (!IsPlayerBody(body)) return;
+		CameraFollow.Instance?.SetInteriorFocus(null, null);
+		if (CameraFollow.Instance != null && ExteriorCameraZoom > 0f)
 		{
-			BuildingInteriorManager.Instance?.NotifyBuildingExited(this);
-			if (CameraFollow.Instance != null && ExteriorCameraZoom > 0f)
-			{
-				CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
-			}
+			CameraFollow.Instance.TargetZoomSize = ExteriorCameraZoom;
 		}
+		BuildingInteriorManager.Instance?.NotifyBuildingExited(this);
 	}
 }

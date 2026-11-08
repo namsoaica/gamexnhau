@@ -26,7 +26,7 @@ public partial class InteriorZone : Area3D
 	public override void _Ready()
 	{
 		CollisionLayer = 0;
-		CollisionMask = 1 << 1; // Layer 2: Player
+		CollisionMask = (1 << 0) | (1 << 1);
 
 		CollectArchitectureNodes();
 		ConfigureInitialState();
@@ -85,17 +85,19 @@ public partial class InteriorZone : Area3D
 
 	protected virtual void OnBodyEntered(Node3D body)
 	{
-		if (!body.IsInGroup("Player") && body.Name != "Player") return;
+		if (!IsPlayerBody(body)) return;
 		_isPlayerInside = true;
 		SetInteriorState(true);
 	}
 
 	protected virtual void OnBodyExited(Node3D body)
 	{
-		if (!body.IsInGroup("Player") && body.Name != "Player") return;
+		if (!IsPlayerBody(body)) return;
 		_isPlayerInside = false;
 		SetInteriorState(false);
 	}
+
+	protected static bool IsPlayerBody(Node3D body) => body.IsInGroup("Player") || body.Name == "Player";
 
 	private void SetInteriorState(bool inside)
 	{

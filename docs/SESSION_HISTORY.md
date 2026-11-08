@@ -606,3 +606,19 @@
 - **Đồng bộ hóa toàn diện**:
   - Cập nhật `AGENTS.md`, `GEMINI.md`, `.agents/workflows/hierarchical_supervision.py`, `.agents/workflows/dev_and_review.py`, `.agents/workflows/asset_and_material_pipeline.py`.
   - Cập nhật ranh giới file trong `.agents/skills/texture-architect/SKILL.md`, `.agents/skills/blender-helper/SKILL.md`, `.agents/skills/csharp-coder/SKILL.md`.
+
+
+## Phiên làm việc: 2026-11-08 (Chiều muộn - Khắc Phục Triệt Để Seamless Interior Transition & Tích Hợp Toast Banner Hệ Thống)
+- **Phát hiện & Phân tích nguyên nhân gốc rễ (Root Cause)**:
+  * Trong quá trình trải nghiệm thực tế, khi Player di chuyển qua cửa vào 4 phòng nội thất diorama (Nhà Rèn, Hiệu Thuốc, Quán Rượu, Nhà Dân), camera không tự zoom cận cảnh vào phòng và mái nhà/tường trước không tự động ẩn.
+  * Nguyên nhân kỹ thuật: Lệch cấu hình Bitmask va chạm vật lý giữa `CharacterBody3D` của Player (`CollisionLayer = 1`) và `Area3D` của các `InteriorZone` (`CollisionMask = 2`). Godot Physics Engine chỉ kích hoạt sự kiện `BodyEntered` khi `(Player.CollisionLayer & Zone.CollisionMask) != 0`. Do `1 & 2 == 0`, Area3D hoàn toàn không phát hiện được sự xuất hiện của Player.
+- **Giải pháp xử lý triệt để**:
+  * Chuẩn hóa bitmask vật lý: Cấu hình `CollisionLayer = (1 << 0) | (1 << 1)` (= 3, thuộc cả Layer 1 World và Layer 2 Player) trong `PlayerMovement.cs` và `Scenes/Characters/Player.tscn`. Cấu hình `CollisionMask = (1 << 0) | (1 << 1)` (= 3) trong `InteriorZone.cs`, `BuildingInteriorArea.cs`, `Scenes/Levels/VillageMap.tscn` và `Scenes/Levels/WorldMap.tscn`.
+  * Tối ưu nhận diện Player: Thêm hàm helper `IsPlayerBody(Node3D body) => body.IsInGroup("Player") || body.Name == "Player"`.
+  * Khắc phục Camera Zoom & Focus: Bổ sung gọi trực tiếp `CameraFollow.Instance?.SetInteriorFocus(roomCenter, InteriorCameraZoom)` trong `BuildingInteriorArea.OnBodyEntered`, đảm bảo chuyển tiêu cự cận cảnh diorama (~9.5f) và khôi phục góc nhìn toàn cảnh (~17.5f) khi bước ra ngoài.
+  * Tích hợp UI Toast Banner hệ thống trong `BuildingInteriorManager.cs`: Thiết kế CanvasLayer (layer 15), PanelContainer bo góc mờ với StyleBoxFlat viền màu điểm nhấn, chữ nổi 15pt căn giữa, Tween animate mượt mà hiện `modulate:a` 0 -> 1 -> 0. Khi vào nhà hiển thị: `"Đã vào: {BuildingName}"` (màu vàng kim ấm áp #FFE05A), khi ra ngoài hiển thị: `"Đã ra ngoài - Góc nhìn toàn cảnh"` (màu xanh ngọc thanh thoát #73F299).
+- **Kiểm định chất lượng của 2 Giám sát viên chuyên trách**:
+  * `@csharp-inspector`: Chạy công cụ kiểm định tự động `tools/supervisor_gate.py` đảm bảo 100% C# code tuân thủ Clean Code (hàm < 25 dòng, file < 200 dòng theo `CODING_STANDARDS.md`), an toàn bộ nhớ `-=` trong `_ExitTree()`, Input Action đã đăng ký trong `project.godot`, `dotnet build` đạt **0 Cảnh báo, 0 Lỗi**. Ký duyệt **100% PASS**.
+  * `@chief-supervisor`: Cập nhật kịch bản kiểm thử `test_suite.gd` trên Godot Windowed Console, đạt **465 / 465 Test cases PASSED (100% Tuyệt đối, 0 Fail, 0 Error)**. Chụp bộ 4 ảnh màn hình mới nhất vào `docs/test_screenshots/` (`1_map_overview.png`, `2_interior_view.png`, `3_npc_dialogue.png`, `4_dev_overlay.png` cùng `3_npc_ui.png`, `4_devtools_ui.png`), dùng Vision soi ảnh trực quan xác nhận hiệu ứng chuyển đổi mượt mà hoàn hảo. Ký duyệt **100% PASS Toàn Cục**.
+- **Đồng bộ hóa tài liệu dự án**:
+  * `@producer`: Quét kiểm tra toàn bộ cây thư mục thực tế trên ổ cứng (36 file .cs, 10 file .tscn, models, textures, screenshots). Cập nhật đồng bộ `docs/TASKS.md`, `TASKS.md`, `docs/PROJECT_STATE.md`, `PROJECT_STATE.md` và `docs/SESSION_HISTORY.md`.
